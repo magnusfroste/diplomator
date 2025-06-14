@@ -9,7 +9,7 @@ interface DiplomaContextType {
   isGenerating: boolean;
   setIsGenerating: (generating: boolean) => void;
   messages: Message[];
-  setMessages: (messages: Message[]) => void;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 interface Message {
