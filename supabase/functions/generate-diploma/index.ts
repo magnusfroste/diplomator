@@ -56,6 +56,7 @@ CSS: [Complete CSS code]`;
       requestBody = {
         model: 'claude-3-sonnet-20240229',
         max_tokens: 4000,
+        system: systemPrompt,
         messages: [
           {
             role: 'user',
@@ -87,6 +88,7 @@ CSS: [Complete CSS code]`;
       requestBody = {
         model: 'claude-3-sonnet-20240229',
         max_tokens: 4000,
+        system: systemPrompt,
         messages: [
           {
             role: 'user',
@@ -95,14 +97,14 @@ CSS: [Complete CSS code]`;
         ]
       };
     } else {
-      // Regular chat
+      // Regular chat - filter out any system messages and use them as the system prompt
+      const userMessages = messages.filter(msg => msg.role !== 'system');
+      
       requestBody = {
         model: 'claude-3-sonnet-20240229',
         max_tokens: 4000,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ]
+        system: systemPrompt,
+        messages: userMessages
       };
     }
 
