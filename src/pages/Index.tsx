@@ -1,13 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import { ChatPanel } from "@/components/ChatPanel";
+import { PreviewPanel } from "@/components/PreviewPanel";
+import { DiplomaProvider } from "@/contexts/DiplomaContext";
+import { ApiKeySettings } from "@/components/ApiKeySettings";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <DiplomaProvider>
+      <div className="h-screen flex bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative">
+        <ApiKeySettings />
+        
+        {/* Chat Panel */}
+        <div className="w-1/2 border-r border-slate-200/50 bg-white/80 backdrop-blur-sm">
+          <ChatPanel />
+        </div>
+        
+        {/* Preview Panel */}
+        <div className="w-1/2 bg-gradient-to-br from-slate-100 via-blue-100 to-purple-100">
+          <PreviewPanel />
+        </div>
       </div>
-    </div>
+    </DiplomaProvider>
   );
 };
 
