@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { Bot, User } from 'lucide-react';
+import { Brain, User } from 'lucide-react';
 
 export const MessageList = () => {
   const { messages, isGenerating } = useDiploma();
@@ -23,8 +23,8 @@ export const MessageList = () => {
           className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}
         >
           {!message.isUser && (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-              <Bot className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+              <Brain className="w-4 h-4 text-white" />
             </div>
           )}
           
@@ -48,8 +48,8 @@ export const MessageList = () => {
       
       {isGenerating && (
         <div className="flex gap-3 justify-start">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <Bot className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+            <Brain className="w-4 h-4 text-white" />
           </div>
           <div className="bg-white/90 backdrop-blur-sm border border-slate-200/50 rounded-2xl px-4 py-3">
             <div className="flex gap-1">
