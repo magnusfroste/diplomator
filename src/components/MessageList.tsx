@@ -31,7 +31,7 @@ export const MessageList = () => {
           <div
             className={`max-w-[80%] rounded-2xl px-4 py-3 ${
               message.isUser
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                ? 'bg-slate-100 text-slate-800 border border-slate-200'
                 : 'bg-white/90 backdrop-blur-sm border border-slate-200/50 text-slate-900'
             }`}
           >
