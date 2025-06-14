@@ -15,8 +15,12 @@ export const MessageList = () => {
   }, [messages]);
 
   const AnthropicIcon = () => (
-    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
-      <span className="text-white font-bold text-sm">AI</span>
+    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 overflow-hidden">
+      <img 
+        src="/lovable-uploads/044b9806-cef9-4478-ad0e-3eb21af8622f.png" 
+        alt="Anthropic" 
+        className="w-6 h-6 object-contain"
+      />
     </div>
   );
 
