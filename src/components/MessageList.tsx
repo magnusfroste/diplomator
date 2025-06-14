@@ -36,9 +36,6 @@ export const MessageList = () => {
             }`}
           >
             <p className="whitespace-pre-wrap">{message.content}</p>
-            <div className={`text-xs mt-2 opacity-70 ${message.isUser ? 'text-blue-100' : 'text-slate-500'}`}>
-              {message.timestamp.toLocaleTimeString()}
-            </div>
           </div>
 
           {message.isUser && (
