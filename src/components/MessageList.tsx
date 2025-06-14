@@ -15,11 +15,11 @@ export const MessageList = () => {
   }, [messages]);
 
   const AnthropicIcon = () => (
-    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 overflow-hidden">
+    <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
       <img 
         src="/lovable-uploads/044b9806-cef9-4478-ad0e-3eb21af8622f.png" 
         alt="Anthropic" 
-        className="w-6 h-6 object-contain"
+        className="w-8 h-8 object-contain"
       />
     </div>
   );
@@ -34,15 +34,15 @@ export const MessageList = () => {
           {!message.isUser && (
             <div className="flex flex-col items-center gap-1">
               <AnthropicIcon />
-              <span className="text-xs text-slate-500 font-medium">Anthropic</span>
+              <span className="text-xs text-muted-foreground font-medium">Anthropic</span>
             </div>
           )}
           
           <div
             className={`max-w-[80%] rounded-2xl px-4 py-3 ${
               message.isUser
-                ? 'bg-slate-100 text-slate-800 border border-slate-200'
-                : 'bg-white/90 backdrop-blur-sm border border-slate-200/50 text-slate-900'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-card text-card-foreground border border-border'
             }`}
           >
             <p className="whitespace-pre-wrap">{message.content}</p>
@@ -54,13 +54,13 @@ export const MessageList = () => {
         <div className="flex gap-3 justify-start">
           <div className="flex flex-col items-center gap-1">
             <AnthropicIcon />
-            <span className="text-xs text-slate-500 font-medium">Anthropic</span>
+            <span className="text-xs text-muted-foreground font-medium">Anthropic</span>
           </div>
-          <div className="bg-white/90 backdrop-blur-sm border border-slate-200/50 rounded-2xl px-4 py-3">
+          <div className="bg-card text-card-foreground border border-border rounded-2xl px-4 py-3">
             <div className="flex gap-1">
-              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
             </div>
           </div>
         </div>
