@@ -1,7 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { Brain } from 'lucide-react';
 
 export const MessageList = () => {
   const { messages, isGenerating } = useDiploma();
@@ -15,6 +14,12 @@ export const MessageList = () => {
     scrollToBottom();
   }, [messages]);
 
+  const AnthropicIcon = () => (
+    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+      <span className="text-white font-bold text-sm">AI</span>
+    </div>
+  );
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {messages.map((message) => (
@@ -24,10 +29,8 @@ export const MessageList = () => {
         >
           {!message.isUser && (
             <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
-                <Brain className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xs text-slate-500 font-medium">Claude</span>
+              <AnthropicIcon />
+              <span className="text-xs text-slate-500 font-medium">Anthropic</span>
             </div>
           )}
           
@@ -46,10 +49,8 @@ export const MessageList = () => {
       {isGenerating && (
         <div className="flex gap-3 justify-start">
           <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
-              <Brain className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xs text-slate-500 font-medium">Claude</span>
+            <AnthropicIcon />
+            <span className="text-xs text-slate-500 font-medium">Anthropic</span>
           </div>
           <div className="bg-white/90 backdrop-blur-sm border border-slate-200/50 rounded-2xl px-4 py-3">
             <div className="flex gap-1">
