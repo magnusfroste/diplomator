@@ -15,7 +15,7 @@ export const MessageList = () => {
   }, [messages]);
 
   const AnthropicIcon = () => (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 mb-2">
       <img 
         src="/lovable-uploads/044b9806-cef9-4478-ad0e-3eb21af8622f.png" 
         alt="Anthropic" 
@@ -30,30 +30,33 @@ export const MessageList = () => {
       {messages.map((message) => (
         <div
           key={message.id}
-          className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}
+          className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
         >
-          {!message.isUser && <AnthropicIcon />}
-          
-          <div
-            className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-              message.isUser
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-card text-card-foreground border border-border'
-            }`}
-          >
-            <p className="whitespace-pre-wrap">{message.content}</p>
+          <div className={`max-w-[80%] ${message.isUser ? '' : 'flex flex-col'}`}>
+            {!message.isUser && <AnthropicIcon />}
+            <div
+              className={`rounded-2xl px-4 py-3 ${
+                message.isUser
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-card text-card-foreground border border-border'
+              }`}
+            >
+              <p className="whitespace-pre-wrap">{message.content}</p>
+            </div>
           </div>
         </div>
       ))}
       
       {isGenerating && (
-        <div className="flex gap-3 justify-start">
-          <AnthropicIcon />
-          <div className="bg-card text-card-foreground border border-border rounded-2xl px-4 py-3">
-            <div className="flex gap-1">
-              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        <div className="flex justify-start">
+          <div className="max-w-[80%] flex flex-col">
+            <AnthropicIcon />
+            <div className="bg-card text-card-foreground border border-border rounded-2xl px-4 py-3">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
             </div>
           </div>
         </div>
