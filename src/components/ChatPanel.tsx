@@ -9,6 +9,7 @@ import { generateDiploma } from '@/services/anthropicService';
 import { MessageList } from '@/components/MessageList';
 import { FileUpload } from '@/components/FileUpload';
 import { URLInput } from '@/components/URLInput';
+import { Message } from '@/contexts/DiplomaContext';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
@@ -25,7 +26,7 @@ export const ChatPanel = () => {
   const handleSendMessage = async () => {
     if (!message.trim() || isGenerating) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: message,
       isUser: true,
@@ -39,14 +40,14 @@ export const ChatPanel = () => {
     try {
       const response = await generateDiploma(message, messages);
       
-      const aiMessage = {
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: response.message,
         isUser: false,
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages((prev: Message[]) => [...prev, aiMessage]);
       
       if (response.html) {
         setDiplomaHtml(response.html);
@@ -56,13 +57,13 @@ export const ChatPanel = () => {
       }
     } catch (error) {
       console.error('Error generating diploma:', error);
-      const errorMessage = {
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, I encountered an error while generating your diploma. Please try again.',
         isUser: false,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev: Message[]) => [...prev, errorMessage]);
     } finally {
       setIsGenerating(false);
     }
