@@ -16,14 +16,12 @@ export const MessageList = () => {
 
   const AnthropicIcon = () => (
     <div className="flex items-center gap-2">
-      <div className="flex flex-col items-center">
-        <img 
-          src="/lovable-uploads/044b9806-cef9-4478-ad0e-3eb21af8622f.png" 
-          alt="Anthropic" 
-          className="w-6 h-6 object-contain"
-        />
-        <span className="text-xs text-muted-foreground font-medium">Anthropic</span>
-      </div>
+      <img 
+        src="/lovable-uploads/044b9806-cef9-4478-ad0e-3eb21af8622f.png" 
+        alt="Anthropic" 
+        className="w-6 h-6 object-contain"
+      />
+      <span className="text-xs text-muted-foreground font-medium">Anthropic</span>
     </div>
   );
 
