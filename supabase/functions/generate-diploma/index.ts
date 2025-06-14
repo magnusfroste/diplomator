@@ -24,6 +24,8 @@ serve(async (req) => {
 
     let systemPrompt = `You are an expert diploma designer. Your task is to create beautiful, professional diplomas based on user requirements. 
 
+IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
 Always respond with:
 1. A friendly message explaining what you've created
 2. Complete HTML code for the diploma
@@ -40,18 +42,25 @@ Make diplomas that are:
 - Use classic fonts like Georgia, Times New Roman, or serif fonts
 - Include proper spacing and layout
 - Use appropriate colors (often gold, navy, maroon)
-- Include decorative elements like borders, seals, ribbons
-- Have proper hierarchy for text elements`;
+- Include CSS-based decorative elements like borders, seals made with CSS shapes, ribbons using CSS
+- Have proper hierarchy for text elements
+- Create seals and emblems using CSS circles, borders, and text only
+- Use CSS gradients, shadows, and transforms for visual appeal
+- Never include <img> tags or src attributes pointing to image files`;
 
     let requestBody;
 
     if (requestType === 'image') {
       systemPrompt = `You are an expert diploma designer. Analyze the uploaded image and create a diploma design inspired by its style, colors, layout, and aesthetic elements.
 
+IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
 Format your response like this:
 MESSAGE: [Explanation of how you used the image as inspiration]
 HTML: [Complete HTML code]
-CSS: [Complete CSS code]`;
+CSS: [Complete CSS code]
+
+Create CSS-based decorative elements inspired by the image instead of referencing external files.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -63,7 +72,7 @@ CSS: [Complete CSS code]`;
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements.'
+                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files.'
               },
               {
                 type: 'image',
@@ -80,10 +89,14 @@ CSS: [Complete CSS code]`;
     } else if (requestType === 'url') {
       systemPrompt = `You are an expert diploma designer. The user has provided a website URL. Create a diploma design that would be appropriate for or inspired by this type of website/organization.
 
+IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
 Format your response like this:
 MESSAGE: [Explanation of the diploma you created based on the URL]
 HTML: [Complete HTML code]
-CSS: [Complete CSS code]`;
+CSS: [Complete CSS code]
+
+Use CSS to create decorative elements instead of referencing image files.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -92,7 +105,7 @@ CSS: [Complete CSS code]`;
         messages: [
           {
             role: 'user',
-            content: `Please create a diploma design that would be appropriate for or inspired by this website: ${url}. Consider what type of organization this might be and create a suitable diploma design.`
+            content: `Please create a diploma design that would be appropriate for or inspired by this website: ${url}. Consider what type of organization this might be and create a suitable diploma design using only CSS for visual elements.`
           }
         ]
       };
