@@ -23,8 +23,11 @@ export const MessageList = () => {
           className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}
         >
           {!message.isUser && (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
-              <Brain className="w-4 h-4 text-white" />
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+                <Brain className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">Claude</span>
             </div>
           )}
           
@@ -42,8 +45,11 @@ export const MessageList = () => {
       
       {isGenerating && (
         <div className="flex gap-3 justify-start">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
-            <Brain className="w-4 h-4 text-white" />
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+              <Brain className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xs text-slate-500 font-medium">Claude</span>
           </div>
           <div className="bg-white/90 backdrop-blur-sm border border-slate-200/50 rounded-2xl px-4 py-3">
             <div className="flex gap-1">
