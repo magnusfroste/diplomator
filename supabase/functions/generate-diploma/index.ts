@@ -26,6 +26,14 @@ serve(async (req) => {
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
+MODIFICATIONS: Users can request adjustments to their diplomas after creation. Be ready to:
+- Add or modify text, colors, fonts, and layouts
+- Add CSS animations (like floating elements, rotating seals, fade-ins, hover effects)
+- Move elements around or resize them
+- Change decorative elements or add new ones
+- Create interactive effects using CSS :hover, :focus, or keyframe animations
+- Modify the overall style, theme, or visual hierarchy
+
 Always respond with:
 1. A friendly message explaining what you've created
 2. Complete HTML code for the diploma
@@ -46,7 +54,8 @@ Make diplomas that are:
 - Have proper hierarchy for text elements
 - Create seals and emblems using CSS circles, borders, and text only
 - Use CSS gradients, shadows, and transforms for visual appeal
-- Never include <img> tags or src attributes pointing to image files`;
+- Never include <img> tags or src attributes pointing to image files
+- Be easily modifiable for user adjustments and animations`;
 
     let requestBody;
 
@@ -54,6 +63,8 @@ Make diplomas that are:
       systemPrompt = `You are an expert diploma designer. Analyze the uploaded image and create a diploma design inspired by its style, colors, layout, and aesthetic elements.
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
+MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
 Format your response like this:
 MESSAGE: [Explanation of how you used the image as inspiration]
@@ -90,6 +101,8 @@ Create CSS-based decorative elements inspired by the image instead of referencin
       systemPrompt = `You are an expert diploma designer. The user has provided a website URL. Create a diploma design that would be appropriate for or inspired by this type of website/organization.
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
+MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
 Format your response like this:
 MESSAGE: [Explanation of the diploma you created based on the URL]
