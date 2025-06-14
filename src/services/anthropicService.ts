@@ -1,5 +1,6 @@
 
 import { Message } from '@/contexts/DiplomaContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DiplomaResponse {
   message: string;
@@ -7,60 +8,27 @@ interface DiplomaResponse {
   css?: string;
 }
 
-const callAnthropicAPI = async (messages: any[]): Promise<string> => {
-  // Get API key when function is called, not at module load time
-  const ANTHROPIC_API_KEY = localStorage.getItem('anthropic_api_key');
+const callDiplomaFunction = async (payload: any): Promise<DiplomaResponse> => {
+  console.log('Calling diploma generation function...');
   
-  if (!ANTHROPIC_API_KEY) {
-    throw new Error('Anthropic API key not found. Please set it in the settings.');
-  }
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 4000,
-      messages: messages
-    })
+  const { data, error } = await supabase.functions.invoke('generate-diploma', {
+    body: payload
   });
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.statusText}`);
+  if (error) {
+    console.error('Edge function error:', error);
+    throw new Error(`Function call failed: ${error.message}`);
   }
 
-  const data = await response.json();
-  return data.content[0].text;
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  return data;
 };
 
 export const generateDiploma = async (userMessage: string, conversationHistory: Message[]): Promise<DiplomaResponse> => {
-  const systemPrompt = `You are an expert diploma designer. Your task is to create beautiful, professional diplomas based on user requirements. 
-
-  Always respond with:
-  1. A friendly message explaining what you've created
-  2. Complete HTML code for the diploma
-  3. Complete CSS code for styling
-
-  Format your response like this:
-  MESSAGE: [Your friendly explanation]
-  HTML: [Complete HTML code]
-  CSS: [Complete CSS code]
-
-  Make diplomas that are:
-  - Professional and elegant
-  - Print-ready (8.5x11 or A4 size)
-  - Use classic fonts like Georgia, Times New Roman, or serif fonts
-  - Include proper spacing and layout
-  - Use appropriate colors (often gold, navy, maroon)
-  - Include decorative elements like borders, seals, ribbons
-  - Have proper hierarchy for text elements`;
-
   const messages = [
-    { role: 'system', content: systemPrompt },
     ...conversationHistory.map(msg => ({
       role: msg.isUser ? 'user' : 'assistant',
       content: msg.content
@@ -69,20 +37,14 @@ export const generateDiploma = async (userMessage: string, conversationHistory: 
   ];
 
   try {
-    const response = await callAnthropicAPI(messages);
+    const response = await callDiplomaFunction({
+      messages,
+      requestType: 'chat'
+    });
     
-    // Parse the response to extract MESSAGE, HTML, and CSS
-    const messagePart = response.match(/MESSAGE:\s*(.*?)(?=HTML:|$)/s)?.[1]?.trim() || 'I\'ve created a diploma for you!';
-    const htmlPart = response.match(/HTML:\s*(.*?)(?=CSS:|$)/s)?.[1]?.trim() || '';
-    const cssPart = response.match(/CSS:\s*(.*?)$/s)?.[1]?.trim() || '';
-
-    return {
-      message: messagePart,
-      html: htmlPart,
-      css: cssPart
-    };
+    return response;
   } catch (error) {
-    console.error('Error calling Anthropic API:', error);
+    console.error('Error calling diploma generation function:', error);
     throw error;
   }
 };
@@ -96,45 +58,16 @@ export const generateDiplomaFromImage = async (imageFile: File): Promise<Diploma
     reader.readAsDataURL(imageFile);
   });
 
-  const systemPrompt = `You are an expert diploma designer. Analyze the uploaded image and create a diploma design inspired by its style, colors, layout, and aesthetic elements.
-
-  Format your response like this:
-  MESSAGE: [Explanation of how you used the image as inspiration]
-  HTML: [Complete HTML code]
-  CSS: [Complete CSS code]`;
-
-  const messages = [
-    {
-      role: 'user',
-      content: [
-        {
-          type: 'text',
-          text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements.'
-        },
-        {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: imageFile.type,
-            data: base64Image.split(',')[1]
-          }
-        }
-      ]
-    }
-  ];
-
   try {
-    const response = await callAnthropicAPI(messages);
+    const response = await callDiplomaFunction({
+      requestType: 'image',
+      imageData: {
+        type: imageFile.type,
+        data: base64Image.split(',')[1]
+      }
+    });
     
-    const messagePart = response.match(/MESSAGE:\s*(.*?)(?=HTML:|$)/s)?.[1]?.trim() || 'I\'ve created a diploma inspired by your image!';
-    const htmlPart = response.match(/HTML:\s*(.*?)(?=CSS:|$)/s)?.[1]?.trim() || '';
-    const cssPart = response.match(/CSS:\s*(.*?)$/s)?.[1]?.trim() || '';
-
-    return {
-      message: messagePart,
-      html: htmlPart,
-      css: cssPart
-    };
+    return response;
   } catch (error) {
     console.error('Error generating diploma from image:', error);
     throw error;
@@ -142,47 +75,25 @@ export const generateDiplomaFromImage = async (imageFile: File): Promise<Diploma
 };
 
 export const generateDiplomaFromUrl = async (url: string): Promise<DiplomaResponse> => {
-  // Note: In a real implementation, you'd need a backend service to scrape the URL
-  // For now, we'll simulate this by asking Claude to create a diploma based on the URL concept
-  
-  const systemPrompt = `You are an expert diploma designer. The user has provided a website URL. Create a diploma design that would be appropriate for or inspired by this type of website/organization.
-
-  Format your response like this:
-  MESSAGE: [Explanation of the diploma you created based on the URL]
-  HTML: [Complete HTML code]
-  CSS: [Complete CSS code]`;
-
-  const messages = [
-    {
-      role: 'user',
-      content: `Please create a diploma design that would be appropriate for or inspired by this website: ${url}. Consider what type of organization this might be and create a suitable diploma design.`
-    }
-  ];
-
   try {
-    const response = await callAnthropicAPI(messages);
+    const response = await callDiplomaFunction({
+      requestType: 'url',
+      url
+    });
     
-    const messagePart = response.match(/MESSAGE:\s*(.*?)(?=HTML:|$)/s)?.[1]?.trim() || 'I\'ve created a diploma inspired by the website!';
-    const htmlPart = response.match(/HTML:\s*(.*?)(?=CSS:|$)/s)?.[1]?.trim() || '';
-    const cssPart = response.match(/CSS:\s*(.*?)$/s)?.[1]?.trim() || '';
-
-    return {
-      message: messagePart,
-      html: htmlPart,
-      css: cssPart
-    };
+    return response;
   } catch (error) {
     console.error('Error generating diploma from URL:', error);
     throw error;
   }
 };
 
-// Utility function to check if API key is set
+// Remove the old utility functions since we're now using Supabase
 export const isApiKeySet = (): boolean => {
-  return !!localStorage.getItem('anthropic_api_key');
+  return true; // Always true since we're using Supabase secrets
 };
 
-// Utility function to set API key
 export const setApiKey = (apiKey: string): void => {
-  localStorage.setItem('anthropic_api_key', apiKey);
+  // No-op since we're using Supabase secrets
+  console.log('API key management is now handled by Supabase');
 };
