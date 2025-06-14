@@ -7,10 +7,10 @@ interface DiplomaResponse {
   css?: string;
 }
 
-// Note: In production, you should use Supabase Edge Functions to securely handle API keys
-const ANTHROPIC_API_KEY = localStorage.getItem('anthropic_api_key') || '';
-
 const callAnthropicAPI = async (messages: any[]): Promise<string> => {
+  // Get API key when function is called, not at module load time
+  const ANTHROPIC_API_KEY = localStorage.getItem('anthropic_api_key');
+  
   if (!ANTHROPIC_API_KEY) {
     throw new Error('Anthropic API key not found. Please set it in the settings.');
   }
