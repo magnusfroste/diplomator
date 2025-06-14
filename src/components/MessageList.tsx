@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { Brain, User } from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 export const MessageList = () => {
   const { messages, isGenerating } = useDiploma();
@@ -37,12 +37,6 @@ export const MessageList = () => {
           >
             <p className="whitespace-pre-wrap">{message.content}</p>
           </div>
-
-          {message.isUser && (
-            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-slate-600" />
-            </div>
-          )}
         </div>
       ))}
       
