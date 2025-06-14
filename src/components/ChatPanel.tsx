@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Upload, Link, Sparkles } from 'lucide-react';
+import { Upload, Link, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -79,44 +79,44 @@ export const ChatPanel = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-6 border-b border-slate-200/50 bg-white/90 backdrop-blur-sm">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
+      <div className="p-4 border-b border-slate-200/50 bg-white/90 backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">Diploma Designer</h1>
-            <p className="text-sm text-slate-600">Create beautiful diplomas with AI</p>
+            <h1 className="text-lg font-semibold text-slate-900">Diploma Designer</h1>
+            <p className="text-xs text-slate-600">Create beautiful diplomas with AI</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <Button
             variant={activeTab === 'chat' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('chat')}
-            className="h-8"
+            className="h-7 text-xs"
           >
-            <Send className="w-4 h-4 mr-1" />
+            <Sparkles className="w-3 h-3 mr-1" />
             Chat
           </Button>
           <Button
             variant={activeTab === 'upload' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('upload')}
-            className="h-8"
+            className="h-7 text-xs"
           >
-            <Upload className="w-4 h-4 mr-1" />
+            <Upload className="w-3 h-3 mr-1" />
             Upload
           </Button>
           <Button
             variant={activeTab === 'url' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('url')}
-            className="h-8"
+            className="h-7 text-xs"
           >
-            <Link className="w-4 h-4 mr-1" />
+            <Link className="w-3 h-3 mr-1" />
             URL
           </Button>
         </div>
@@ -127,25 +127,16 @@ export const ChatPanel = () => {
         {activeTab === 'chat' && (
           <>
             <MessageList />
-            <div className="p-4 border-t border-slate-200/50 bg-white/90 backdrop-blur-sm">
-              <div className="flex gap-2">
-                <Textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Describe the diploma you want to create..."
-                  className="resize-none"
-                  rows={3}
-                  disabled={isGenerating}
-                />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!message.trim() || isGenerating}
-                  className="self-end"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+            <div className="p-3 border-t border-slate-200/50 bg-white/90 backdrop-blur-sm">
+              <Textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Describe the diploma you want to create... (Press Enter to send)"
+                className="resize-none min-h-[60px]"
+                rows={2}
+                disabled={isGenerating}
+              />
             </div>
           </>
         )}
