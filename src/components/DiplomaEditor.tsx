@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,8 +23,10 @@ export const DiplomaEditor = () => {
   useEffect(() => {
     // Get the user's full name for the signature
     const getUserFullName = async () => {
+      console.log('DiplomaEditor: Getting user full name...');
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        console.log('DiplomaEditor: User found:', user.email);
         // First try to get name from profiles table
         const { data: profileData } = await supabase
           .from('profiles')
@@ -33,7 +34,10 @@ export const DiplomaEditor = () => {
           .eq('id', user.id)
           .single();
         
+        console.log('DiplomaEditor: Profile data:', profileData);
+        
         if (profileData?.name) {
+          console.log('DiplomaEditor: Using profile name:', profileData.name);
           setUserFullName(profileData.name);
         } else {
           // Fallback to auth metadata or email prefix
@@ -41,8 +45,11 @@ export const DiplomaEditor = () => {
                               user.user_metadata?.full_name || 
                               user.email?.split('@')[0] || 
                               'User';
+          console.log('DiplomaEditor: Using fallback name:', fallbackName);
           setUserFullName(fallbackName);
         }
+      } else {
+        console.log('DiplomaEditor: No user found');
       }
     };
 
@@ -81,7 +88,8 @@ export const DiplomaEditor = () => {
       });
     });
 
-    // Ensure the signature section shows the user's name - with more comprehensive patterns
+    // Ensure the signature section shows the user's name
+    console.log('DiplomaEditor: Updating signature with userFullName:', userFullName);
     if (userFullName) {
       // Replace various signature name patterns
       updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, userFullName);
@@ -89,12 +97,21 @@ export const DiplomaEditor = () => {
       updatedHtml = updatedHtml.replace(/Authorized Signature/gi, userFullName);
       updatedHtml = updatedHtml.replace(/<div class="signature-name">[^<]*<\/div>/gi, `<div class="signature-name">${userFullName}</div>`);
       updatedHtml = updatedHtml.replace(/class="signature-name">[^<]*</gi, `class="signature-name">${userFullName}<`);
+      
+      // Also check for any remaining placeholder text in signature areas
+      updatedHtml = updatedHtml.replace(/Your Name Here/gi, userFullName);
+      updatedHtml = updatedHtml.replace(/Name Here/gi, userFullName);
+      updatedHtml = updatedHtml.replace(/\[SIGNATURE\]/gi, userFullName);
     }
     
+    console.log('DiplomaEditor: Updated HTML contains userFullName:', updatedHtml.includes(userFullName));
     setDiplomaHtml(updatedHtml);
   };
 
   const generateTemplateWithFields = (fields: any) => {
+    console.log('DiplomaEditor: Generating template with userFullName:', userFullName);
+    const signatureName = userFullName || 'Authorized Signature';
+    
     const template = `
       <div class="diploma-container">
         <div class="diploma-content">
@@ -114,13 +131,14 @@ export const DiplomaEditor = () => {
           
           <div class="signature-section">
             <div class="signature-line"></div>
-            <div class="signature-name">${userFullName || 'Authorized Signature'}</div>
+            <div class="signature-name">${signatureName}</div>
             <div class="signature-title">Authorized Signature</div>
           </div>
         </div>
       </div>
     `;
     
+    // ... keep existing code (CSS styles)
     const css = `
       .diploma-container {
         width: 100%;
@@ -225,6 +243,7 @@ export const DiplomaEditor = () => {
       }
     `;
     
+    console.log('DiplomaEditor: Template generated with signature:', signatureName);
     setDiplomaHtml(template);
     setDiplomaCss(css);
   };
