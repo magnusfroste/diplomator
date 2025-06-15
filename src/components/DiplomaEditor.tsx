@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 
 export const DiplomaEditor = () => {
   const { 
@@ -17,6 +18,36 @@ export const DiplomaEditor = () => {
     setDiplomaHtml,
     setDiplomaCss 
   } = useDiploma();
+
+  const [userFullName, setUserFullName] = useState<string>('');
+
+  useEffect(() => {
+    // Get the user's full name for the signature
+    const getUserFullName = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // First try to get name from profiles table
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileData?.name) {
+          setUserFullName(profileData.name);
+        } else {
+          // Fallback to auth metadata or email prefix
+          const fallbackName = user.user_metadata?.name || 
+                              user.user_metadata?.full_name || 
+                              user.email?.split('@')[0] || 
+                              'User';
+          setUserFullName(fallbackName);
+        }
+      }
+    };
+
+    getUserFullName();
+  }, []);
 
   const handleFieldChange = (field: string, value: string) => {
     const newFields = { ...diplomaFields, [field]: value };
@@ -49,6 +80,12 @@ export const DiplomaEditor = () => {
         updatedHtml = updatedHtml.replace(pattern, value as string);
       });
     });
+
+    // Ensure the signature section shows the user's name
+    if (userFullName) {
+      updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, userFullName);
+      updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Diplomator Demo'}/gi, userFullName);
+    }
     
     setDiplomaHtml(updatedHtml);
   };
@@ -69,6 +106,12 @@ export const DiplomaEditor = () => {
             <h3 class="institution-name">${fields.institution || 'Institution Name'}</h3>
             <p>on this</p>
             <div class="date">${fields.date || new Date().toLocaleDateString()}</div>
+          </div>
+          
+          <div class="signature-section">
+            <div class="signature-line"></div>
+            <div class="signature-name">${userFullName || 'Authorized Signature'}</div>
+            <div class="signature-title">Authorized Signature</div>
           </div>
         </div>
       </div>
@@ -150,6 +193,32 @@ export const DiplomaEditor = () => {
         border-top: 2px solid #bdc3c7;
         padding-top: 20px;
       }
+      
+      .signature-section {
+        margin-top: 40px;
+        text-align: center;
+        padding-top: 30px;
+      }
+      
+      .signature-line {
+        width: 300px;
+        height: 2px;
+        background: #2c3e50;
+        margin: 0 auto 10px auto;
+      }
+      
+      .signature-name {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      .signature-title {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        font-style: italic;
+      }
     `;
     
     setDiplomaHtml(template);
@@ -176,7 +245,7 @@ export const DiplomaEditor = () => {
               id="recipientName"
               value={diplomaFields.recipientName || ''}
               onChange={(e) => handleFieldChange('recipientName', e.target.value)}
-              placeholder="Magnus Froste"
+              placeholder="Enter recipient name"
             />
           </div>
           
@@ -218,6 +287,14 @@ export const DiplomaEditor = () => {
               value={diplomaFields.date || ''}
               onChange={(e) => handleFieldChange('date', e.target.value)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Authorized Signature</Label>
+            <div className="text-sm text-muted-foreground bg-gray-50 p-3 rounded">
+              <p><strong>Signatory:</strong> {userFullName || 'Loading...'}</p>
+              <p className="text-xs mt-1">This will be the authorized signature on your diploma. To change this, update your profile name.</p>
+            </div>
           </div>
           
           <div className="pt-4">

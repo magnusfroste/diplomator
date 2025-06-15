@@ -57,6 +57,8 @@ export const generateDiploma = async (request: DiplomaGenerationRequest): Promis
       }
     }
 
+    console.log('Using userFullName for signature:', userFullName);
+
     const response = await supabase.functions.invoke('generate-diploma', {
       body: {
         ...request,
