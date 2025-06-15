@@ -23,28 +23,26 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
 
     if (lang === 'html') {
       return code
-        // HTML tags
-        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)(.*?)(&gt;)/g, 
-          '<span class="tag-bracket">$1</span><span class="tag-name">$2</span><span class="attr">$3</span><span class="tag-bracket">$4</span>')
-        // Attributes
-        .replace(/(\s+)([a-zA-Z-]+)(=)/g, '$1<span class="attr-name">$2</span><span class="operator">$3</span>')
+        // HTML comments first (to avoid interfering with other patterns)
+        .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span style="color: #6B7280; font-style: italic; opacity: 0.8;">$1</span>')
+        // HTML tags with attributes
+        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z-]+=(?:&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;))*?)(\s*\/?)(&gt;)/g, 
+          '<span style="color: #8B5CF6; font-weight: 500;">$1</span><span style="color: #2563EB; font-weight: 600;">$2</span><span style="color: #D97706; font-weight: 500;">$3</span><span style="color: #8B5CF6; font-weight: 500;">$4$5</span>')
         // Attribute values
-        .replace(/(=)(&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;)/g, '$1<span class="string">$2</span>')
-        // Comments
-        .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="comment">$1</span>');
+        .replace(/(&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;)/g, '<span style="color: #059669; font-weight: 500;">$1</span>');
     } else if (lang === 'css') {
       return code
-        // CSS selectors
-        .replace(/^(\s*)([.#]?[a-zA-Z][a-zA-Z0-9_-]*|\*|::?[a-zA-Z-]+)(\s*{)/gm, 
-          '$1<span class="selector">$2</span>$3')
+        // CSS comments first
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: #6B7280; font-style: italic; opacity: 0.8;">$1</span>')
+        // CSS selectors (at start of line, before {)
+        .replace(/^(\s*)([.#]?[a-zA-Z][a-zA-Z0-9_-]*|\*|::?[a-zA-Z-]+)(\s*\{)/gm, 
+          '$1<span style="color: #7C3AED; font-weight: 600;">$2</span>$3')
         // CSS properties
-        .replace(/(\s+)([a-zA-Z-]+)(\s*:)/g, '$1<span class="property">$2</span><span class="operator">$3</span>')
+        .replace(/(\s+)([a-zA-Z-]+)(\s*:)/g, '$1<span style="color: #2563EB; font-weight: 500;">$2</span><span style="color: #8B5CF6; font-weight: 500;">$3</span>')
         // CSS values
-        .replace(/(:\s*)([^;{}]+)(;?)/g, '$1<span class="value">$2</span>$3')
-        // Comments
-        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="comment">$1</span>')
-        // Important
-        .replace(/(!important)/g, '<span class="important">$1</span>');
+        .replace(/(:\s*)([^;{}]+)(;?)/g, '$1<span style="color: #059669; font-weight: 500;">$2</span>$3')
+        // Important declarations
+        .replace(/(!important)/g, '<span style="color: #DC2626; font-weight: 700;">$1</span>');
     }
 
     return code;
@@ -74,132 +72,19 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
 
   return (
     <div className="relative h-full">
-      <style>{`
-        .syntax-editor {
-          position: relative;
-          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
-          font-size: 14px;
-          line-height: 1.5;
-          border-radius: 8px;
-          overflow: hidden;
-          background: hsl(var(--background));
-          height: 100%;
-          min-height: 400px;
-        }
-        
-        .syntax-highlight {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          padding: 20px;
-          margin: 0;
-          color: transparent;
-          background: transparent;
-          overflow: auto;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-          pointer-events: none;
-          z-index: 1;
-          tab-size: 2;
-          font-family: inherit;
-          font-size: inherit;
-          line-height: inherit;
-        }
-        
-        .syntax-textarea {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          padding: 20px;
-          margin: 0;
-          border: none;
-          outline: none;
-          background: transparent;
-          color: hsl(var(--foreground));
-          font-family: inherit;
-          font-size: inherit;
-          line-height: inherit;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-          overflow: auto;
-          resize: none;
-          z-index: 2;
-          tab-size: 2;
-        }
-        
-        .syntax-textarea::placeholder {
-          color: hsl(var(--muted-foreground));
-          opacity: 0.7;
-        }
-        
-        .syntax-textarea:focus {
-          outline: none;
-        }
-        
-        /* Enhanced Syntax highlighting colors */
-        .tag-bracket { 
-          color: #8B5CF6; 
-          font-weight: 500; 
-        }
-        .tag-name { 
-          color: #2563EB; 
-          font-weight: 600; 
-        }
-        .attr-name { 
-          color: #D97706; 
-          font-weight: 500; 
-        }
-        .string { 
-          color: #059669; 
-          font-weight: 500; 
-        }
-        .comment { 
-          color: #6B7280; 
-          font-style: italic; 
-          opacity: 0.8;
-        }
-        .operator { 
-          color: #8B5CF6; 
-          font-weight: 500; 
-        }
-        .selector { 
-          color: #7C3AED; 
-          font-weight: 600; 
-        }
-        .property { 
-          color: #2563EB; 
-          font-weight: 500; 
-        }
-        .value { 
-          color: #059669; 
-          font-weight: 500; 
-        }
-        .important { 
-          color: #DC2626; 
-          font-weight: 700; 
-        }
-        
-        /* Dark mode adjustments */
-        .dark .tag-bracket { color: #A78BFA; }
-        .dark .tag-name { color: #60A5FA; }
-        .dark .attr-name { color: #FBBF24; }
-        .dark .string { color: #34D399; }
-        .dark .comment { color: #9CA3AF; }
-        .dark .operator { color: #A78BFA; }
-        .dark .selector { color: #A78BFA; }
-        .dark .property { color: #60A5FA; }
-        .dark .value { color: #34D399; }
-        .dark .important { color: #F87171; }
-      `}</style>
-      
-      <div className="syntax-editor">
+      <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+        {/* Syntax highlighting overlay */}
         <pre
           ref={highlightRef}
-          className="syntax-highlight"
+          className="absolute inset-0 p-4 m-0 text-transparent bg-transparent overflow-auto whitespace-pre-wrap break-words pointer-events-none z-10 font-mono text-sm leading-6 tab-size-2"
+          style={{ 
+            fontFamily: "'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
+            tabSize: 2 
+          }}
           dangerouslySetInnerHTML={{ __html: highlightedCode }}
         />
+        
+        {/* Textarea */}
         <textarea
           ref={textareaRef}
           value={value}
@@ -208,9 +93,21 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="syntax-textarea"
+          className="absolute inset-0 p-4 m-0 border-0 outline-0 bg-transparent resize-none overflow-auto whitespace-pre-wrap break-words z-20 font-mono text-sm leading-6 text-slate-900 dark:text-slate-100 tab-size-2"
+          style={{ 
+            fontFamily: "'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
+            tabSize: 2,
+            caretColor: '#3b82f6'
+          }}
           spellCheck={false}
         />
+        
+        {/* Placeholder styling */}
+        {!value && (
+          <div className="absolute inset-0 p-4 pointer-events-none text-slate-400 dark:text-slate-500 font-mono text-sm leading-6 z-5">
+            {placeholder}
+          </div>
+        )}
       </div>
     </div>
   );
