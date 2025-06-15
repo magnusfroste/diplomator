@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Award } from 'lucide-react';
 
 const TestDiploma = () => {
   const { diplomaId } = useParams();
@@ -84,7 +85,16 @@ const TestDiploma = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Test Diploma Page</h1>
+        {/* Header with Brand */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+            <Award className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Diplomator</h1>
+            <p className="text-sm text-gray-600">Test Diploma Page</p>
+          </div>
+        </div>
         
         {/* Basic Info */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">

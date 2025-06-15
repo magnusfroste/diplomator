@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
@@ -11,6 +10,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
+import { Award } from "lucide-react";
 
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -66,9 +66,7 @@ const Index = () => {
             <div className="flex items-center justify-between px-6 py-3">
               <div className="flex items-center gap-3">
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                  </svg>
+                  <Award className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Diplomator</h1>
