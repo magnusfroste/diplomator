@@ -34,8 +34,6 @@ MODIFICATIONS: Users can request adjustments to their diplomas after creation. B
 - Create interactive effects using CSS :hover, :focus, or keyframe animations
 - Modify the overall style, theme, or visual hierarchy
 
-ITERATION MODE: If existing HTML and CSS are provided, you are modifying an existing diploma. Make only the requested changes while preserving the overall design and structure. Focus on the specific modification requested.
-
 Always respond with:
 1. A friendly message explaining what you've created or modified
 2. Complete HTML code for the diploma
@@ -128,22 +126,19 @@ Use CSS to create decorative elements instead of referencing image files.`;
       // Regular chat - filter out any system messages and use them as the system prompt
       const userMessages = messages.filter(msg => msg.role !== 'system');
       
-      // If we have existing diploma content, include it in the context
+      // If we have existing diploma content, modify the system prompt to include it
       if (currentHtml && currentCss) {
-        const modificationPrompt = `
-CURRENT DIPLOMA CONTENT:
-HTML:
+        systemPrompt += `
+
+ITERATION MODE: You are modifying an existing diploma. Here is the current diploma content:
+
+CURRENT HTML:
 ${currentHtml}
 
-CSS:
+CURRENT CSS:
 ${currentCss}
 
-Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design.`;
-        
-        userMessages.unshift({
-          role: 'assistant',
-          content: modificationPrompt
-        });
+Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design and structure. Keep the same layout, fonts, and styling unless specifically asked to change them.`;
       }
       
       requestBody = {
