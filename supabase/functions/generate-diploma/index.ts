@@ -1,10 +1,95 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Function to extract website content and styling information
+const scrapeWebsiteData = async (url: string) => {
+  try {
+    console.log(`Fetching website data from: ${url}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; DiplomaBot/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const html = await response.text();
+    
+    // Extract useful information from the HTML
+    const extractedData = {
+      title: html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '',
+      metaDescription: html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i)?.[1] || '',
+      favicon: html.match(/<link[^>]*rel="icon"[^>]*href="([^"]*)"[^>]*>/i)?.[1] || '',
+      colors: extractColors(html),
+      fonts: extractFonts(html),
+      brandName: extractBrandName(html, url),
+      themeColor: html.match(/<meta[^>]*name="theme-color"[^>]*content="([^"]*)"[^>]*>/i)?.[1] || '',
+    };
+
+    console.log('Extracted website data:', extractedData);
+    return extractedData;
+  } catch (error) {
+    console.error('Error scraping website:', error);
+    return null;
+  }
+};
+
+// Extract color information from CSS and styles
+const extractColors = (html: string) => {
+  const colors = new Set<string>();
+  
+  // Look for color values in style attributes and CSS
+  const colorRegex = /#[0-9a-fA-F]{3,6}|rgb\([^)]+\)|rgba\([^)]+\)|hsl\([^)]+\)|hsla\([^)]+\)/g;
+  const matches = html.match(colorRegex);
+  
+  if (matches) {
+    matches.slice(0, 10).forEach(color => colors.add(color)); // Limit to first 10 colors
+  }
+  
+  return Array.from(colors);
+};
+
+// Extract font information
+const extractFonts = (html: string) => {
+  const fonts = new Set<string>();
+  
+  // Look for font-family declarations
+  const fontRegex = /font-family\s*:\s*([^;]+)/gi;
+  const matches = html.matchAll(fontRegex);
+  
+  for (const match of matches) {
+    const fontFamily = match[1].replace(/['"]/g, '').split(',')[0].trim();
+    if (fontFamily && fontFamily !== 'inherit') {
+      fonts.add(fontFamily);
+    }
+  }
+  
+  return Array.from(fonts).slice(0, 5); // Limit to first 5 fonts
+};
+
+// Extract brand name from various sources
+const extractBrandName = (html: string, url: string) => {
+  // Try to extract from title
+  const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
+  
+  // Try to extract from URL domain
+  const domain = new URL(url).hostname.replace('www.', '');
+  
+  // Try to extract from meta property og:site_name
+  const siteName = html.match(/<meta[^>]*property="og:site_name"[^>]*content="([^"]*)"[^>]*>/i)?.[1] || '';
+  
+  return siteName || title.split(/[-|–—]/)[0].trim() || domain.split('.')[0];
 };
 
 serve(async (req) => {
@@ -105,24 +190,46 @@ Create CSS-based decorative elements inspired by the image instead of referencin
         ]
       };
     } else if (requestType === 'url') {
-      systemPrompt = `You are an expert diploma designer. The user has provided a website URL. You should create a diploma design that captures the visual branding and aesthetic of well-known companies/organizations when possible.
+      // Scrape the website data
+      const websiteData = await scrapeWebsiteData(url);
+      
+      let websiteInfo = '';
+      if (websiteData) {
+        websiteInfo = `
+
+SCRAPED WEBSITE DATA:
+- Brand/Company Name: ${websiteData.brandName}
+- Page Title: ${websiteData.title}
+- Meta Description: ${websiteData.metaDescription}
+- Extracted Colors: ${websiteData.colors.join(', ')}
+- Fonts Found: ${websiteData.fonts.join(', ')}
+- Theme Color: ${websiteData.themeColor}
+
+Use this actual website data to create an authentic diploma design that reflects the real brand colors, fonts, and style.`;
+      }
+
+      systemPrompt = `You are an expert diploma designer. The user has provided a website URL and I have scraped the actual content from that website. Create a diploma design that authentically reflects the website's actual branding, colors, and design elements.${websiteInfo}
 
 BRAND-SPECIFIC GUIDELINES:
 - For Telia (telia.se): Use their distinctive purple/magenta color palette (#990AE3, #FF6B35), modern Nordic design, clean typography
 - For telecommunications companies: Use colors associated with connectivity, technology, and innovation
 - For educational institutions: Use traditional academic colors and formal layouts
-- For corporate brands: Research and use their known color schemes and design principles
+- For corporate brands: Use the extracted colors and fonts from the actual website data above
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
 MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
 Format your response like this:
-MESSAGE: [Explanation of the diploma you created based on the URL and any brand recognition]
+MESSAGE: [Explanation of the diploma you created based on the actual website data]
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Use CSS to create decorative elements that reflect the organization's brand identity when recognizable.`;
+Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data.`;
+
+      const userMessage = websiteData 
+        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity.`
+        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -131,7 +238,7 @@ Use CSS to create decorative elements that reflect the organization's brand iden
         messages: [
           {
             role: 'user',
-            content: `Please create a diploma design inspired by this website: ${url}. If you recognize this as a well-known brand (like Telia for telia.se), please use their actual brand colors and design aesthetic. For Telia specifically, use their purple/magenta branding (#990AE3, #FF6B35) and modern Nordic design principles. Create a professional diploma that reflects the organization's visual identity using only CSS for visual elements.`
+            content: userMessage
           }
         ]
       };
@@ -214,3 +321,4 @@ SPECIAL FOCUS FOR SHAPE IMPROVEMENTS:
     });
   }
 });
+
