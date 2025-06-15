@@ -95,10 +95,7 @@ export const ChatPanel = () => {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">Diploma Designer</h1>
-            <p className="text-xs text-slate-600">Create beautiful diplomas with AI</p>
-          </div>
+      
         </div>
 
         {/* Guidelines Section */}
