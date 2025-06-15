@@ -125,6 +125,7 @@ export type Database = {
       scenes: {
         Row: {
           created_at: string
+          generation_job_id: string | null
           id: string
           prompt: string
           scene_order: number
@@ -139,6 +140,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          generation_job_id?: string | null
           id?: string
           prompt: string
           scene_order: number
@@ -153,6 +155,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          generation_job_id?: string | null
           id?: string
           prompt?: string
           scene_order?: number

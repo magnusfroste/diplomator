@@ -1,12 +1,12 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield, CheckCircle, Copy, ExternalLink, QrCode } from 'lucide-react';
+import { Shield, CheckCircle, ExternalLink, Loader2 } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { signDiplomaToBlockchain, createVerificationUrl, createDiplomaUrl, DiplomaRecord } from '@/services/blockchainService';
-import { QRCodeGenerator } from './QRCodeGenerator';
+import { signDiplomaToBlockchain, createDiplomaUrl, DiplomaRecord } from '@/services/blockchainService';
 import { toast } from 'sonner';
 
 export const BlockchainSigner = () => {
@@ -15,9 +15,7 @@ export const BlockchainSigner = () => {
   const [institutionName, setInstitutionName] = useState('');
   const [isSigningTx, setIsSigningTx] = useState(false);
   const [signedRecord, setSignedRecord] = useState<DiplomaRecord | null>(null);
-  const [verificationUrl, setVerificationUrl] = useState('');
   const [diplomaUrl, setDiplomaUrl] = useState('');
-  const [showQR, setShowQR] = useState(false);
 
   const handleSignToBlockchain = async () => {
     if (!recipientName.trim() || !institutionName.trim()) {
@@ -31,14 +29,8 @@ export const BlockchainSigner = () => {
     }
 
     setIsSigningTx(true);
-    console.log('=== SIGNING PROCESS START ===');
-    console.log('Recipient:', recipientName.trim());
-    console.log('Institution:', institutionName.trim());
-    console.log('Has HTML content:', !!diplomaHtml);
-    console.log('Has CSS content:', !!diplomaCss);
 
     try {
-      console.log('Calling signDiplomaToBlockchain...');
       const record = await signDiplomaToBlockchain(
         diplomaHtml,
         diplomaCss,
@@ -46,59 +38,16 @@ export const BlockchainSigner = () => {
         institutionName.trim()
       );
       
-      console.log('=== SIGNING SUCCESS ===');
-      console.log('Generated record:', record);
-      
       setSignedRecord(record);
-      const verifyUrl = createVerificationUrl(record.id);
       const directUrl = createDiplomaUrl(record.id);
-      
-      console.log('Generated URLs:');
-      console.log('- Verification URL:', verifyUrl);
-      console.log('- Direct URL:', directUrl);
-      
-      setVerificationUrl(verifyUrl);
       setDiplomaUrl(directUrl);
       
       toast.success('Diploma successfully signed and stored on blockchain!');
     } catch (error) {
-      console.error('=== SIGNING ERROR ===');
-      console.error('Error details:', error);
-      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      
+      console.error('Signing error:', error);
       toast.error('Failed to sign diploma to blockchain: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSigningTx(false);
-    }
-  };
-
-  const copyDiplomaUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(diplomaUrl);
-      toast.success('Diploma link copied to clipboard!');
-    } catch (error) {
-      toast.error('Failed to copy URL');
-    }
-  };
-
-  const copyVerificationUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(verificationUrl);
-      toast.success('Verification URL copied to clipboard!');
-    } catch (error) {
-      toast.error('Failed to copy URL');
-    }
-  };
-
-  const copyDiplomaId = async () => {
-    if (signedRecord) {
-      try {
-        await navigator.clipboard.writeText(signedRecord.id);
-        toast.success('Diploma ID copied to clipboard!');
-      } catch (error) {
-        toast.error('Failed to copy Diploma ID');
-      }
     }
   };
 
@@ -118,26 +67,28 @@ export const BlockchainSigner = () => {
       <CardContent className="space-y-4">
         {!signedRecord ? (
           <>
-            <div className="space-y-2">
-              <Label htmlFor="recipient">Recipient Name</Label>
-              <Input
-                id="recipient"
-                value={recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
-                placeholder="Enter recipient's full name"
-                disabled={isSigningTx}
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="recipient">Recipient Name</Label>
+                <Input
+                  id="recipient"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  placeholder="Enter recipient's full name"
+                  disabled={isSigningTx}
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="institution">Institution Name</Label>
-              <Input
-                id="institution"
-                value={institutionName}
-                onChange={(e) => setInstitutionName(e.target.value)}
-                placeholder="Enter institution name"
-                disabled={isSigningTx}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="institution">Institution Name</Label>
+                <Input
+                  id="institution"
+                  value={institutionName}
+                  onChange={(e) => setInstitutionName(e.target.value)}
+                  placeholder="Enter institution name"
+                  disabled={isSigningTx}
+                />
+              </div>
             </div>
 
             <Button
@@ -145,14 +96,25 @@ export const BlockchainSigner = () => {
               disabled={!hasContent || isSigningTx || !recipientName.trim() || !institutionName.trim()}
               className="w-full"
             >
-              <Shield className="w-4 h-4 mr-2" />
-              {isSigningTx ? 'Signing to Blockchain...' : 'Sign & Store on Blockchain'}
+              {isSigningTx ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing to Blockchain...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Sign & Store on Blockchain
+                </>
+              )}
             </Button>
 
             {!hasContent && (
-              <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
-                ⚠️ Create a diploma first before signing to blockchain
-              </p>
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-700">
+                  ⚠️ Create a diploma first before signing to blockchain
+                </p>
+              </div>
             )}
           </>
         ) : (
@@ -160,7 +122,7 @@ export const BlockchainSigner = () => {
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <h4 className="font-medium text-green-900">Blockchain Verified!</h4>
+                <h4 className="font-medium text-green-900">Successfully Signed!</h4>
               </div>
               <p className="text-sm text-green-800">
                 Your diploma has been cryptographically signed and stored on the blockchain.
@@ -169,64 +131,16 @@ export const BlockchainSigner = () => {
 
             <div className="space-y-3">
               <div>
-                <Label className="text-xs font-medium text-muted-foreground">SHARE LINK (Direct View)</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <code className="flex-1 text-sm bg-blue-50 px-2 py-1 rounded font-mono truncate border border-blue-200">
-                    {diplomaUrl}
-                  </code>
-                  <Button size="sm" variant="outline" onClick={copyDiplomaUrl}>
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setShowQR(!showQR)}
-                  >
-                    <QrCode className="w-3 h-3" />
-                  </Button>
-                </div>
-                <p className="text-xs text-blue-600 mt-1">✅ Production URL - Recipients can view the diploma directly</p>
-              </div>
-
-              <div>
                 <Label className="text-xs font-medium text-muted-foreground">DIPLOMA ID</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono">
-                    {signedRecord.id}
-                  </code>
-                  <Button size="sm" variant="outline" onClick={copyDiplomaId}>
-                    <Copy className="w-3 h-3" />
-                  </Button>
+                <div className="text-sm bg-muted px-3 py-2 rounded font-mono mt-1">
+                  {signedRecord.id}
                 </div>
               </div>
 
               <div>
-                <Label className="text-xs font-medium text-muted-foreground">VERIFICATION URL</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
-                    {verificationUrl}
-                  </code>
-                  <Button size="sm" variant="outline" onClick={copyVerificationUrl}>
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-1">For manual verification by employers</p>
-                </div>
-              </div>
-
-              {showQR && (
-                <div className="flex justify-center p-4 bg-white rounded-lg border">
-                  <QRCodeGenerator value={diplomaUrl} size={120} />
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <Label className="text-xs font-medium text-muted-foreground">TIMESTAMP</Label>
-                  <p className="font-mono">{new Date(signedRecord.timestamp).toLocaleString()}</p>
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-muted-foreground">INSTITUTION</Label>
-                  <p className="truncate">{signedRecord.institutionInfo}</p>
+                <Label className="text-xs font-medium text-muted-foreground">TIMESTAMP</Label>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {new Date(signedRecord.timestamp).toLocaleString()}
                 </div>
               </div>
 
@@ -236,7 +150,7 @@ export const BlockchainSigner = () => {
                 onClick={() => window.open(diplomaUrl, '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                View Diploma
+                View Signed Diploma
               </Button>
             </div>
 
@@ -245,11 +159,9 @@ export const BlockchainSigner = () => {
               className="w-full"
               onClick={() => {
                 setSignedRecord(null);
-                setVerificationUrl('');
                 setDiplomaUrl('');
                 setRecipientName('');
                 setInstitutionName('');
-                setShowQR(false);
               }}
             >
               Sign Another Diploma

@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Share2, Mail, Copy, Check } from 'lucide-react';
+import { Download, Share2, Copy, Check, QrCode, Loader2 } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { supabase } from '@/integrations/supabase/client';
 import html2canvas from 'html2canvas';
@@ -24,15 +25,14 @@ export const SharePanel = () => {
   const [copied, setCopied] = useState(false);
   const [diplomaUrl, setDiplomaUrl] = useState('');
   const [currentDiplomaId, setCurrentDiplomaId] = useState('');
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     const fetchLastDiplomaUrl = async () => {
       try {
-        // Get current user
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Get the most recent diploma URL for this user
         const { data, error } = await supabase
           .from('signed_diplomas')
           .select('diploma_url, blockchain_id')
@@ -45,7 +45,6 @@ export const SharePanel = () => {
           setDiplomaUrl(data.diploma_url);
           setCurrentDiplomaId(data.blockchain_id);
         } else {
-          // Fallback to sessionStorage if no diploma found in database
           const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
           const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
           if (savedDiplomaUrl) {
@@ -57,7 +56,6 @@ export const SharePanel = () => {
         }
       } catch (error) {
         console.error('Error fetching diploma URL:', error);
-        // Fallback to sessionStorage
         const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
         const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
         if (savedDiplomaUrl) {
@@ -74,6 +72,8 @@ export const SharePanel = () => {
 
   const shareUrl = diplomaUrl || window.location.href;
   const shareTitle = "Check out my diploma created with Diploma Generator!";
+  const hasContent = diplomaHtml || diplomaCss;
+  const isSignedDiploma = diplomaUrl.includes('/diploma/');
 
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
@@ -82,44 +82,30 @@ export const SharePanel = () => {
         ? `${window.location.origin}/verify/${currentDiplomaId}`
         : shareUrl;
       
-      // Create a temporary div with balanced containment
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
         <div style="width: 800px; height: 600px; padding: 20px; background: white; position: relative; overflow: hidden;">
           <style>
             ${diplomaCss}
-            /* Balanced containment styles */
-            * {
-              box-sizing: border-box !important;
-            }
+            * { box-sizing: border-box !important; }
             .diploma-container {
               width: 100% !important;
               height: 100% !important;
               position: relative !important;
               overflow: hidden !important;
             }
-            .diploma-container * {
-              max-width: 95% !important;
-              box-sizing: border-box !important;
-            }
-            /* Handle absolutely positioned elements */
+            .diploma-container * { max-width: 95% !important; box-sizing: border-box !important; }
             .diploma-container [style*="position: absolute"],
-            .diploma-container [style*="position:absolute"] {
-              max-width: 90% !important;
-            }
+            .diploma-container [style*="position:absolute"] { max-width: 90% !important; }
           </style>
-          <div class="diploma-container">
-            ${diplomaHtml}
-          </div>
+          <div class="diploma-container">${diplomaHtml}</div>
           
-          <!-- Verification Badge -->
           <div style="position: absolute; top: 12px; right: 12px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; backdrop-filter: blur(4px);">
             <span style="font-size: 12px;">🛡️</span>
             Verified by Diplomator
           </div>
           
           ${currentDiplomaId ? `
-          <!-- QR Code and ID for PDF -->
           <div style="position: absolute; bottom: 12px; left: 12px; text-align: center; z-index: 1000;">
             <div style="background: rgba(255, 255, 255, 0.95); padding: 6px; border-radius: 6px; border: 2px solid #e5e7eb; margin-bottom: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
               <div id="qr-code-container" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;"></div>
@@ -136,15 +122,12 @@ export const SharePanel = () => {
       tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Add actual QR code if available
       if (currentDiplomaId) {
         const qrContainer = tempDiv.querySelector('#qr-code-container') as HTMLElement;
         if (qrContainer) {
-          // Create a temporary container for the QR code component
           const qrTempDiv = document.createElement('div');
           document.body.appendChild(qrTempDiv);
           
-          // Import and render QR code component
           const { createRoot } = await import('react-dom/client');
           const root = createRoot(qrTempDiv);
           
@@ -157,7 +140,6 @@ export const SharePanel = () => {
               })
             );
             
-            // Wait for the QR code to render
             setTimeout(() => {
               const qrSvg = qrTempDiv.querySelector('svg');
               if (qrSvg) {
@@ -171,7 +153,6 @@ export const SharePanel = () => {
         }
       }
 
-      // Convert to canvas with improved settings
       const canvas = await html2canvas(tempDiv.firstElementChild as HTMLElement, {
         width: 800,
         height: 600,
@@ -188,7 +169,6 @@ export const SharePanel = () => {
         }
       });
 
-      // Create PDF with better proportions
       const pdf = new jsPDF('landscape', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png', 0.95);
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -227,27 +207,6 @@ export const SharePanel = () => {
     }
   };
 
-  const shareViaEmail = () => {
-    const subject = encodeURIComponent(shareTitle);
-    const body = encodeURIComponent(`I created this diploma using the Diploma Generator. Check it out: ${shareUrl}`);
-    window.open(`mailto:?subject=${subject}&body=${body}`);
-  };
-
-  const nativeShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          url: shareUrl
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    }
-  };
-
-  const hasContent = diplomaHtml || diplomaCss;
-
   return (
     <Card>
       <CardHeader>
@@ -259,136 +218,132 @@ export const SharePanel = () => {
           Download your diploma or share it with others
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Note about signing */}
-        {hasContent && !diplomaUrl.includes('/diploma/') && (
+      <CardContent className="space-y-6">
+        {/* Status Info */}
+        {hasContent && !isSignedDiploma && (
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              💡 Sign your diploma to the blockchain first to get a shareable link and QR code for CVs and LinkedIn
+              💡 Sign your diploma to the blockchain first to get a shareable link and QR code
             </p>
           </div>
         )}
 
-        {/* PDF Download */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">Export</h4>
+        {isSignedDiploma && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
+              ✅ This is a verified blockchain diploma with QR verification
+            </p>
+          </div>
+        )}
+
+        {/* Export Section */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold">Export</h4>
           <Button
             onClick={generatePDF}
             disabled={!hasContent || isGeneratingPDF}
             className="w-full"
+            variant="outline"
           >
-            <Download className="w-4 h-4 mr-2" />
-            {isGeneratingPDF ? 'Generating PDF...' : 'Download as PDF'}
+            {isGeneratingPDF ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" />
+                Download as PDF
+              </>
+            )}
           </Button>
           {hasContent && (
-            <p className="text-xs text-muted-foreground mt-1">
-              PDF will include "Verified by Diplomator" badge{currentDiplomaId ? ' and QR code for verification' : ''}
+            <p className="text-xs text-muted-foreground">
+              PDF includes verification badge{currentDiplomaId ? ' and QR code' : ''}
             </p>
           )}
         </div>
 
-        {/* Copy Link */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">
-            {diplomaUrl.includes('/diploma/') ? 'Share Diploma Link' : 'Copy Link'}
-          </h4>
-          <Button
-            variant="outline"
-            onClick={copyToClipboard}
-            className="w-full"
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 mr-2" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Link
-              </>
-            )}
-          </Button>
-          {diplomaUrl.includes('/diploma/') && (
-            <div className="mt-2">
-              <p className="text-xs text-green-600 mb-1">
-                ✅ This is a direct diploma viewing link with QR verification
-              </p>
-              {currentDiplomaId && (
-                <div className="text-center p-2 bg-gray-50 rounded border">
-                  <div className="mb-2">
-                    <QRCodeGenerator 
-                      value={`${window.location.origin}/verify/${currentDiplomaId}`}
-                      size={60}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-600 font-mono">
-                    {currentDiplomaId}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    QR leads to verification page
-                  </p>
-                </div>
+        {/* Share Link Section */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold">Share Link</h4>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={copyToClipboard}
+              className="flex-1"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Link
+                </>
               )}
+            </Button>
+            
+            {isSignedDiploma && currentDiplomaId && (
+              <Button
+                variant="outline"
+                onClick={() => setShowQR(!showQR)}
+                size="icon"
+              >
+                <QrCode className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+
+          {showQR && currentDiplomaId && (
+            <div className="flex justify-center p-4 bg-white rounded-lg border">
+              <div className="text-center">
+                <QRCodeGenerator 
+                  value={`${window.location.origin}/verify/${currentDiplomaId}`}
+                  size={100}
+                />
+                <p className="text-xs text-muted-foreground mt-2 font-mono">
+                  {currentDiplomaId}
+                </p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Social Sharing */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">Share on Social Media</h4>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Social Media Section */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold">Social Media</h4>
+          <div className="grid grid-cols-2 gap-3">
             <FacebookShareButton url={shareUrl} hashtag="#diploma">
-              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full">
-                <FacebookIcon size={20} round />
+              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full justify-center">
+                <FacebookIcon size={16} round />
                 <span className="text-sm">Facebook</span>
               </div>
             </FacebookShareButton>
 
             <TwitterShareButton url={shareUrl} title={shareTitle}>
-              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full">
-                <TwitterIcon size={20} round />
+              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full justify-center">
+                <TwitterIcon size={16} round />
                 <span className="text-sm">Twitter</span>
               </div>
             </TwitterShareButton>
 
             <LinkedinShareButton url={shareUrl} title={shareTitle}>
-              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full">
-                <LinkedinIcon size={20} round />
+              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full justify-center">
+                <LinkedinIcon size={16} round />
                 <span className="text-sm">LinkedIn</span>
               </div>
             </LinkedinShareButton>
 
             <WhatsappShareButton url={shareUrl} title={shareTitle}>
-              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full">
-                <WhatsappIcon size={20} round />
+              <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full justify-center">
+                <WhatsappIcon size={16} round />
                 <span className="text-sm">WhatsApp</span>
               </div>
             </WhatsappShareButton>
           </div>
-        </div>
-
-        {/* Email & Native Share */}
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            onClick={shareViaEmail}
-            className="w-full"
-          >
-            <Mail className="w-4 h-4 mr-2" />
-            Share via Email
-          </Button>
-
-          {navigator.share && (
-            <Button
-              variant="outline"
-              onClick={nativeShare}
-              className="w-full"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>
