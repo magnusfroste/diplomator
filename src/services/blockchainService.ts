@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DiplomaRecord {
@@ -209,6 +208,7 @@ export const createVerificationUrl = (diplomaId: string): string => {
  * Creates a direct diploma viewing URL
  */
 export const createDiplomaUrl = (diplomaId: string): string => {
-  const baseUrl = window.location.origin;
+  // Use the actual project domain instead of window.location.origin
+  const baseUrl = 'https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com';
   return `${baseUrl}/diploma/${diplomaId}`;
 };
