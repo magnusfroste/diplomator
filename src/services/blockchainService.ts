@@ -1,6 +1,4 @@
 
-import { createHash } from 'crypto';
-
 export interface DiplomaRecord {
   id: string;
   contentHash: string;
@@ -18,19 +16,30 @@ const blockchainStorage = new Map<string, DiplomaRecord>();
 const DIPLOMATOR_PRIVATE_KEY = 'diplomator_secure_key_2024';
 
 /**
+ * Creates a SHA-256 hash using Web Crypto API
+ */
+const createWebCryptoHash = async (data: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const dataBuffer = encoder.encode(data);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+/**
  * Creates a SHA-256 hash of the diploma content
  */
-export const createContentHash = (html: string, css: string): string => {
+export const createContentHash = async (html: string, css: string): Promise<string> => {
   const content = html + css;
-  return createHash('sha256').update(content).digest('hex');
+  return await createWebCryptoHash(content);
 };
 
 /**
  * Creates Diplomator's cryptographic signature
  */
-export const createDiplomatorSignature = (contentHash: string, recipientName: string): string => {
+export const createDiplomatorSignature = async (contentHash: string, recipientName: string): Promise<string> => {
   const signatureData = `${contentHash}:${recipientName}:${DIPLOMATOR_PRIVATE_KEY}`;
-  return createHash('sha256').update(signatureData).digest('hex');
+  return await createWebCryptoHash(signatureData);
 };
 
 /**
@@ -49,17 +58,17 @@ export const signDiplomaToBlockchain = async (
   recipientName: string,
   institutionName: string
 ): Promise<DiplomaRecord> => {
-  const contentHash = createContentHash(html, css);
+  const contentHash = await createContentHash(html, css);
   const diplomaId = generateDiplomaId();
-  const signature = createDiplomatorSignature(contentHash, recipientName);
-  const diplomatorSeal = createHash('sha256').update(`DIPLOMATOR_SEAL_${diplomaId}`).digest('hex');
+  const signature = await createDiplomatorSignature(contentHash, recipientName);
+  const diplomatorSeal = await createWebCryptoHash(`DIPLOMATOR_SEAL_${diplomaId}`);
   
   const record: DiplomaRecord = {
     id: diplomaId,
     contentHash,
     signature,
     timestamp: Date.now(),
-    recipientInfo: createHash('sha256').update(recipientName).digest('hex'), // Privacy: store hash only
+    recipientInfo: await createWebCryptoHash(recipientName), // Privacy: store hash only
     institutionInfo: institutionName,
     diplomatorSeal
   };
@@ -96,19 +105,19 @@ export const verifyDiplomaFromBlockchain = async (
   }
 
   // Verify content hash
-  const currentContentHash = createContentHash(html, css);
+  const currentContentHash = await createContentHash(html, css);
   if (currentContentHash !== record.contentHash) {
     issues.push('Diploma content has been tampered with');
   }
 
   // Verify Diplomator signature
-  const expectedSignature = createDiplomatorSignature(record.contentHash, recipientName);
+  const expectedSignature = await createDiplomatorSignature(record.contentHash, recipientName);
   if (expectedSignature !== record.signature) {
     issues.push('Invalid Diplomator signature');
   }
 
   // Verify recipient (privacy-preserving)
-  const recipientHash = createHash('sha256').update(recipientName).digest('hex');
+  const recipientHash = await createWebCryptoHash(recipientName);
   if (recipientHash !== record.recipientInfo) {
     issues.push('Recipient name does not match blockchain record');
   }
