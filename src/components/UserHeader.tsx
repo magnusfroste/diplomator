@@ -83,7 +83,7 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleSignedClick}>
             <FileText className="mr-2 h-4 w-4" />
-            <span>Signed</span>
+            <span>Blockchain Verification</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
