@@ -35,31 +35,48 @@ const Diploma = () => {
 
   const fetchDiplomaData = async () => {
     try {
+      console.log('=== DIPLOMA FETCH DEBUG ===');
       console.log('Fetching diploma with ID:', diplomaId);
+      console.log('URL params:', useParams());
+      
       const { data, error } = await supabase
         .from('signed_diplomas')
         .select('*')
         .eq('blockchain_id', diplomaId)
         .maybeSingle();
 
-      console.log('Supabase response:', { data, error });
+      console.log('Supabase query result:', { data, error });
+      console.log('Query was: SELECT * FROM signed_diplomas WHERE blockchain_id =', diplomaId);
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error details:', error);
         toast.error('Error loading diploma: ' + error.message);
         return;
       }
 
       if (!data) {
-        console.error('No diploma found with ID:', diplomaId);
+        console.error('No diploma found with blockchain_id:', diplomaId);
+        console.log('This means the query returned no results');
+        
+        // Let's also try to get all diplomas to see what's in the database
+        const { data: allDiplomas, error: allError } = await supabase
+          .from('signed_diplomas')
+          .select('blockchain_id, recipient_name')
+          .limit(10);
+        
+        console.log('All diplomas in database (first 10):', allDiplomas);
+        if (allError) {
+          console.error('Error fetching all diplomas:', allError);
+        }
+        
         toast.error('Diploma not found');
         return;
       }
 
-      console.log('Diploma data found:', data);
+      console.log('SUCCESS: Diploma data found:', data);
       setDiplomaData(data);
     } catch (error) {
-      console.error('Error fetching diploma:', error);
+      console.error('Unexpected error fetching diploma:', error);
       toast.error('Error loading diploma');
     } finally {
       setIsLoading(false);
@@ -157,6 +174,7 @@ const Diploma = () => {
         <div className="text-center">
           <Shield className="w-12 h-12 mx-auto mb-4 text-blue-600 animate-pulse" />
           <p className="text-lg text-gray-600">Loading diploma...</p>
+          <p className="text-sm text-gray-500 mt-2">Diploma ID: {diplomaId}</p>
         </div>
       </div>
     );
@@ -168,7 +186,8 @@ const Diploma = () => {
         <div className="text-center">
           <XCircle className="w-12 h-12 mx-auto mb-4 text-red-600" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Diploma Not Found</h1>
-          <p className="text-gray-600 mb-4">The requested diploma could not be found.</p>
+          <p className="text-gray-600 mb-2">The requested diploma could not be found.</p>
+          <p className="text-sm text-gray-500 mb-4">Searched for ID: {diplomaId}</p>
           <Button onClick={() => navigate('/')}>
             <Home className="w-4 h-4 mr-2" />
             Back to Diplomator
