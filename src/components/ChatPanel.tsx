@@ -224,7 +224,7 @@ export const ChatPanel = () => {
                 onKeyPress={handleKeyPress}
                 placeholder="Describe the diploma you want to create..."
                 className="resize-none min-h-[60px]"
-                rows={2}
+                rows={3}
                 disabled={isGenerating}
               />
             </div>
