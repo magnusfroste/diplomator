@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DiplomaRecord {
@@ -16,7 +17,7 @@ const DIPLOMATOR_PRIVATE_KEY = 'diplomator_secure_key_2024';
 /**
  * Creates a SHA-256 hash using Web Crypto API
  */
-const createWebCryptoHash = async (data: string): Promise<string> => {
+export const createWebCryptoHash = async (data: string): Promise<string> => {
   const encoder = new TextEncoder();
   const dataBuffer = encoder.encode(data);
   const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
