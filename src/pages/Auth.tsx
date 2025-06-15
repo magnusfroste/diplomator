@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Award, Mail, Lock, User, ArrowLeft, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,27 +19,61 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate auth process
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/app`
+          }
+        });
+        
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Check your email to confirm your account!');
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Signed in successfully!');
+          navigate('/app');
+        }
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
       setLoading(false);
-      // Redirect to main app
-      navigate('/app');
-    }, 1500);
+    }
   };
 
-  const handleDemoLogin = () => {
-    setEmail('demo@diplomator.com');
-    setPassword('123456');
-    setIsSignUp(false);
+  const handleDemoLogin = async () => {
+    setLoading(true);
     
-    // Auto-submit after a brief moment
-    setTimeout(() => {
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: 'demo@diplomator.com',
+        password: 'demo123456',
+      });
+      
+      if (error) {
+        toast.error('Demo login failed: ' + error.message);
+      } else {
+        toast.success('Demo login successful!');
         navigate('/app');
-      }, 1500);
-    }, 500);
+      }
+    } catch (error) {
+      toast.error('Demo login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleAuthMode = () => {

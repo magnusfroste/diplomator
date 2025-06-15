@@ -7,19 +7,30 @@ import { LogOut, Settings, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DiplomaManager } from './DiplomaManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface UserHeaderProps {
-  userEmail?: string;
-  userName?: string;
+  userEmail: string;
+  userName: string;
 }
 
-export const UserHeader = ({ userEmail = 'demo@diplomator.com', userName = 'Demo User' }: UserHeaderProps) => {
+export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
   const navigate = useNavigate();
   const [showSignedDiplomas, setShowSignedDiplomas] = useState(false);
 
-  const handleLogout = () => {
-    // In a real app, this would handle actual logout
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error('Error signing out');
+      } else {
+        toast.success('Signed out successfully');
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error('Error signing out');
+    }
   };
 
   const getInitials = (name: string) => {

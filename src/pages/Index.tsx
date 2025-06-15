@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
 import { UserHeader } from "@/components/UserHeader";
@@ -8,8 +8,55 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ApiKeySettings } from "@/components/ApiKeySettings";
 import { BlockchainMenu } from "@/components/BlockchainMenu";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { User } from "@supabase/supabase-js";
 
 const Index = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+      
+      if (!session) {
+        navigate('/auth');
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        
+        if (!session) {
+          navigate('/auth');
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect to auth
+  }
+
   return (
     <ThemeProvider>
       <DiplomaProvider>
@@ -32,7 +79,10 @@ const Index = () => {
               <div className="flex items-center gap-4">
                 <BlockchainMenu />
                 <ApiKeySettings />
-                <UserHeader />
+                <UserHeader 
+                  userEmail={user.email || 'Unknown'} 
+                  userName={user.user_metadata?.name || user.email?.split('@')[0] || 'User'} 
+                />
               </div>
             </div>
           </div>
