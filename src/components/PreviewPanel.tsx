@@ -1,11 +1,10 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Code, Eye, Maximize, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SyntaxHighlightedEditor } from '@/components/SyntaxHighlightedEditor';
 
 export const PreviewPanel = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
@@ -214,12 +213,11 @@ export const PreviewPanel = () => {
                     <CardTitle className="text-sm">HTML</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Textarea
+                    <SyntaxHighlightedEditor
                       value={editableHtml}
-                      onChange={(e) => setEditableHtml(e.target.value)}
+                      onChange={setEditableHtml}
+                      language="html"
                       placeholder="HTML content will appear here..."
-                      className="font-mono text-xs min-h-[150px] resize-none"
-                      rows={8}
                     />
                   </CardContent>
                 </Card>
@@ -230,12 +228,11 @@ export const PreviewPanel = () => {
                     <CardTitle className="text-sm">CSS</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Textarea
+                    <SyntaxHighlightedEditor
                       value={editableCss}
-                      onChange={(e) => setEditableCss(e.target.value)}
+                      onChange={setEditableCss}
+                      language="css"
                       placeholder="CSS styles will appear here..."
-                      className="font-mono text-xs min-h-[150px] resize-none"
-                      rows={8}
                     />
                   </CardContent>
                 </Card>
