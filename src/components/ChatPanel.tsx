@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles, Info } from 'lucide-react';
+import { Upload, Link, Sparkles, Info, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,13 +8,15 @@ import { generateDiploma } from '@/services/anthropicService';
 import { MessageList } from '@/components/MessageList';
 import { FileUpload } from '@/components/FileUpload';
 import { URLInput } from '@/components/URLInput';
+import { DiplomaEditor } from '@/components/DiplomaEditor';
 import { Message } from '@/contexts/DiplomaContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'editor'>('chat');
   const [showGuidelines, setShowGuidelines] = useState(false);
+  
   const { 
     messages, 
     setMessages, 
@@ -174,6 +175,15 @@ export const ChatPanel = () => {
             <Link className="w-3 h-3 mr-1" />
             URL
           </Button>
+          <Button
+            variant={activeTab === 'editor' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('editor')}
+            className="h-7 text-xs"
+          >
+            <Edit className="w-3 h-3 mr-1" />
+            Editor
+          </Button>
         </div>
       </div>
 
@@ -198,6 +208,7 @@ export const ChatPanel = () => {
         
         {activeTab === 'upload' && <FileUpload />}
         {activeTab === 'url' && <URLInput />}
+        {activeTab === 'editor' && <DiplomaEditor />}
       </div>
     </div>
   );

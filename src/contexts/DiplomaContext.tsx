@@ -1,6 +1,14 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+interface DiplomaFields {
+  recipientName: string;
+  degree: string;
+  field: string;
+  institution: string;
+  date: string;
+}
+
 interface DiplomaContextType {
   diplomaHtml: string;
   setDiplomaHtml: (html: string) => void;
@@ -10,6 +18,8 @@ interface DiplomaContextType {
   setIsGenerating: (generating: boolean) => void;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  diplomaFields: DiplomaFields;
+  setDiplomaFields: (fields: DiplomaFields) => void;
 }
 
 interface Message {
@@ -25,10 +35,17 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [diplomaHtml, setDiplomaHtml] = useState('');
   const [diplomaCss, setDiplomaCss] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
+    recipientName: '',
+    degree: '',
+    field: '',
+    institution: '',
+    date: ''
+  });
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: 'Hello! I\'m here to help you create beautiful diplomas. You can either upload an image for inspiration or provide a website URL to scrape design elements from. What would you like to create today?',
+      content: 'Hello! I\'m here to help you create beautiful diplomas. You can either upload an image for inspiration, provide a website URL to scrape design elements from, or use the Editor tab to manually customize diploma content. What would you like to create today?',
       isUser: false,
       timestamp: new Date()
     }
@@ -43,7 +60,9 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
       isGenerating,
       setIsGenerating,
       messages,
-      setMessages
+      setMessages,
+      diplomaFields,
+      setDiplomaFields
     }}>
       {children}
     </DiplomaContext.Provider>
@@ -58,4 +77,4 @@ export const useDiploma = () => {
   return context;
 };
 
-export type { Message };
+export type { Message, DiplomaFields };
