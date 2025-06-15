@@ -18,14 +18,8 @@ const Index = () => {
           <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex items-center justify-between px-6 py-3">
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                  </svg>
-                </div>
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Diplomator</h1>
-                  <p className="text-xs text-muted-foreground">AI-Powered Diploma Designer</p>
                 </div>
               </div>
               
