@@ -73,17 +73,18 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
   const highlightedCode = highlightSyntax(escapeHtml(value), language);
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <style>{`
         .syntax-editor {
           position: relative;
           font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 14px;
+          line-height: 1.5;
           border-radius: 8px;
           overflow: hidden;
-          border: 1px solid hsl(var(--border));
           background: hsl(var(--background));
+          height: 100%;
+          min-height: 400px;
         }
         
         .syntax-highlight {
@@ -92,7 +93,7 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           left: 0;
           right: 0;
           bottom: 0;
-          padding: 16px;
+          padding: 20px;
           margin: 0;
           color: transparent;
           background: transparent;
@@ -102,13 +103,16 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           pointer-events: none;
           z-index: 1;
           tab-size: 2;
+          font-family: inherit;
+          font-size: inherit;
+          line-height: inherit;
         }
         
         .syntax-textarea {
           position: relative;
           width: 100%;
-          height: 200px;
-          padding: 16px;
+          height: 100%;
+          padding: 20px;
           margin: 0;
           border: none;
           outline: none;
@@ -120,18 +124,18 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           white-space: pre-wrap;
           word-wrap: break-word;
           overflow: auto;
-          resize: vertical;
+          resize: none;
           z-index: 2;
           tab-size: 2;
         }
         
         .syntax-textarea::placeholder {
           color: hsl(var(--muted-foreground));
+          opacity: 0.7;
         }
         
         .syntax-textarea:focus {
-          outline: 2px solid hsl(var(--ring));
-          outline-offset: -2px;
+          outline: none;
         }
         
         /* Enhanced Syntax highlighting colors */
@@ -140,15 +144,15 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           font-weight: 500; 
         }
         .tag-name { 
-          color: #3B82F6; 
+          color: #2563EB; 
           font-weight: 600; 
         }
         .attr-name { 
-          color: #F59E0B; 
+          color: #D97706; 
           font-weight: 500; 
         }
         .string { 
-          color: #10B981; 
+          color: #059669; 
           font-weight: 500; 
         }
         .comment { 
@@ -158,22 +162,22 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
         }
         .operator { 
           color: #8B5CF6; 
-          font-weight: 600; 
+          font-weight: 500; 
         }
         .selector { 
-          color: #8B5CF6; 
+          color: #7C3AED; 
           font-weight: 600; 
         }
         .property { 
-          color: #3B82F6; 
+          color: #2563EB; 
           font-weight: 500; 
         }
         .value { 
-          color: #10B981; 
+          color: #059669; 
           font-weight: 500; 
         }
         .important { 
-          color: #EF4444; 
+          color: #DC2626; 
           font-weight: 700; 
         }
         

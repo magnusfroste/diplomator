@@ -1,9 +1,9 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Code, Eye, Maximize, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SyntaxHighlightedEditor } from '@/components/SyntaxHighlightedEditor';
 
 export const PreviewPanel = () => {
@@ -158,9 +158,13 @@ export const PreviewPanel = () => {
               <Eye className="w-4 h-4 mr-1" />
               Preview
             </TabsTrigger>
-            <TabsTrigger value="code">
+            <TabsTrigger value="html">
               <Code className="w-4 h-4 mr-1" />
-              Code
+              HTML
+            </TabsTrigger>
+            <TabsTrigger value="css">
+              <Code className="w-4 h-4 mr-1" />
+              CSS
             </TabsTrigger>
           </TabsList>
           
@@ -175,7 +179,7 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="code" className="flex-1 p-4 m-0 overflow-hidden">
+          <TabsContent value="html" className="flex-1 p-4 m-0 overflow-hidden">
             <div className="h-full flex flex-col">
               {/* Unsaved Changes Bar */}
               {hasUnsavedChanges && (
@@ -205,37 +209,66 @@ export const PreviewPanel = () => {
                 </div>
               )}
 
-              {/* Code Editors */}
-              <div className="flex-1 space-y-4 overflow-y-auto">
-                {/* HTML Editor */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">HTML</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <SyntaxHighlightedEditor
-                      value={editableHtml}
-                      onChange={setEditableHtml}
-                      language="html"
-                      placeholder="HTML content will appear here..."
-                    />
-                  </CardContent>
-                </Card>
+              {/* HTML Editor */}
+              <div className="flex-1 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-3 border-b border-slate-200 bg-slate-50">
+                  <h3 className="text-sm font-medium text-slate-700">HTML Structure</h3>
+                </div>
+                <div className="h-full p-4 overflow-hidden">
+                  <SyntaxHighlightedEditor
+                    value={editableHtml}
+                    onChange={setEditableHtml}
+                    language="html"
+                    placeholder="HTML content will appear here..."
+                  />
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="css" className="flex-1 p-4 m-0 overflow-hidden">
+            <div className="h-full flex flex-col">
+              {/* Unsaved Changes Bar */}
+              {hasUnsavedChanges && (
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between">
+                  <span className="text-sm text-amber-800 font-medium">
+                    You have unsaved changes
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDiscard}
+                      className="h-8 text-xs"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Discard
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSave}
+                      className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Save className="w-3 h-3 mr-1" />
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              )}
 
-                {/* CSS Editor */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">CSS</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <SyntaxHighlightedEditor
-                      value={editableCss}
-                      onChange={setEditableCss}
-                      language="css"
-                      placeholder="CSS styles will appear here..."
-                    />
-                  </CardContent>
-                </Card>
+              {/* CSS Editor */}
+              <div className="flex-1 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-3 border-b border-slate-200 bg-slate-50">
+                  <h3 className="text-sm font-medium text-slate-700">CSS Styles</h3>
+                </div>
+                <div className="h-full p-4 overflow-hidden">
+                  <SyntaxHighlightedEditor
+                    value={editableCss}
+                    onChange={setEditableCss}
+                    language="css"
+                    placeholder="CSS styles will appear here..."
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>
