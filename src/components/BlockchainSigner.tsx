@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Shield, CheckCircle, Copy, ExternalLink, QrCode } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { signDiplomaToBlockchain, createVerificationUrl, DiplomaRecord } from '@/services/blockchainService';
+import { signDiplomaToBlockchain, createVerificationUrl, createDiplomaUrl, DiplomaRecord } from '@/services/blockchainService';
 import { QRCodeGenerator } from './QRCodeGenerator';
 import { toast } from 'sonner';
 
@@ -41,8 +42,7 @@ export const BlockchainSigner = () => {
       
       setSignedRecord(record);
       const verifyUrl = createVerificationUrl(record.id);
-      // Use the production URL for diploma viewing
-      const directUrl = `https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com/diploma/${record.id}`;
+      const directUrl = createDiplomaUrl(record.id);
       setVerificationUrl(verifyUrl);
       setDiplomaUrl(directUrl);
       

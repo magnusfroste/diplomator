@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DiplomaRecord {
@@ -45,6 +46,13 @@ export const createDiplomatorSignature = async (contentHash: string, recipientNa
  */
 export const generateDiplomaId = (): string => {
   return 'DIP_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+};
+
+/**
+ * Gets the production base URL for diploma links
+ */
+const getProductionBaseUrl = (): string => {
+  return 'https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com';
 };
 
 /**
@@ -200,7 +208,7 @@ export const getAllBlockchainRecords = async (): Promise<DiplomaRecord[]> => {
  * Creates a verification URL for a diploma
  */
 export const createVerificationUrl = (diplomaId: string): string => {
-  const baseUrl = window.location.origin;
+  const baseUrl = getProductionBaseUrl();
   return `${baseUrl}/verify/${diplomaId}`;
 };
 
@@ -208,7 +216,6 @@ export const createVerificationUrl = (diplomaId: string): string => {
  * Creates a direct diploma viewing URL
  */
 export const createDiplomaUrl = (diplomaId: string): string => {
-  // Always use the production domain for diploma URLs
-  const baseUrl = 'https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com';
+  const baseUrl = getProductionBaseUrl();
   return `${baseUrl}/diploma/${diplomaId}`;
 };
