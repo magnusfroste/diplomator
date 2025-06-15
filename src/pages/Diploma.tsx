@@ -37,7 +37,6 @@ const Diploma = () => {
     try {
       console.log('=== DIPLOMA FETCH DEBUG ===');
       console.log('Fetching diploma with ID:', diplomaId);
-      console.log('URL params:', useParams());
       
       const { data, error } = await supabase
         .from('signed_diplomas')
