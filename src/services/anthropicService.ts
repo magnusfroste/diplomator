@@ -48,11 +48,12 @@ export const generateDiploma = async (request: DiplomaGenerationRequest): Promis
           } else if (user.user_metadata?.full_name) {
             userFullName = user.user_metadata.full_name;
           } else {
-            userFullName = 'Diplomator Demo';
+            // Use email prefix as final fallback
+            userFullName = user.email?.split('@')[0] || 'User';
           }
         }
       } else {
-        userFullName = 'Diplomator Demo';
+        userFullName = 'User';
       }
     }
 
