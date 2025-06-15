@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +25,7 @@ export const SharePanel = () => {
   const [diplomaUrl, setDiplomaUrl] = useState('');
   const [currentDiplomaId, setCurrentDiplomaId] = useState('');
   const [showQR, setShowQR] = useState(false);
+  const [isSignedDiploma, setIsSignedDiploma] = useState(false);
 
   useEffect(() => {
     const fetchLastDiplomaUrl = async () => {
@@ -44,25 +44,30 @@ export const SharePanel = () => {
         if (data && data.diploma_url) {
           setDiplomaUrl(data.diploma_url);
           setCurrentDiplomaId(data.blockchain_id);
+          setIsSignedDiploma(true);
         } else {
           const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
           const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
-          if (savedDiplomaUrl) {
+          if (savedDiplomaUrl && savedDiplomaId) {
             setDiplomaUrl(savedDiplomaUrl);
-            setCurrentDiplomaId(savedDiplomaId || '');
+            setCurrentDiplomaId(savedDiplomaId);
+            setIsSignedDiploma(true);
           } else {
             setDiplomaUrl(window.location.href);
+            setIsSignedDiploma(false);
           }
         }
       } catch (error) {
         console.error('Error fetching diploma URL:', error);
         const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
         const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
-        if (savedDiplomaUrl) {
+        if (savedDiplomaUrl && savedDiplomaId) {
           setDiplomaUrl(savedDiplomaUrl);
-          setCurrentDiplomaId(savedDiplomaId || '');
+          setCurrentDiplomaId(savedDiplomaId);
+          setIsSignedDiploma(true);
         } else {
           setDiplomaUrl(window.location.href);
+          setIsSignedDiploma(false);
         }
       }
     };
@@ -73,7 +78,6 @@ export const SharePanel = () => {
   const shareUrl = diplomaUrl || window.location.href;
   const shareTitle = "Check out my diploma created with Diploma Generator!";
   const hasContent = diplomaHtml || diplomaCss;
-  const isSignedDiploma = diplomaUrl.includes('/diploma/');
 
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
@@ -228,7 +232,7 @@ export const SharePanel = () => {
           </div>
         )}
 
-        {isSignedDiploma && (
+        {isSignedDiploma && currentDiplomaId && (
           <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
               ✅ This is a verified blockchain diploma with QR verification
