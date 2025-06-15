@@ -1,10 +1,10 @@
-
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Code, Eye, Maximize, Save, X } from 'lucide-react';
+import { Download, Code, Eye, Maximize, Save, X, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MonacoEditor } from '@/components/MonacoEditor';
+import { SharePanel } from '@/components/SharePanel';
 
 export const PreviewPanel = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
@@ -166,6 +166,10 @@ export const PreviewPanel = () => {
               <Code className="w-4 h-4 mr-1" />
               CSS
             </TabsTrigger>
+            <TabsTrigger value="share">
+              <Share className="w-4 h-4 mr-1" />
+              Share
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="preview" className="flex-1 p-4 m-0">
@@ -270,6 +274,12 @@ export const PreviewPanel = () => {
                   />
                 </div>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="share" className="flex-1 p-4 m-0">
+            <div className="max-w-md mx-auto">
+              <SharePanel />
             </div>
           </TabsContent>
         </Tabs>
