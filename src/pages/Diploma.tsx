@@ -136,7 +136,7 @@ const Diploma = () => {
             Verified by Diplomator
           </div>
           
-          <!-- QR Code and ID -->
+          <!-- QR Code and ID for PDF -->
           <div style="position: absolute; bottom: 12px; left: 12px; text-align: center; z-index: 1000;">
             <div style="background: rgba(255, 255, 255, 0.95); padding: 6px; border-radius: 6px; border: 2px solid #e5e7eb; margin-bottom: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
               <div id="qr-code-container" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;"></div>
@@ -152,22 +152,37 @@ const Diploma = () => {
       tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Generate QR code
+      // Add actual QR code
       const qrContainer = tempDiv.querySelector('#qr-code-container') as HTMLElement;
       if (qrContainer) {
-        const qrDiv = document.createElement('div');
-        qrDiv.innerHTML = `
-          <svg width="60" height="60" viewBox="0 0 60 60" style="background: white;">
-            <rect width="60" height="60" fill="white"/>
-            <rect x="5" y="5" width="50" height="50" fill="none" stroke="black" stroke-width="1"/>
-            <rect x="8" y="8" width="12" height="12" fill="black"/>
-            <rect x="40" y="8" width="12" height="12" fill="black"/>
-            <rect x="8" y="40" width="12" height="12" fill="black"/>
-            <rect x="26" y="26" width="8" height="8" fill="black"/>
-            <text x="30" y="32" text-anchor="middle" font-size="3" fill="white">QR</text>
-          </svg>
-        `;
-        qrContainer.appendChild(qrDiv.firstElementChild as HTMLElement);
+        // Create a temporary container for the QR code component
+        const qrTempDiv = document.createElement('div');
+        document.body.appendChild(qrTempDiv);
+        
+        // Import and render QR code component
+        const { createRoot } = await import('react-dom/client');
+        const root = createRoot(qrTempDiv);
+        
+        await new Promise<void>((resolve) => {
+          root.render(
+            React.createElement(QRCodeGenerator, {
+              value: verificationUrl,
+              size: 60,
+              level: 'M'
+            })
+          );
+          
+          // Wait for the QR code to render
+          setTimeout(() => {
+            const qrSvg = qrTempDiv.querySelector('svg');
+            if (qrSvg) {
+              qrContainer.appendChild(qrSvg.cloneNode(true));
+            }
+            root.unmount();
+            document.body.removeChild(qrTempDiv);
+            resolve();
+          }, 100);
+        });
       }
 
       // Convert to canvas with higher quality settings
@@ -271,34 +286,6 @@ const Diploma = () => {
           .diploma-wrapper [style*="position:absolute"] {
             max-width: 95% !important;
           }
-          .verification-section {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            text-align: center;
-            z-index: 1000;
-          }
-          .qr-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            backdrop-filter: blur(4px);
-          }
-          .diploma-id {
-            font-size: 10px;
-            color: #444;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-            max-width: 96px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 4px 6px;
-            border-radius: 4px;
-            border: 1px solid #d1d5db;
-            font-weight: 500;
-          }
           .verification-badge {
             position: fixed;
             bottom: 20px;
@@ -324,12 +311,6 @@ const Diploma = () => {
           <div class="verification-badge">
             <span style="font-size: 14px;">🛡️</span>
             Verified by Diplomator
-          </div>
-          <div class="verification-section">
-            <div class="qr-container">
-              <div id="qr-code-placeholder" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
-            </div>
-            <div class="diploma-id">${diplomaData.blockchain_id}</div>
           </div>
         </div>
       </body>

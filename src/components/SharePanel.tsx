@@ -119,7 +119,7 @@ export const SharePanel = () => {
           </div>
           
           ${currentDiplomaId ? `
-          <!-- QR Code and ID -->
+          <!-- QR Code and ID for PDF -->
           <div style="position: absolute; bottom: 12px; left: 12px; text-align: center; z-index: 1000;">
             <div style="background: rgba(255, 255, 255, 0.95); padding: 6px; border-radius: 6px; border: 2px solid #e5e7eb; margin-bottom: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
               <div id="qr-code-container" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;"></div>
@@ -136,23 +136,38 @@ export const SharePanel = () => {
       tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Add QR code if available
+      // Add actual QR code if available
       if (currentDiplomaId) {
         const qrContainer = tempDiv.querySelector('#qr-code-container') as HTMLElement;
         if (qrContainer) {
-          const qrDiv = document.createElement('div');
-          qrDiv.innerHTML = `
-            <svg width="60" height="60" viewBox="0 0 60 60" style="background: white;">
-              <rect width="60" height="60" fill="white"/>
-              <rect x="5" y="5" width="50" height="50" fill="none" stroke="black" stroke-width="1"/>
-              <rect x="8" y="8" width="12" height="12" fill="black"/>
-              <rect x="40" y="8" width="12" height="12" fill="black"/>
-              <rect x="8" y="40" width="12" height="12" fill="black"/>
-              <rect x="26" y="26" width="8" height="8" fill="black"/>
-              <text x="30" y="32" text-anchor="middle" font-size="3" fill="white">QR</text>
-            </svg>
-          `;
-          qrContainer.appendChild(qrDiv.firstElementChild as HTMLElement);
+          // Create a temporary container for the QR code component
+          const qrTempDiv = document.createElement('div');
+          document.body.appendChild(qrTempDiv);
+          
+          // Import and render QR code component
+          const { createRoot } = await import('react-dom/client');
+          const root = createRoot(qrTempDiv);
+          
+          await new Promise<void>((resolve) => {
+            root.render(
+              React.createElement(QRCodeGenerator, {
+                value: verificationUrl,
+                size: 60,
+                level: 'M'
+              })
+            );
+            
+            // Wait for the QR code to render
+            setTimeout(() => {
+              const qrSvg = qrTempDiv.querySelector('svg');
+              if (qrSvg) {
+                qrContainer.appendChild(qrSvg.cloneNode(true));
+              }
+              root.unmount();
+              document.body.removeChild(qrTempDiv);
+              resolve();
+            }, 100);
+          });
         }
       }
 
