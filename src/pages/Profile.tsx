@@ -9,19 +9,23 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
-import { useDiploma } from '@/contexts/DiplomaContext';
 import { Toggle } from '@/components/ui/toggle';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { diplomaFormat, setDiplomaFormat } = useDiploma();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState({ name: '' });
   const [loading, setLoading] = useState(false);
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
 
   useEffect(() => {
     getProfile();
+    // Load saved diploma format from localStorage
+    const savedFormat = localStorage.getItem('diplomaFormat') as 'portrait' | 'landscape';
+    if (savedFormat) {
+      setDiplomaFormat(savedFormat);
+    }
   }, []);
 
   const getProfile = async () => {
@@ -82,6 +86,7 @@ const Profile = () => {
 
   const handleFormatChange = (format: 'portrait' | 'landscape') => {
     setDiplomaFormat(format);
+    localStorage.setItem('diplomaFormat', format);
     toast({
       title: "Format Updated",
       description: `Diploma format set to ${format}`,
