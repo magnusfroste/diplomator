@@ -57,3 +57,38 @@ export const generateDiploma = async (request: DiplomaGenerationRequest): Promis
     throw error;
   }
 };
+
+export const generateDiplomaFromImage = async (imageFile: File): Promise<DiplomaGenerationResponse> => {
+  try {
+    // Convert image to base64
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const base64Data = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    
+    const imageData = {
+      type: imageFile.type,
+      data: base64Data
+    };
+
+    return await generateDiploma({
+      messages: [],
+      requestType: 'image',
+      imageData
+    });
+  } catch (error) {
+    console.error('Error generating diploma from image:', error);
+    throw error;
+  }
+};
+
+export const generateDiplomaFromUrl = async (url: string): Promise<DiplomaGenerationResponse> => {
+  try {
+    return await generateDiploma({
+      messages: [],
+      requestType: 'url',
+      url
+    });
+  } catch (error) {
+    console.error('Error generating diploma from URL:', error);
+    throw error;
+  }
+};
