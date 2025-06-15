@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,13 +82,13 @@ export const SharePanel = () => {
         ? `${window.location.origin}/verify/${currentDiplomaId}`
         : shareUrl;
       
-      // Create a temporary div with improved containment
+      // Create a temporary div with balanced containment
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
-        <div style="width: 800px; height: 600px; padding: 0; background: white; position: relative; overflow: hidden;">
+        <div style="width: 800px; height: 600px; padding: 20px; background: white; position: relative; overflow: hidden;">
           <style>
             ${diplomaCss}
-            /* Strict containment styles */
+            /* Balanced containment styles */
             * {
               box-sizing: border-box !important;
             }
@@ -98,25 +97,15 @@ export const SharePanel = () => {
               height: 100% !important;
               position: relative !important;
               overflow: hidden !important;
-              padding: 40px !important;
             }
-            .diploma-container *,
-            .diploma-container *::before,
-            .diploma-container *::after {
-              max-width: calc(100% - 80px) !important;
-              max-height: calc(100% - 80px) !important;
-              overflow: hidden !important;
-              contain: layout style !important;
+            .diploma-container * {
+              max-width: 95% !important;
+              box-sizing: border-box !important;
             }
-            /* Prevent absolute positioned elements from escaping */
+            /* Handle absolutely positioned elements */
             .diploma-container [style*="position: absolute"],
             .diploma-container [style*="position:absolute"] {
-              max-width: calc(100% - 80px) !important;
-              max-height: calc(100% - 80px) !important;
-              left: auto !important;
-              right: auto !important;
-              top: auto !important;
-              bottom: auto !important;
+              max-width: 90% !important;
             }
           </style>
           <div class="diploma-container">

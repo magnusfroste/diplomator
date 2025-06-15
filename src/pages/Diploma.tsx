@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -100,13 +99,13 @@ const Diploma = () => {
     try {
       const verificationUrl = `${window.location.origin}/verify/${diplomaData.blockchain_id}`;
       
-      // Create a temporary div with improved containment
+      // Create a temporary div with balanced containment
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
-        <div style="width: 800px; height: 600px; padding: 0; background: white; position: relative; overflow: hidden;">
+        <div style="width: 800px; height: 600px; padding: 20px; background: white; position: relative; overflow: hidden;">
           <style>
             ${diplomaData.diploma_css}
-            /* Strict containment styles */
+            /* Balanced containment styles for PDF */
             * {
               box-sizing: border-box !important;
             }
@@ -115,25 +114,15 @@ const Diploma = () => {
               height: 100% !important;
               position: relative !important;
               overflow: hidden !important;
-              padding: 40px !important;
             }
-            .diploma-container *,
-            .diploma-container *::before,
-            .diploma-container *::after {
-              max-width: calc(100% - 80px) !important;
-              max-height: calc(100% - 80px) !important;
-              overflow: hidden !important;
-              contain: layout style !important;
+            .diploma-container * {
+              max-width: 95% !important;
+              box-sizing: border-box !important;
             }
-            /* Prevent absolute positioned elements from escaping */
+            /* Handle absolutely positioned elements */
             .diploma-container [style*="position: absolute"],
             .diploma-container [style*="position:absolute"] {
-              max-width: calc(100% - 80px) !important;
-              max-height: calc(100% - 80px) !important;
-              left: auto !important;
-              right: auto !important;
-              top: auto !important;
-              bottom: auto !important;
+              max-width: 90% !important;
             }
           </style>
           <div class="diploma-container">
@@ -261,41 +250,25 @@ const Diploma = () => {
           ${diplomaData.diploma_css}
           body {
             margin: 0;
-            padding: 0;
-            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
           }
           .diploma-wrapper {
             width: 100%;
-            height: 100vh;
+            min-height: calc(100vh - 40px);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
           }
-          .diploma-content {
-            width: 100%;
-            height: 100%;
-            padding: 40px;
-            box-sizing: border-box;
-            overflow: hidden;
-            position: relative;
+          /* Gentle containment for preview */
+          .diploma-wrapper * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
           }
-          /* Strict containment for preview */
-          .diploma-content *,
-          .diploma-content *::before,
-          .diploma-content *::after {
-            max-width: calc(100% - 80px) !important;
-            max-height: calc(100% - 80px) !important;
-            overflow: hidden !important;
-            contain: layout style !important;
-          }
-          /* Prevent absolute positioned elements from escaping */
-          .diploma-content [style*="position: absolute"],
-          .diploma-content [style*="position:absolute"] {
-            max-width: calc(100% - 160px) !important;
-            max-height: calc(100% - 160px) !important;
-            left: auto !important;
-            right: auto !important;
-            top: auto !important;
-            bottom: auto !important;
+          /* Handle absolutely positioned elements more gently */
+          .diploma-wrapper [style*="position: absolute"],
+          .diploma-wrapper [style*="position:absolute"] {
+            max-width: 95% !important;
           }
           .verification-section {
             position: fixed;
@@ -346,9 +319,7 @@ const Diploma = () => {
       </head>
       <body>
         <div class="diploma-wrapper">
-          <div class="diploma-content">
-            ${diplomaData.diploma_html}
-          </div>
+          ${diplomaData.diploma_html}
           <div class="verification-badge">
             <span style="font-size: 14px;">🛡️</span>
             Verified by Diplomator

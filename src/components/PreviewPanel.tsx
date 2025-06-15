@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Code, Eye, Maximize, Save, X, Share, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -109,35 +108,28 @@ export const PreviewPanel = () => {
         <title>Diploma Preview</title>
         <style>
           ${diplomaCss}
-          /* Enhanced containment styles for preview */
+          /* Gentle containment styles for preview */
           body {
             margin: 0;
-            padding: 40px;
-            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
           }
           .diploma-wrapper {
             width: 100%;
-            height: calc(100vh - 80px);
+            min-height: calc(100vh - 40px);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
           }
-          .diploma-wrapper *,
-          .diploma-wrapper *::before,
-          .diploma-wrapper *::after {
-            max-width: calc(100% - 80px) !important;
-            max-height: calc(100% - 80px) !important;
-            overflow: hidden !important;
-            contain: layout style !important;
+          /* Only prevent horizontal overflow, allow vertical */
+          .diploma-wrapper * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
           }
-          /* Prevent absolute positioned elements from escaping */
+          /* Handle absolutely positioned elements more gently */
           .diploma-wrapper [style*="position: absolute"],
           .diploma-wrapper [style*="position:absolute"] {
-            max-width: calc(100% - 160px) !important;
-            max-height: calc(100% - 160px) !important;
-            left: auto !important;
-            right: auto !important;
-            top: auto !important;
-            bottom: auto !important;
+            max-width: 95% !important;
           }
         </style>
       </head>
