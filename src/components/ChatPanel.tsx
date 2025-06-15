@@ -44,13 +44,25 @@ export const ChatPanel = () => {
     setIsGenerating(true);
 
     try {
+      // Convert messages to the format expected by the service
+      const chatMessages = messages.map(msg => ({
+        role: msg.isUser ? 'user' : 'assistant' as const,
+        content: msg.content
+      }));
+
+      // Add the current message
+      chatMessages.push({
+        role: 'user' as const,
+        content: message
+      });
+
       // Pass current diploma content for iteration
-      const response = await generateDiploma(
-        message, 
-        messages, 
-        diplomaHtml || undefined, 
-        diplomaCss || undefined
-      );
+      const response = await generateDiploma({
+        messages: chatMessages,
+        requestType: 'text',
+        currentHtml: diplomaHtml || undefined,
+        currentCss: diplomaCss || undefined
+      });
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
