@@ -27,14 +27,30 @@ export interface DiplomaGenerationResponse {
 
 export const generateDiploma = async (request: DiplomaGenerationRequest): Promise<DiplomaGenerationResponse> => {
   try {
-    // Get user's full name from auth metadata
+    // Get user's full name from profiles table
     let userFullName = request.userFullName;
     if (!userFullName) {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user?.user_metadata?.name) {
-        userFullName = user.user_metadata.name;
-      } else if (user?.user_metadata?.full_name) {
-        userFullName = user.user_metadata.full_name;
+      if (user) {
+        // Fetch name from profiles table
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileData?.name) {
+          userFullName = profileData.name;
+        } else {
+          // Fallback to auth metadata if profile name doesn't exist
+          if (user.user_metadata?.name) {
+            userFullName = user.user_metadata.name;
+          } else if (user.user_metadata?.full_name) {
+            userFullName = user.user_metadata.full_name;
+          } else {
+            userFullName = 'Diplomator Demo';
+          }
+        }
       } else {
         userFullName = 'Diplomator Demo';
       }
