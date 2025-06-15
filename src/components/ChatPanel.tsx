@@ -12,6 +12,7 @@ import { URLInput } from '@/components/URLInput';
 import { MagicDiploma } from '@/components/MagicDiploma';
 import { Message } from '@/contexts/DiplomaContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import type { ChatMessage } from '@/services/anthropicService';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
@@ -45,8 +46,8 @@ export const ChatPanel = () => {
 
     try {
       // Convert messages to the format expected by the service
-      const chatMessages = messages.map(msg => ({
-        role: msg.isUser ? 'user' : 'assistant' as const,
+      const chatMessages: ChatMessage[] = messages.map(msg => ({
+        role: msg.isUser ? 'user' as const : 'assistant' as const,
         content: msg.content
       }));
 
