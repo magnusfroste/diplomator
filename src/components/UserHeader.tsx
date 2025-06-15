@@ -1,12 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { DiplomaManager } from './DiplomaManager';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -17,7 +15,6 @@ interface UserHeaderProps {
 
 export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
   const navigate = useNavigate();
-  const [showSignedDiplomas, setShowSignedDiplomas] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -35,6 +32,10 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
 
   const handleProfileClick = () => {
     navigate('/profile');
+  };
+
+  const handleSignedClick = () => {
+    navigate('/signed');
   };
 
   const getInitials = (name: string) => {
@@ -80,7 +81,7 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowSignedDiplomas(true)}>
+          <DropdownMenuItem onClick={handleSignedClick}>
             <FileText className="mr-2 h-4 w-4" />
             <span>Signed</span>
           </DropdownMenuItem>
@@ -91,15 +92,6 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Dialog open={showSignedDiplomas} onOpenChange={setShowSignedDiplomas}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>My Signed Diplomas</DialogTitle>
-          </DialogHeader>
-          <DiplomaManager />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

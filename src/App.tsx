@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
+import Signed from "./pages/Signed";
 import Verify from "./pages/Verify";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/app" element={<Index />} />
           <Route path="/demo" element={<Index />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/signed" element={<Signed />} />
           <Route path="/verify/:diplomaId?" element={<Verify />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
