@@ -14,7 +14,7 @@ export const MagicDiploma = () => {
 
   const getRandomTemplate = () => {
     const templates = [
-      // Template 1: Classic Elegance (Original)
+      // Template 1: Classic Elegance (Fixed positioning)
       {
         name: "Classic Elegance",
         html: `
@@ -148,12 +148,13 @@ export const MagicDiploma = () => {
             align-items: center;
             justify-content: space-between;
             position: relative;
+            overflow: hidden;
           }
 
           .institution-seal {
             position: absolute;
-            top: 20px;
-            right: 40px;
+            top: 30px;
+            right: 50px;
           }
 
           .seal-outer {
@@ -321,6 +322,7 @@ export const MagicDiploma = () => {
             right: 0;
             bottom: 0;
             pointer-events: none;
+            overflow: hidden;
           }
 
           .floating-star {
@@ -333,20 +335,20 @@ export const MagicDiploma = () => {
           }
 
           .star-1 {
-            top: 20%;
-            left: 10%;
+            top: 25%;
+            left: 15%;
             animation-delay: 0s;
           }
 
           .star-2 {
-            top: 60%;
-            right: 15%;
+            top: 55%;
+            right: 20%;
             animation-delay: 2s;
           }
 
           .star-3 {
-            bottom: 20%;
-            left: 20%;
+            bottom: 25%;
+            left: 25%;
             animation-delay: 4s;
           }
 
@@ -356,7 +358,7 @@ export const MagicDiploma = () => {
               opacity: 0.7;
             }
             50% { 
-              transform: translateY(-20px) rotate(180deg); 
+              transform: translateY(-15px) rotate(180deg); 
               opacity: 1;
             }
           }
@@ -383,7 +385,7 @@ export const MagicDiploma = () => {
         `
       },
       
-      // Template 2: Modern Minimalist
+      // Template 2: Modern Minimalist (Fixed positioning)
       {
         name: "Modern Minimalist",
         html: `
@@ -462,9 +464,10 @@ export const MagicDiploma = () => {
             position: absolute;
             top: 0;
             right: 0;
-            width: 200px;
-            height: 200px;
+            width: 150px;
+            height: 150px;
             pointer-events: none;
+            overflow: hidden;
           }
 
           .triangle {
@@ -475,35 +478,35 @@ export const MagicDiploma = () => {
           }
 
           .triangle-1 {
-            border-left: 60px solid transparent;
-            border-right: 60px solid #667eea;
-            border-bottom: 60px solid transparent;
-            top: 20px;
-            right: 20px;
+            border-left: 50px solid transparent;
+            border-right: 50px solid #667eea;
+            border-bottom: 50px solid transparent;
+            top: 30px;
+            right: 30px;
             animation: triangleFloat 6s ease-in-out infinite;
           }
 
           .triangle-2 {
-            border-left: 40px solid transparent;
-            border-right: 40px solid #764ba2;
-            border-bottom: 40px solid transparent;
+            border-left: 35px solid transparent;
+            border-right: 35px solid #764ba2;
+            border-bottom: 35px solid transparent;
             top: 80px;
             right: 60px;
             animation: triangleFloat 6s ease-in-out infinite 2s;
           }
 
           .triangle-3 {
-            border-left: 30px solid transparent;
-            border-right: 30px solid #667eea;
-            border-bottom: 30px solid transparent;
-            top: 40px;
-            right: 100px;
+            border-left: 25px solid transparent;
+            border-right: 25px solid #667eea;
+            border-bottom: 25px solid transparent;
+            top: 50px;
+            right: 90px;
             animation: triangleFloat 6s ease-in-out infinite 4s;
           }
 
           @keyframes triangleFloat {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
           }
 
           .diploma-content {
@@ -512,6 +515,7 @@ export const MagicDiploma = () => {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden;
           }
 
           .modern-header {
@@ -658,7 +662,7 @@ export const MagicDiploma = () => {
         `
       },
 
-      // Template 3: Royal Vintage
+      // Template 3: Royal Vintage (Fixed positioning)
       {
         name: "Royal Vintage",
         html: `
@@ -790,11 +794,12 @@ export const MagicDiploma = () => {
             align-items: center;
             justify-content: space-between;
             position: relative;
+            overflow: hidden;
           }
 
           .royal-crown {
             position: absolute;
-            top: 30px;
+            top: 40px;
             left: 50%;
             transform: translateX(-50%);
           }
@@ -902,8 +907,8 @@ export const MagicDiploma = () => {
             font-size: 24px;
           }
 
-          .recipient-name::before { left: -50px; }
-          .recipient-name::after { right: -50px; }
+          .recipient-name::before { left: -45px; }
+          .recipient-name::after { right: -45px; }
 
           .achievement-text {
             font-family: 'Cormorant Garamond', serif;
@@ -989,34 +994,35 @@ export const MagicDiploma = () => {
             right: 0;
             bottom: 0;
             pointer-events: none;
+            overflow: hidden;
           }
 
           .laurel-left,
           .laurel-right {
             position: absolute;
-            width: 80px;
-            height: 120px;
+            width: 60px;
+            height: 100px;
             background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(210, 105, 30, 0.1));
-            border-radius: 40px 10px;
+            border-radius: 30px 8px;
           }
 
           .laurel-left {
             top: 50%;
-            left: 20px;
-            transform: translateY(-50%) rotate(-15deg);
+            left: 30px;
+            transform: translateY(-50%) rotate(-10deg);
             animation: laurelSway 8s ease-in-out infinite;
           }
 
           .laurel-right {
             top: 50%;
-            right: 20px;
-            transform: translateY(-50%) rotate(15deg) scaleX(-1);
+            right: 30px;
+            transform: translateY(-50%) rotate(10deg) scaleX(-1);
             animation: laurelSway 8s ease-in-out infinite 4s;
           }
 
           @keyframes laurelSway {
-            0%, 100% { transform: translateY(-50%) rotate(-15deg); }
-            50% { transform: translateY(-50%) rotate(-10deg); }
+            0%, 100% { transform: translateY(-50%) rotate(-10deg); }
+            50% { transform: translateY(-50%) rotate(-5deg); }
           }
 
           @media (max-width: 768px) {
@@ -1058,7 +1064,7 @@ export const MagicDiploma = () => {
     // Add a message to show what was generated
     const newMessage = {
       id: Date.now().toString(),
-      content: `✨ Magic diploma created for ${recipientName}! Generated "${selectedTemplate.name}" template with premium styling, unique animations, and professional design elements.`,
+      content: `✨ Magic diploma created for ${recipientName}! Generated "${selectedTemplate.name}" template with premium styling, unique animations, and professional design elements. All decorative elements are now properly contained within the diploma boundaries.`,
       isUser: false,
       timestamp: new Date()
     };
