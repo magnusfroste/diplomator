@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Share2, Mail, Copy, Check } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
+import { supabase } from '@/integrations/supabase/client';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import {
@@ -23,13 +25,45 @@ export const SharePanel = () => {
   const [diplomaUrl, setDiplomaUrl] = useState('');
 
   useEffect(() => {
-    // Try to get the last signed diploma URL from sessionStorage
-    const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
-    if (savedDiplomaUrl) {
-      setDiplomaUrl(savedDiplomaUrl);
-    } else {
-      setDiplomaUrl(window.location.href);
-    }
+    const fetchLastDiplomaUrl = async () => {
+      try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Get the most recent diploma URL for this user
+        const { data, error } = await supabase
+          .from('signed_diplomas')
+          .select('diploma_url')
+          .eq('issuer_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (data?.diploma_url) {
+          setDiplomaUrl(data.diploma_url);
+        } else {
+          // Fallback to sessionStorage if no diploma found in database
+          const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
+          if (savedDiplomaUrl) {
+            setDiplomaUrl(savedDiplomaUrl);
+          } else {
+            setDiplomaUrl(window.location.href);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching diploma URL:', error);
+        // Fallback to sessionStorage
+        const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
+        if (savedDiplomaUrl) {
+          setDiplomaUrl(savedDiplomaUrl);
+        } else {
+          setDiplomaUrl(window.location.href);
+        }
+      }
+    };
+
+    fetchLastDiplomaUrl();
   }, []);
 
   const shareUrl = diplomaUrl || window.location.href;

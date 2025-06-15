@@ -81,7 +81,7 @@ export const signDiplomaToBlockchain = async (
   const verificationUrl = createVerificationUrl(diplomaId);
   const diplomaUrl = createDiplomaUrl(diplomaId);
 
-  // Store in Supabase database
+  // Store in Supabase database - now including diploma_url
   const { error } = await supabase
     .from('signed_diplomas')
     .insert({
@@ -94,7 +94,8 @@ export const signDiplomaToBlockchain = async (
       content_hash: contentHash,
       signature: signature,
       diplomator_seal: diplomatorSeal,
-      verification_url: verificationUrl
+      verification_url: verificationUrl,
+      diploma_url: diplomaUrl
     });
 
   if (error) {
