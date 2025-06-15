@@ -120,10 +120,11 @@ IMPORTANT: Never use <img> tags or reference external image files. Use only CSS 
 
 SIGNATURE SECTION: Always include a professional signature section with the following elements:
 - A signature line (using CSS border-bottom)
-- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- The text "Mr Diploma" in handwriting style (use Dancing Script font or similar cursive font)
 - Position it appropriately on the diploma (usually bottom right or center)
 - Style it professionally with appropriate fonts and spacing
 - Include a title like "Authorized Signature" or "Official Signature"
+- Apply handwriting styling: font-family: 'Dancing Script', cursive; font-weight: 700; transform: rotate(-2deg); display: inline-block;
 
 CSS SHAPE CREATION GUIDELINES:
 - For hearts: Use the ::before and ::after pseudo-elements with border-radius to create proper heart shapes
@@ -163,7 +164,7 @@ Make diplomas that are:
 - Never include <img> tags or src attributes pointing to image files
 - Be easily modifiable for user adjustments and animations
 - NEVER include any QR code elements or placeholders
-- ALWAYS include a signature section with "${userFullName || 'Diplomator Demo'}" as the signatory`;
+- ALWAYS include a signature section with "Mr Diploma" in handwriting style (Dancing Script font)`;
 
     let requestBody;
 
@@ -182,9 +183,9 @@ IMPORTANT: Never use <img> tags or reference external image files. Use only CSS 
 
 SIGNATURE SECTION: Always include a professional signature section with:
 - A signature line (using CSS border-bottom)
-- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- The text "Mr Diploma" in handwriting style (use Dancing Script font)
 - Position it appropriately on the diploma
-- Style it professionally with appropriate fonts and spacing
+- Style it professionally with handwriting styling: font-family: 'Dancing Script', cursive; font-weight: 700; transform: rotate(-2deg); display: inline-block;
 
 MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
@@ -193,7 +194,7 @@ MESSAGE: [Explanation of how you used the image as inspiration]
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include any QR code elements. Always include the signature section.`;
+Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include any QR code elements. Always include the signature section with "Mr Diploma" in handwriting style.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -205,7 +206,7 @@ Create CSS-based decorative elements inspired by the image instead of referencin
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes or QR placeholders. Include a signature section with the signatory name.'
+                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes or QR placeholders. Include a signature section with "Mr Diploma" in handwriting style using Dancing Script font.'
               },
               {
                 type: 'image',
@@ -250,9 +251,9 @@ ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
 
 SIGNATURE SECTION: Always include a professional signature section with:
 - A signature line (using CSS border-bottom)
-- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- The text "Mr Diploma" in handwriting style (use Dancing Script font)
 - Position it appropriately on the diploma
-- Style it professionally with appropriate fonts and spacing
+- Style it professionally with handwriting styling: font-family: 'Dancing Script', cursive; font-weight: 700; transform: rotate(-2deg); display: inline-block;
 
 BRAND-SPECIFIC GUIDELINES:
 - For Telia (telia.se): Use their distinctive purple/magenta color palette (#990AE3, #FF6B35), modern Nordic design, clean typography
@@ -269,11 +270,11 @@ MESSAGE: [Explanation of the diploma you created based on the actual website dat
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include any QR code elements. Always include the signature section.`;
+Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include any QR code elements. Always include the signature section with "Mr Diploma" in handwriting style.`;
 
       const userMessage = websiteData 
-        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes or QR placeholders. Include a signature section with the signatory name.`
-        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes or QR placeholders. Include a signature section with the signatory name.`;
+        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes or QR placeholders. Include a signature section with "Mr Diploma" in handwriting style using Dancing Script font.`
+        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes or QR placeholders. Include a signature section with "Mr Diploma" in handwriting style using Dancing Script font.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -305,7 +306,7 @@ Please modify the above diploma based on the user's request. Make only the speci
 
 CRITICAL: Never add QR codes, QR placeholders, or any QR-related elements during modifications.
 
-SIGNATURE REQUIREMENT: If there's no signature section in the current diploma, add one with "${userFullName || 'Diplomator Demo'}" as the signatory. If there is already a signature section, ensure it uses the correct name.
+SIGNATURE REQUIREMENT: If there's no signature section in the current diploma, add one with "Mr Diploma" in handwriting style. If there is already a signature section, ensure it uses "Mr Diploma" with proper handwriting styling: font-family: 'Dancing Script', cursive; font-weight: 700; transform: rotate(-2deg); display: inline-block;
 
 SPECIAL FOCUS FOR SHAPE IMPROVEMENTS:
 - If modifying hearts or other CSS shapes, ensure they are well-formed and visually clear

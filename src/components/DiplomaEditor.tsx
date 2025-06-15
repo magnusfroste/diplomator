@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,29 +91,31 @@ export const DiplomaEditor = () => {
       });
     });
 
-    // Ensure the signature section shows the user's name
-    console.log('DiplomaEditor: Updating signature with userFullName:', userFullName);
+    // Ensure the signature section shows "Mr Diploma" in handwriting style
+    console.log('DiplomaEditor: Updating signature with Mr Diploma');
+    // Replace various signature name patterns with "Mr Diploma"
+    updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Diplomator Demo'}/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/Authorized Signature/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/<div class="signature-name">[^<]*<\/div>/gi, `<div class="signature-name">Mr Diploma</div>`);
+    updatedHtml = updatedHtml.replace(/class="signature-name">[^<]*</gi, `class="signature-name">Mr Diploma<`);
+    
+    // Also check for any remaining placeholder text in signature areas
+    updatedHtml = updatedHtml.replace(/Your Name Here/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/Name Here/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/\[SIGNATURE\]/gi, 'Mr Diploma');
+    
+    // Replace the actual user's full name with "Mr Diploma" if it appears
     if (userFullName) {
-      // Replace various signature name patterns
-      updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, userFullName);
-      updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Diplomator Demo'}/gi, userFullName);
-      updatedHtml = updatedHtml.replace(/Authorized Signature/gi, userFullName);
-      updatedHtml = updatedHtml.replace(/<div class="signature-name">[^<]*<\/div>/gi, `<div class="signature-name">${userFullName}</div>`);
-      updatedHtml = updatedHtml.replace(/class="signature-name">[^<]*</gi, `class="signature-name">${userFullName}<`);
-      
-      // Also check for any remaining placeholder text in signature areas
-      updatedHtml = updatedHtml.replace(/Your Name Here/gi, userFullName);
-      updatedHtml = updatedHtml.replace(/Name Here/gi, userFullName);
-      updatedHtml = updatedHtml.replace(/\[SIGNATURE\]/gi, userFullName);
+      updatedHtml = updatedHtml.replace(new RegExp(userFullName, 'gi'), 'Mr Diploma');
     }
     
-    console.log('DiplomaEditor: Updated HTML contains userFullName:', updatedHtml.includes(userFullName));
+    console.log('DiplomaEditor: Updated HTML contains Mr Diploma:', updatedHtml.includes('Mr Diploma'));
     setDiplomaHtml(updatedHtml);
   };
 
   const generateTemplateWithFields = (fields: any) => {
-    console.log('DiplomaEditor: Generating template with userFullName:', userFullName);
-    const signatureName = userFullName || 'Authorized Signature';
+    console.log('DiplomaEditor: Generating template with Mr Diploma signature');
     
     // Adjust dimensions based on format
     const containerStyle = diplomaFormat === 'portrait' 
@@ -138,15 +141,16 @@ export const DiplomaEditor = () => {
           
           <div class="signature-section">
             <div class="signature-line"></div>
-            <div class="signature-name">${signatureName}</div>
+            <div class="signature-name">Mr Diploma</div>
             <div class="signature-title">Authorized Signature</div>
           </div>
         </div>
       </div>
     `;
     
-    // ... keep existing code (CSS styles)
     const css = `
+      @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
+      
       .diploma-container {
         width: 100%;
         max-width: 800px;
@@ -237,10 +241,13 @@ export const DiplomaEditor = () => {
       }
       
       .signature-name {
-        font-size: 1.1rem;
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.8rem;
         color: #2c3e50;
-        font-weight: bold;
+        font-weight: 700;
         margin-bottom: 5px;
+        transform: rotate(-2deg);
+        display: inline-block;
       }
       
       .signature-title {
@@ -250,7 +257,7 @@ export const DiplomaEditor = () => {
       }
     `;
     
-    console.log('DiplomaEditor: Template generated with signature:', signatureName);
+    console.log('DiplomaEditor: Template generated with Mr Diploma signature');
     setDiplomaHtml(template);
     setDiplomaCss(css);
   };
@@ -335,8 +342,8 @@ export const DiplomaEditor = () => {
           <div className="space-y-2">
             <Label>Authorized Signature</Label>
             <div className="text-sm text-muted-foreground bg-gray-50 p-3 rounded">
-              <p><strong>Signatory:</strong> {userFullName || 'Loading...'}</p>
-              <p className="text-xs mt-1">This will be the authorized signature on your diploma. To change this, update your profile name.</p>
+              <p><strong>Signatory:</strong> Mr Diploma</p>
+              <p className="text-xs mt-1">This signature will appear in handwriting style on your diploma.</p>
             </div>
           </div>
           
