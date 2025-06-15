@@ -10,15 +10,21 @@ import { signDiplomaToBlockchain, createDiplomaUrl, DiplomaRecord } from '@/serv
 import { toast } from 'sonner';
 
 export const BlockchainSigner = () => {
-  const { diplomaHtml, diplomaCss } = useDiploma();
-  const [recipientName, setRecipientName] = useState('');
-  const [institutionName, setInstitutionName] = useState('');
+  const { 
+    diplomaHtml, 
+    diplomaCss,
+    signingRecipientName,
+    setSigningRecipientName,
+    signingInstitutionName,
+    setSigningInstitutionName
+  } = useDiploma();
+  
   const [isSigningTx, setIsSigningTx] = useState(false);
   const [signedRecord, setSignedRecord] = useState<DiplomaRecord | null>(null);
   const [diplomaUrl, setDiplomaUrl] = useState('');
 
   const handleSignToBlockchain = async () => {
-    if (!recipientName.trim() || !institutionName.trim()) {
+    if (!signingRecipientName.trim() || !signingInstitutionName.trim()) {
       toast.error('Please fill in both recipient and institution names');
       return;
     }
@@ -34,8 +40,8 @@ export const BlockchainSigner = () => {
       const record = await signDiplomaToBlockchain(
         diplomaHtml,
         diplomaCss,
-        recipientName.trim(),
-        institutionName.trim()
+        signingRecipientName.trim(),
+        signingInstitutionName.trim()
       );
       
       setSignedRecord(record);
@@ -72,8 +78,8 @@ export const BlockchainSigner = () => {
                 <Label htmlFor="recipient">Recipient Name</Label>
                 <Input
                   id="recipient"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
+                  value={signingRecipientName}
+                  onChange={(e) => setSigningRecipientName(e.target.value)}
                   placeholder="Enter recipient's full name"
                   disabled={isSigningTx}
                 />
@@ -83,8 +89,8 @@ export const BlockchainSigner = () => {
                 <Label htmlFor="institution">Institution Name</Label>
                 <Input
                   id="institution"
-                  value={institutionName}
-                  onChange={(e) => setInstitutionName(e.target.value)}
+                  value={signingInstitutionName}
+                  onChange={(e) => setSigningInstitutionName(e.target.value)}
                   placeholder="Enter institution name"
                   disabled={isSigningTx}
                 />
@@ -93,7 +99,7 @@ export const BlockchainSigner = () => {
 
             <Button
               onClick={handleSignToBlockchain}
-              disabled={!hasContent || isSigningTx || !recipientName.trim() || !institutionName.trim()}
+              disabled={!hasContent || isSigningTx || !signingRecipientName.trim() || !signingInstitutionName.trim()}
               className="w-full"
             >
               {isSigningTx ? (
@@ -160,8 +166,8 @@ export const BlockchainSigner = () => {
               onClick={() => {
                 setSignedRecord(null);
                 setDiplomaUrl('');
-                setRecipientName('');
-                setInstitutionName('');
+                setSigningRecipientName('');
+                setSigningInstitutionName('');
               }}
             >
               Sign Another Diploma

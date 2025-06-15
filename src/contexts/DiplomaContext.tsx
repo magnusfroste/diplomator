@@ -20,6 +20,11 @@ interface DiplomaContextType {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   diplomaFields: DiplomaFields;
   setDiplomaFields: (fields: DiplomaFields) => void;
+  // New fields for blockchain signing
+  signingRecipientName: string;
+  setSigningRecipientName: (name: string) => void;
+  signingInstitutionName: string;
+  setSigningInstitutionName: (name: string) => void;
 }
 
 interface Message {
@@ -35,6 +40,8 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [diplomaHtml, setDiplomaHtml] = useState('');
   const [diplomaCss, setDiplomaCss] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [signingRecipientName, setSigningRecipientName] = useState('');
+  const [signingInstitutionName, setSigningInstitutionName] = useState('');
   const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
     recipientName: '',
     degree: '',
@@ -62,7 +69,11 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
       messages,
       setMessages,
       diplomaFields,
-      setDiplomaFields
+      setDiplomaFields,
+      signingRecipientName,
+      setSigningRecipientName,
+      signingInstitutionName,
+      setSigningInstitutionName
     }}>
       {children}
     </DiplomaContext.Provider>
