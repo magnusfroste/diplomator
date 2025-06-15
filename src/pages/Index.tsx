@@ -20,7 +20,7 @@ const Index = () => {
           
           <ResizablePanelGroup direction="horizontal" className="w-full">
             {/* Chat Panel */}
-            <ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
+            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
               <div className="h-full border-r border-border bg-background">
                 <ChatPanel />
               </div>
@@ -29,7 +29,7 @@ const Index = () => {
             <ResizableHandle withHandle />
             
             {/* Preview Panel */}
-            <ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
+            <ResizablePanel defaultSize={70} minSize={50} maxSize={80}>
               <div className="h-full bg-muted/50">
                 <PreviewPanel />
               </div>
