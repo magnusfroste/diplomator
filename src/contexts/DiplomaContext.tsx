@@ -56,7 +56,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: 'Hello! I\'m here to help you create beautiful diplomas. You can either upload an image for inspiration, provide a website URL to scrape design elements from, or use the Editor tab to manually customize diploma content. What would you like to create today?',
+      content: 'Hello! I\'m here to help you create beautiful diplomas. You can either Upload an image for inspiration, provide a website URL, Chat or try the Magic! What would you like to create today?',
       isUser: false,
       timestamp: new Date()
     }
