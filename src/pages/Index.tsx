@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
+import { UserHeader } from "@/components/UserHeader";
 import { DiplomaProvider } from "@/contexts/DiplomaContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ApiKeySettings } from "@/components/ApiKeySettings";
@@ -12,29 +13,50 @@ const Index = () => {
   return (
     <ThemeProvider>
       <DiplomaProvider>
-        <div className="h-screen flex bg-background relative">
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
-            <BlockchainMenu />
-            <ApiKeySettings />
+        <div className="h-screen flex flex-col bg-background">
+          {/* Header */}
+          <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex items-center justify-between px-6 py-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Diplomator</h1>
+                  <p className="text-xs text-muted-foreground">AI-Powered Diploma Designer</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <BlockchainMenu />
+                <ApiKeySettings />
+                <UserHeader />
+              </div>
+            </div>
           </div>
           
-          <ResizablePanelGroup direction="horizontal" className="w-full">
-            {/* Chat Panel */}
-            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
-              <div className="h-full border-r border-border bg-background">
-                <ChatPanel />
-              </div>
-            </ResizablePanel>
-            
-            <ResizableHandle withHandle />
-            
-            {/* Preview Panel */}
-            <ResizablePanel defaultSize={70} minSize={50} maxSize={80}>
-              <div className="h-full bg-muted/50">
-                <PreviewPanel />
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          {/* Main Content */}
+          <div className="flex-1">
+            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+              {/* Chat Panel */}
+              <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+                <div className="h-full border-r border-border bg-background">
+                  <ChatPanel />
+                </div>
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle />
+              
+              {/* Preview Panel */}
+              <ResizablePanel defaultSize={70} minSize={50} maxSize={80}>
+                <div className="h-full bg-muted/50">
+                  <PreviewPanel />
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
         </div>
       </DiplomaProvider>
     </ThemeProvider>
