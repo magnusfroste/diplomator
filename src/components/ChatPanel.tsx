@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles, Info, Wand2 } from 'lucide-react';
+import { Upload, Link, Sparkles, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,14 +9,13 @@ import { generateDiploma } from '@/services/anthropicService';
 import { MessageList } from '@/components/MessageList';
 import { FileUpload } from '@/components/FileUpload';
 import { URLInput } from '@/components/URLInput';
-import { MagicDiploma } from '@/components/MagicDiploma';
 import { Message } from '@/contexts/DiplomaContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { ChatMessage } from '@/services/anthropicService';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'magic'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url'>('chat');
   const [showGuidelines, setShowGuidelines] = useState(false);
   
   const { 
@@ -181,15 +181,6 @@ export const ChatPanel = () => {
             <Link className="w-3 h-3 mr-1" />
             URL
           </Button>
-          <Button
-            variant={activeTab === 'magic' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('magic')}
-            className="h-7 text-xs bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
-          >
-            <Wand2 className="w-3 h-3 mr-1" />
-            Magic
-          </Button>
         </div>
       </div>
 
@@ -214,7 +205,6 @@ export const ChatPanel = () => {
         
         {activeTab === 'upload' && <FileUpload />}
         {activeTab === 'url' && <URLInput />}
-        {activeTab === 'magic' && <MagicDiploma />}
       </div>
     </div>
   );
