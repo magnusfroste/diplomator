@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles, Info } from 'lucide-react';
+import { Upload, Link, Sparkles, Info, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,9 +13,22 @@ import { Message } from '@/contexts/DiplomaContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { ChatMessage } from '@/services/anthropicService';
 
+const stunningDiplomaPrompts = [
+  "Create an elegant royal diploma with gold embossed borders, deep burgundy background, ornate baroque decorations, and calligraphy-style fonts for a Master of Fine Arts degree",
+  "Design a modern minimalist diploma with clean geometric lines, soft gradients in blue and white, contemporary typography, and subtle shadow effects for a Bachelor of Computer Science",
+  "Generate a vintage-style diploma with aged parchment texture, sepia tones, decorative Victorian flourishes, ornate frame borders, and classic serif fonts for a Doctor of Philosophy",
+  "Create a luxurious certificate with marble texture background, gold leaf accents, art deco patterns, elegant script fonts, and sophisticated color palette for a Master of Business Administration",
+  "Design a nature-inspired diploma with forest green colors, botanical illustrations, organic flowing lines, earth-tone gradients, and handwritten-style fonts for an Environmental Science degree",
+  "Generate a space-themed futuristic diploma with cosmic background, holographic effects, neon blue accents, modern sci-fi fonts, and constellation patterns for an Aerospace Engineering degree",
+  "Create a classic academic diploma with traditional university styling, navy blue and gold colors, official seals, formal typography, and distinguished border designs for a Law degree",
+  "Design an artistic diploma with watercolor splash effects, vibrant rainbow gradients, creative typography, painterly textures, and abstract artistic elements for a Bachelor of Fine Arts",
+  "Generate an ocean-themed diploma with deep blue waves, pearl accents, nautical elements, flowing script fonts, and underwater color schemes for a Marine Biology degree",
+  "Create a sophisticated medical diploma with clean white background, medical blue accents, professional typography, caduceus symbols, and elegant simplicity for a Doctor of Medicine"
+];
+
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'magic'>('chat');
   const [showGuidelines, setShowGuidelines] = useState(false);
   
   const { 
@@ -29,6 +42,12 @@ export const ChatPanel = () => {
     setDiplomaCss,
     diplomaFormat
   } = useDiploma();
+
+  const generateRandomPrompt = () => {
+    const randomPrompt = stunningDiplomaPrompts[Math.floor(Math.random() * stunningDiplomaPrompts.length)];
+    setMessage(randomPrompt);
+    setActiveTab('chat');
+  };
 
   const handleSendMessage = async () => {
     if (!message.trim() || isGenerating) return;
@@ -181,6 +200,15 @@ export const ChatPanel = () => {
             <Link className="w-3 h-3 mr-1" />
             URL
           </Button>
+          <Button
+            variant={activeTab === 'magic' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('magic')}
+            className="h-7 text-xs bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
+          >
+            <Wand2 className="w-3 h-3 mr-1" />
+            Magic
+          </Button>
         </div>
       </div>
 
@@ -205,6 +233,32 @@ export const ChatPanel = () => {
         
         {activeTab === 'upload' && <FileUpload />}
         {activeTab === 'url' && <URLInput />}
+        {activeTab === 'magic' && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-6">
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <Wand2 className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Magic Diploma Generator</h3>
+              <p className="text-gray-600 max-w-md text-sm">
+                Get inspiration with stunning diploma designs! Click the button below to generate a random, professionally crafted diploma prompt.
+              </p>
+            </div>
+            
+            <Button
+              onClick={generateRandomPrompt}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 text-base font-medium"
+              size="lg"
+            >
+              <Wand2 className="w-5 h-5 mr-2" />
+              Generate Magic Prompt
+            </Button>
+            
+            <div className="text-xs text-gray-500 text-center max-w-sm">
+              This will create a detailed prompt for a beautiful diploma design and automatically switch to the Chat tab where you can send it.
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
