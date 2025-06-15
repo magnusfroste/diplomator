@@ -132,6 +132,7 @@ export type Database = {
           speech: string | null
           status: string
           story_id: string
+          title: string
           updated_at: string
           user_id: string
           video_url: string | null
@@ -145,6 +146,7 @@ export type Database = {
           speech?: string | null
           status?: string
           story_id: string
+          title?: string
           updated_at?: string
           user_id: string
           video_url?: string | null
@@ -158,6 +160,7 @@ export type Database = {
           speech?: string | null
           status?: string
           story_id?: string
+          title?: string
           updated_at?: string
           user_id?: string
           video_url?: string | null

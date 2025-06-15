@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
+import { EmbedGenerator } from '@/components/EmbedGenerator';
 
 const Diploma = () => {
   const { diplomaId } = useParams();
@@ -471,6 +472,9 @@ const Diploma = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Embed Generator */}
+            <EmbedGenerator diplomaId={diplomaData.blockchain_id} />
 
             {/* About Verification */}
             <Card>
