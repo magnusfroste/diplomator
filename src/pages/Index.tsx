@@ -1,81 +1,65 @@
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DiplomaProvider } from "@/contexts/DiplomaContext";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
-import { DiplomaEditor } from "@/components/DiplomaEditor";
-import { SharePanel } from "@/components/SharePanel";
-import { BlockchainSigner } from "@/components/BlockchainSigner";
-import { DiplomaManager } from "@/components/DiplomaManager";
-import { BlockchainMenu } from "@/components/BlockchainMenu";
 import { UserHeader } from "@/components/UserHeader";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { DiplomaProvider } from "@/contexts/DiplomaContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ApiKeySettings } from "@/components/ApiKeySettings";
+import { BlockchainMenu } from "@/components/BlockchainMenu";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("chat");
-
   return (
-    <DiplomaProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-        <header className="border-b bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Diploma Generator
-              </h1>
-              <BlockchainMenu />
-            </div>
-            <div className="flex items-center gap-4">
-              <ThemeToggle />
-              <UserHeader />
+    <ThemeProvider>
+      <DiplomaProvider>
+        <div className="h-screen flex flex-col bg-background">
+          {/* Header */}
+          <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex items-center justify-between px-6 py-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Diplomator</h1>
+                  <p className="text-xs text-muted-foreground">AI-Powered Diploma Designer</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <BlockchainMenu />
+                <ApiKeySettings />
+                <UserHeader />
+              </div>
             </div>
           </div>
-        </header>
-
-        <div className="container mx-auto p-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[calc(100vh-120px)]">
-            {/* Left Panel */}
-            <div className="space-y-4">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="chat">Chat</TabsTrigger>
-                  <TabsTrigger value="editor">Editor</TabsTrigger>
-                  <TabsTrigger value="share">Share</TabsTrigger>
-                  <TabsTrigger value="sign">Sign</TabsTrigger>
-                  <TabsTrigger value="manage">Manage</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="chat" className="mt-4">
+          
+          {/* Main Content */}
+          <div className="flex-1">
+            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+              {/* Chat Panel */}
+              <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+                <div className="h-full border-r border-border bg-background">
                   <ChatPanel />
-                </TabsContent>
-                
-                <TabsContent value="editor" className="mt-4">
-                  <DiplomaEditor />
-                </TabsContent>
-                
-                <TabsContent value="share" className="mt-4">
-                  <SharePanel />
-                </TabsContent>
-                
-                <TabsContent value="sign" className="mt-4">
-                  <BlockchainSigner />
-                </TabsContent>
-
-                <TabsContent value="manage" className="mt-4">
-                  <DiplomaManager />
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            {/* Right Panel */}
-            <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-120px)]">
-              <PreviewPanel />
-            </div>
+                </div>
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle />
+              
+              {/* Preview Panel */}
+              <ResizablePanel defaultSize={70} minSize={50} maxSize={80}>
+                <div className="h-full bg-muted/50">
+                  <PreviewPanel />
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </div>
         </div>
-      </div>
-    </DiplomaProvider>
+      </DiplomaProvider>
+    </ThemeProvider>
   );
 };
 
