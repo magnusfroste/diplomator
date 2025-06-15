@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Copy, Calendar, User, Building2, FileText } from 'lucide-react';
+import { ExternalLink, Copy, Calendar, User, Building2, FileText, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -45,6 +45,14 @@ export const DiplomaManager = () => {
     window.open(url, '_blank');
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -75,107 +83,117 @@ export const DiplomaManager = () => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4">
-        {signedDiplomas.map((diploma) => (
-          <Card key={diploma.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="w-4 h-4 text-blue-600" />
-                  {diploma.recipient_name}
-                </CardTitle>
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  Verified
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">Institution:</span>
-                  <span className="text-muted-foreground">{diploma.institution_name}</span>
+        {signedDiplomas.map((diploma) => {
+          const { date, time } = formatDate(diploma.created_at);
+          
+          return (
+            <Card key={diploma.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4 text-blue-600" />
+                      {diploma.recipient_name}
+                    </CardTitle>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>Created {date} at {time}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    Verified
+                  </Badge>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">Signed:</span>
-                  <span className="text-muted-foreground">
-                    {new Date(diploma.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Diploma ID
-                  </label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
-                      {diploma.blockchain_id}
-                    </code>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => copyToClipboard(diploma.blockchain_id, 'Diploma ID')}
-                    >
-                      <Copy className="w-3 h-3" />
-                    </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium">Institution:</span>
+                    <span className="text-muted-foreground">{diploma.institution_name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium">Signed:</span>
+                    <span className="text-muted-foreground">{date}</span>
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Diploma URL
-                  </label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
-                      {diploma.diploma_url}
-                    </code>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => copyToClipboard(diploma.diploma_url, 'Diploma URL')}
-                    >
-                      <Copy className="w-3 h-3" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => openUrl(diploma.diploma_url)}
-                    >
-                      <FileText className="w-3 h-3" />
-                    </Button>
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Diploma ID
+                    </label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
+                        {diploma.blockchain_id}
+                      </code>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => copyToClipboard(diploma.blockchain_id, 'Diploma ID')}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Verification URL
-                  </label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
-                      {diploma.verification_url}
-                    </code>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => copyToClipboard(diploma.verification_url, 'Verification URL')}
-                    >
-                      <Copy className="w-3 h-3" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => openUrl(diploma.verification_url)}
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Diploma URL
+                    </label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
+                        {diploma.diploma_url}
+                      </code>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => copyToClipboard(diploma.diploma_url, 'Diploma URL')}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => openUrl(diploma.diploma_url)}
+                      >
+                        <FileText className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Verification URL
+                    </label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
+                        {diploma.verification_url}
+                      </code>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => copyToClipboard(diploma.verification_url, 'Verification URL')}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => openUrl(diploma.verification_url)}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
