@@ -40,7 +40,7 @@ export const SharePanel = () => {
           .limit(1)
           .maybeSingle();
 
-        if (data?.diploma_url) {
+        if (data && data.diploma_url) {
           setDiplomaUrl(data.diploma_url);
         } else {
           // Fallback to sessionStorage if no diploma found in database

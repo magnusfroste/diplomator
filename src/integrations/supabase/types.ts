@@ -129,6 +129,7 @@ export type Database = {
           created_at: string
           diploma_css: string
           diploma_html: string
+          diploma_url: string | null
           diplomator_seal: string
           id: string
           institution_name: string
@@ -144,6 +145,7 @@ export type Database = {
           created_at?: string
           diploma_css: string
           diploma_html: string
+          diploma_url?: string | null
           diplomator_seal: string
           id?: string
           institution_name: string
@@ -159,6 +161,7 @@ export type Database = {
           created_at?: string
           diploma_css?: string
           diploma_html?: string
+          diploma_url?: string | null
           diplomator_seal?: string
           id?: string
           institution_name?: string
