@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,7 @@ export const DiplomaEditor = () => {
   } = useDiploma();
 
   const [userFullName, setUserFullName] = useState<string>('');
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
 
   useEffect(() => {
     // Get the user's full name for the signature
@@ -112,8 +114,13 @@ export const DiplomaEditor = () => {
     console.log('DiplomaEditor: Generating template with userFullName:', userFullName);
     const signatureName = userFullName || 'Authorized Signature';
     
+    // Adjust dimensions based on format
+    const containerStyle = diplomaFormat === 'portrait' 
+      ? 'width: 600px; height: 800px;' 
+      : 'width: 800px; height: 600px;';
+    
     const template = `
-      <div class="diploma-container">
+      <div class="diploma-container" style="${containerStyle}">
         <div class="diploma-content">
           <h1 class="diploma-title">Certificate of Achievement</h1>
           <div class="diploma-text">
@@ -262,6 +269,19 @@ export const DiplomaEditor = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="format">Diploma Format</Label>
+            <Select value={diplomaFormat} onValueChange={(value: 'portrait' | 'landscape') => setDiplomaFormat(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="landscape">Landscape (11" × 8.5")</SelectItem>
+                <SelectItem value="portrait">Portrait (8.5" × 11")</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="recipientName">Recipient Name</Label>
             <Input

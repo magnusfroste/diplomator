@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ChatMessage {
@@ -17,6 +16,7 @@ export interface DiplomaGenerationRequest {
   currentHtml?: string;
   currentCss?: string;
   userFullName?: string;
+  diplomaFormat?: 'portrait' | 'landscape';
 }
 
 export interface DiplomaGenerationResponse {
@@ -62,7 +62,8 @@ export const generateDiploma = async (request: DiplomaGenerationRequest): Promis
     const response = await supabase.functions.invoke('generate-diploma', {
       body: {
         ...request,
-        userFullName
+        userFullName,
+        diplomaFormat: request.diplomaFormat || 'landscape'
       }
     });
 

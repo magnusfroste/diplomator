@@ -27,7 +27,8 @@ export const ChatPanel = () => {
     diplomaHtml,
     diplomaCss,
     setDiplomaHtml,
-    setDiplomaCss 
+    setDiplomaCss,
+    diplomaFormat
   } = useDiploma();
 
   const handleSendMessage = async () => {
@@ -57,12 +58,13 @@ export const ChatPanel = () => {
         content: message
       });
 
-      // Pass current diploma content for iteration
+      // Pass current diploma content and format for iteration
       const response = await generateDiploma({
         messages: chatMessages,
         requestType: 'text',
         currentHtml: diplomaHtml || undefined,
-        currentCss: diplomaCss || undefined
+        currentCss: diplomaCss || undefined,
+        diplomaFormat: diplomaFormat
       });
       
       const aiMessage: Message = {
@@ -144,6 +146,7 @@ export const ChatPanel = () => {
                   <li>Request one feature at a time for complex elements</li>
                   <li>Use "make it more elegant" for refinements</li>
                   <li>Ask for "simpler" versions if shapes don't look right</li>
+                  <li>Set format preference in Editor tab (Portrait/Landscape)</li>
                 </ul>
               </div>
             </div>

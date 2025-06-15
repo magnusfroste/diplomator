@@ -25,6 +25,9 @@ interface DiplomaContextType {
   setSigningRecipientName: (name: string) => void;
   signingInstitutionName: string;
   setSigningInstitutionName: (name: string) => void;
+  // New field for diploma format
+  diplomaFormat: 'portrait' | 'landscape';
+  setDiplomaFormat: (format: 'portrait' | 'landscape') => void;
 }
 
 interface Message {
@@ -42,6 +45,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [signingRecipientName, setSigningRecipientName] = useState('');
   const [signingInstitutionName, setSigningInstitutionName] = useState('');
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
   const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
     recipientName: '',
     degree: '',
@@ -73,7 +77,9 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
       signingRecipientName,
       setSigningRecipientName,
       signingInstitutionName,
-      setSigningInstitutionName
+      setSigningInstitutionName,
+      diplomaFormat,
+      setDiplomaFormat
     }}>
       {children}
     </DiplomaContext.Provider>
