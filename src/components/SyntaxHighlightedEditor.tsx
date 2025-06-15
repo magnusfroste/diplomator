@@ -25,7 +25,7 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
       return code
         // HTML tags
         .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)(.*?)(&gt;)/g, 
-          '<span class="tag">$1</span><span class="tag-name">$2</span><span class="attr">$3</span><span class="tag">$4</span>')
+          '<span class="tag-bracket">$1</span><span class="tag-name">$2</span><span class="attr">$3</span><span class="tag-bracket">$4</span>')
         // Attributes
         .replace(/(\s+)([a-zA-Z-]+)(=)/g, '$1<span class="attr-name">$2</span><span class="operator">$3</span>')
         // Attribute values
@@ -77,12 +77,13 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
       <style>{`
         .syntax-editor {
           position: relative;
-          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
-          font-size: 12px;
-          line-height: 1.5;
-          border-radius: 6px;
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+          font-size: 13px;
+          line-height: 1.6;
+          border-radius: 8px;
           overflow: hidden;
-          border: 1px solid #e2e8f0;
+          border: 1px solid hsl(var(--border));
+          background: hsl(var(--background));
         }
         
         .syntax-highlight {
@@ -91,27 +92,28 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           left: 0;
           right: 0;
           bottom: 0;
-          padding: 12px;
+          padding: 16px;
           margin: 0;
           color: transparent;
-          background: white;
+          background: transparent;
           overflow: auto;
           white-space: pre-wrap;
           word-wrap: break-word;
           pointer-events: none;
           z-index: 1;
+          tab-size: 2;
         }
         
         .syntax-textarea {
           position: relative;
           width: 100%;
-          height: 150px;
-          padding: 12px;
+          height: 200px;
+          padding: 16px;
           margin: 0;
           border: none;
           outline: none;
           background: transparent;
-          color: #1a202c;
+          color: hsl(var(--foreground));
           font-family: inherit;
           font-size: inherit;
           line-height: inherit;
@@ -120,23 +122,72 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
           overflow: auto;
           resize: vertical;
           z-index: 2;
+          tab-size: 2;
         }
         
         .syntax-textarea::placeholder {
-          color: #a0aec0;
+          color: hsl(var(--muted-foreground));
         }
         
-        /* Syntax highlighting colors */
-        .tag { color: #e53e3e; }
-        .tag-name { color: #3182ce; font-weight: 600; }
-        .attr-name { color: #d69e2e; }
-        .string { color: #38a169; }
-        .comment { color: #718096; font-style: italic; }
-        .operator { color: #4a5568; }
-        .selector { color: #805ad5; font-weight: 600; }
-        .property { color: #3182ce; }
-        .value { color: #38a169; }
-        .important { color: #e53e3e; font-weight: 600; }
+        .syntax-textarea:focus {
+          outline: 2px solid hsl(var(--ring));
+          outline-offset: -2px;
+        }
+        
+        /* Enhanced Syntax highlighting colors */
+        .tag-bracket { 
+          color: #8B5CF6; 
+          font-weight: 500; 
+        }
+        .tag-name { 
+          color: #3B82F6; 
+          font-weight: 600; 
+        }
+        .attr-name { 
+          color: #F59E0B; 
+          font-weight: 500; 
+        }
+        .string { 
+          color: #10B981; 
+          font-weight: 500; 
+        }
+        .comment { 
+          color: #6B7280; 
+          font-style: italic; 
+          opacity: 0.8;
+        }
+        .operator { 
+          color: #8B5CF6; 
+          font-weight: 600; 
+        }
+        .selector { 
+          color: #8B5CF6; 
+          font-weight: 600; 
+        }
+        .property { 
+          color: #3B82F6; 
+          font-weight: 500; 
+        }
+        .value { 
+          color: #10B981; 
+          font-weight: 500; 
+        }
+        .important { 
+          color: #EF4444; 
+          font-weight: 700; 
+        }
+        
+        /* Dark mode adjustments */
+        .dark .tag-bracket { color: #A78BFA; }
+        .dark .tag-name { color: #60A5FA; }
+        .dark .attr-name { color: #FBBF24; }
+        .dark .string { color: #34D399; }
+        .dark .comment { color: #9CA3AF; }
+        .dark .operator { color: #A78BFA; }
+        .dark .selector { color: #A78BFA; }
+        .dark .property { color: #60A5FA; }
+        .dark .value { color: #34D399; }
+        .dark .important { color: #F87171; }
       `}</style>
       
       <div className="syntax-editor">
