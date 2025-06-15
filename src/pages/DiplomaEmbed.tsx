@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ExternalLink, Shield } from 'lucide-react';
@@ -37,8 +36,23 @@ const DiplomaEmbed = () => {
     }
   };
 
+  const cleanDiplomaHTML = (html: string) => {
+    // Remove QR code related elements and containers
+    return html
+      .replace(/<div[^>]*qr[^>]*>.*?<\/div>/gis, '') // Remove divs containing 'qr'
+      .replace(/<canvas[^>]*qr[^>]*>.*?<\/canvas>/gis, '') // Remove QR canvas elements
+      .replace(/<svg[^>]*qr[^>]*>.*?<\/svg>/gis, '') // Remove QR SVG elements
+      .replace(/<img[^>]*qr[^>]*[^>]*>/gis, '') // Remove QR images
+      .replace(/QR/g, '') // Remove any standalone "QR" text
+      .replace(/qr-code[^"'\s>]*/g, '') // Remove qr-code class references
+      .replace(/class="[^"]*qr[^"]*"/gis, '') // Remove classes containing 'qr'
+      .replace(/id="[^"]*qr[^"]*"/gis, ''); // Remove IDs containing 'qr'
+  };
+
   const getEmbedContent = () => {
     if (!diplomaData) return '';
+    
+    const cleanedHTML = cleanDiplomaHTML(diplomaData.diploma_html);
     
     return `
       <!DOCTYPE html>
@@ -124,11 +138,15 @@ const DiplomaEmbed = () => {
             text-transform: uppercase;
             letter-spacing: 0.3px;
           }
+          /* Hide any remaining QR elements that might slip through */
+          [class*="qr"], [id*="qr"], [class*="QR"], [id*="QR"] {
+            display: none !important;
+          }
         </style>
       </head>
       <body>
         <div class="embed-wrapper">
-          ${diplomaData.diploma_html}
+          ${cleanedHTML}
           <div class="embed-overlay">
             <a href="${window.location.origin}/diploma/${diplomaData.blockchain_id}" target="_blank" class="embed-link">
               <svg class="shield-icon" fill="currentColor" viewBox="0 0 24 24">
