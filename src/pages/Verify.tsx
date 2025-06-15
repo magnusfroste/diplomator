@@ -148,6 +148,10 @@ const Verify = () => {
 
       if (isValid) {
         toast.success('Diploma verification successful! ✅');
+        // Redirect to the authentic diploma page after a short delay
+        setTimeout(() => {
+          navigate(`/diploma/${diplomaId}`);
+        }, 2000);
       } else {
         toast.error('Diploma verification failed! ❌');
       }
@@ -164,56 +168,15 @@ const Verify = () => {
     }
   };
 
-  const getPreviewContent = () => {
-    if (!verificationResult?.record) return '';
-    
-    const { diploma_html, diploma_css } = verificationResult.record;
-    
-    console.log('=== PREVIEW CONTENT DEBUG ===');
-    console.log('HTML preview (first 500 chars):', diploma_html.substring(0, 500));
-    console.log('CSS preview (first 200 chars):', diploma_css.substring(0, 200));
-    
-    // Ensure the diploma content displays the actual recipient data
-    const previewHtml = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verified Diploma - ${verificationResult.record.recipient_name}</title>
-        <style>
-          body { 
-            margin: 0; 
-            padding: 20px; 
-            font-family: serif; 
-            background: white; 
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .diploma-container {
-            max-width: 100%;
-            width: 100%;
-          }
-          ${diploma_css}
-        </style>
-      </head>
-      <body>
-        <div class="diploma-container">
-          ${diploma_html}
-        </div>
-      </body>
-      </html>
-    `;
-    
-    console.log('Final preview HTML (first 800 chars):', previewHtml.substring(0, 800));
-    return previewHtml;
+  const viewAuthenticDiploma = () => {
+    if (verificationResult?.record) {
+      navigate(`/diploma/${verificationResult.record.blockchain_id}`);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -233,7 +196,7 @@ const Verify = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-2xl mx-auto">
           {/* Verification Form */}
           <Card>
             <CardHeader>
@@ -301,24 +264,39 @@ const Verify = () => {
                   </div>
 
                   {verificationResult.isValid && verificationResult.record && (
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <span>Recipient: {verificationResult.record.recipient_name}</span>
+                    <>
+                      <div className="space-y-2 text-sm mb-4">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                          <span>Recipient: {verificationResult.record.recipient_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Building className="w-4 h-4 text-muted-foreground" />
+                          <span>Institution: {verificationResult.record.institution_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-muted-foreground" />
+                          <span>Signed: {new Date(verificationResult.record.created_at).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Hash className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-mono text-xs">Hash: {verificationResult.record.content_hash.substring(0, 16)}...</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Building className="w-4 h-4 text-muted-foreground" />
-                        <span>Institution: {verificationResult.record.institution_name}</span>
+                      
+                      <div className="text-center">
+                        <p className="text-sm text-green-800 mb-3">
+                          Redirecting to authentic diploma in 2 seconds...
+                        </p>
+                        <Button
+                          onClick={viewAuthenticDiploma}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Authentic Diploma Now
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>Signed: {new Date(verificationResult.record.created_at).toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Hash className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-mono text-xs">Hash: {verificationResult.record.content_hash.substring(0, 16)}...</span>
-                      </div>
-                    </div>
+                    </>
                   )}
 
                   {!verificationResult.isValid && verificationResult.issues.length > 0 && (
@@ -331,50 +309,6 @@ const Verify = () => {
                       </ul>
                     </div>
                   )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Verified Diploma</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {verificationResult?.isValid 
-                  ? "Authentic diploma retrieved from blockchain - showing exactly as originally signed" 
-                  : "Diploma preview will appear after successful verification"
-                }
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="h-96 bg-white rounded-lg border border-slate-200 overflow-hidden">
-                {verificationResult?.isValid && verificationResult.record ? (
-                  <iframe
-                    srcDoc={getPreviewContent()}
-                    className="w-full h-full border-0"
-                    title="Verified Diploma"
-                    sandbox="allow-same-origin"
-                  />
-                ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                      <Shield className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                      <p>Verify a diploma to see its authentic content</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {verificationResult?.isValid && verificationResult.record && (
-                <div className="mt-4 text-center">
-                  <Button
-                    variant="outline"
-                    onClick={() => window.open(getPreviewContent(), '_blank')}
-                    className="text-sm"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Open Full Diploma in New Tab
-                  </Button>
                 </div>
               )}
             </CardContent>
@@ -392,7 +326,7 @@ const Verify = () => {
                 <Shield className="w-12 h-12 mx-auto mb-3 text-blue-600" />
                 <h3 className="font-semibold mb-2">Authentic Content</h3>
                 <p className="text-sm text-muted-foreground">
-                  The verification displays the exact diploma content as it was originally signed, with all recipient information intact.
+                  Upon successful verification, you'll be redirected to view the exact diploma content as it was originally signed.
                 </p>
               </div>
               <div className="text-center">
