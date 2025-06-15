@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Wand, Users, CheckCircle, Upload, MessageSquare, Lock, Award } from 'lucide-react';
+import { Shield, Wand, Users, CheckCircle, Upload, MessageSquare, Lock, Award, BookOpen, TrendingUp, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
@@ -12,32 +12,32 @@ const Landing = () => {
     {
       icon: <MessageSquare className="w-8 h-8 text-blue-600" />,
       title: "AI-Powered Design",
-      description: "Simply chat with our AI to create stunning diploma designs. Describe your vision and watch it come to life instantly."
+      description: "Simply chat with our AI to create stunning certificates for any learning achievement. From micro-courses to major qualifications."
     },
     {
       icon: <Upload className="w-8 h-8 text-green-600" />,
       title: "Smart Upload & Inspiration",
-      description: "Upload existing diplomas or inspiration images. Our AI extracts branding elements and creates consistent designs."
+      description: "Upload existing certificates or inspiration images. Our AI extracts branding elements and creates consistent designs for all your learning programs."
     },
     {
       icon: <Shield className="w-8 h-8 text-purple-600" />,
       title: "Blockchain Verification",
-      description: "Every diploma is digitally signed and stored on blockchain, ensuring immutable proof of authenticity."
+      description: "Every certificate is digitally signed and stored on blockchain, ensuring immutable proof of continuous learning achievements."
     },
     {
       icon: <Lock className="w-8 h-8 text-red-600" />,
       title: "Tamper-Proof Security",
-      description: "Cryptographic signatures prevent forgery. Recipients and employers can instantly verify authenticity."
+      description: "Cryptographic signatures prevent forgery. Learners and employers can instantly verify any skill or knowledge acquisition."
     }
   ];
 
   const benefits = [
-    "Instant diploma creation with AI assistance",
-    "Professional designs that match your brand",
-    "Blockchain-backed authenticity verification",
-    "Secure distribution to recipients",
-    "Tamper-proof digital certificates",
-    "Global verification system"
+    "Instant certificate creation for micro-learning achievements",
+    "Professional designs that showcase continuous growth",
+    "Blockchain-backed authenticity for all skill certifications",
+    "Secure distribution to learners and professionals",
+    "Tamper-proof digital credentials for lifelong learning",
+    "Global verification system for any knowledge domain"
   ];
 
   return (
@@ -66,25 +66,71 @@ const Landing = () => {
       <section className="pt-16 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <TrendingUp className="w-6 h-6 text-blue-600" />
+              <span className="text-blue-600 font-semibold">Embracing the Micro-Learning Revolution</span>
+            </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Create Authentic Diplomas with
+              Showcase Continuous Learning with
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 {" "}AI & Blockchain
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Design beautiful, professional diplomas in minutes through AI conversation. 
-              Every certificate is cryptographically signed and blockchain-verified for 
-              unmatched authenticity and trust.
+              In today's fast-paced world, we learn constantly through micro-courses, workshops, and skill-building sessions. 
+              Create beautiful, verifiable certificates for every learning milestone - from 5-minute tutorials to comprehensive programs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8 py-3" onClick={() => navigate('/auth')}>
-                <Wand className="w-5 h-5 mr-2" />
-                Start Creating
+                <Lightbulb className="w-5 h-5 mr-2" />
+                Start Certifying Learning
               </Button>
               <Button variant="outline" size="lg" className="text-lg px-8 py-3" onClick={() => navigate('/demo')}>
                 View Demo
               </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Micro-Learning Focus Section */}
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <BookOpen className="w-16 h-16 text-white mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-white mb-4">
+            The Future is Continuous Learning
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Whether it's a 10-minute skill-building session, a weekend workshop, or a comprehensive certification program - 
+            every learning moment deserves recognition. Help your organization and learners showcase their commitment to growth.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            <div className="text-center">
+              <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">📚</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Micro-Courses</h3>
+              <p className="text-blue-100">
+                Certificate completion of bite-sized learning modules and skill-building sessions.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🏆</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Skill Badges</h3>
+              <p className="text-blue-100">
+                Recognize specific competencies and practical skills acquired through hands-on learning.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🎓</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Full Programs</h3>
+              <p className="text-blue-100">
+                Create comprehensive certificates for complete learning journeys and major achievements.
+              </p>
             </div>
           </div>
         </div>
@@ -95,20 +141,20 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Trusted by Educational Institutions Worldwide
+              Trusted by Learning Organizations Worldwide
             </h2>
             <p className="text-gray-600">
-              Join thousands of organizations creating secure, verifiable diplomas
+              Join thousands of organizations certifying continuous learning and skill development
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
-              <div className="text-gray-600">Diplomas Created</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">50,000+</div>
+              <div className="text-gray-600">Learning Certificates Issued</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-green-600 mb-2">500+</div>
-              <div className="text-gray-600">Institutions</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">1,200+</div>
+              <div className="text-gray-600">Learning Organizations</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-purple-600 mb-2">99.9%</div>
@@ -152,10 +198,10 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Simple. Secure. Authentic.
+              Simple. Secure. Continuous.
             </h2>
             <p className="text-xl text-gray-600">
-              Creating verified diplomas has never been easier
+              Certifying every learning achievement has never been easier
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -163,27 +209,27 @@ const Landing = () => {
               <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Chat & Design</h3>
+              <h3 className="text-xl font-semibold mb-2">Design & Create</h3>
               <p className="text-gray-600">
-                Describe your diploma vision to our AI. Upload inspiration or existing branding for perfect consistency.
+                Describe your learning program to our AI. From micro-courses to comprehensive certifications - create professional certificates instantly.
               </p>
             </div>
             <div className="text-center">
               <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Blockchain Sign</h3>
+              <h3 className="text-xl font-semibold mb-2">Blockchain Authenticate</h3>
               <p className="text-gray-600">
-                Every diploma is cryptographically signed and recorded on blockchain for immutable verification.
+                Every learning achievement is cryptographically signed and recorded on blockchain for immutable verification.
               </p>
             </div>
             <div className="text-center">
               <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Distribute & Verify</h3>
+              <h3 className="text-xl font-semibold mb-2">Showcase & Verify</h3>
               <p className="text-gray-600">
-                Share diplomas with recipients. Anyone can instantly verify authenticity using our global verification system.
+                Learners can proudly showcase their continuous growth. Employers can instantly verify any skill or knowledge claim.
               </p>
             </div>
           </div>
@@ -196,11 +242,11 @@ const Landing = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                The Future of Credential Verification
+                Empower Lifelong Learning
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Stop worrying about diploma fraud. Our blockchain-backed system ensures every certificate 
-                is authentic, verifiable, and tamper-proof.
+                In an era where skills evolve rapidly, help your organization and learners document every 
+                step of their learning journey. From quick tutorials to major achievements - every learning moment matters.
               </p>
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
@@ -212,14 +258,14 @@ const Landing = () => {
               </div>
             </div>
             <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-              <Shield className="w-16 h-16 mb-6" />
-              <h3 className="text-2xl font-bold mb-4">Blockchain Security</h3>
+              <BookOpen className="w-16 h-16 mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Continuous Learning Recognition</h3>
               <p className="text-blue-100 mb-6">
-                Each diploma receives a unique cryptographic signature stored on an immutable blockchain ledger. 
-                This creates an unbreakable chain of trust that employers and institutions can verify instantly.
+                Whether it's a 5-minute skill tutorial, a weekend workshop, or a multi-month program - 
+                every learning achievement deserves professional recognition. Build a culture of continuous growth.
               </p>
               <Button variant="secondary" className="w-full">
-                Learn About Our Security
+                Explore Learning Solutions
               </Button>
             </div>
           </div>
@@ -230,15 +276,15 @@ const Landing = () => {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Create Authentic Diplomas?
+            Ready to Celebrate Continuous Learning?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of institutions already using Diplomator to create secure, verifiable credentials.
+            Join thousands of organizations already empowering learners to showcase their commitment to growth and skill development.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-3" onClick={() => navigate('/auth')}>
               <Users className="w-5 h-5 mr-2" />
-              Start Free Trial
+              Start Certifying Learning
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-3 text-white border-white hover:bg-white hover:text-blue-600" onClick={() => navigate('/demo')}>
               Schedule Demo
