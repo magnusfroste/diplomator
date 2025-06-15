@@ -4,7 +4,7 @@ import { Download, Code, Eye, Maximize, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SyntaxHighlightedEditor } from '@/components/SyntaxHighlightedEditor';
+import { MonacoEditor } from '@/components/MonacoEditor';
 
 export const PreviewPanel = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
@@ -214,8 +214,8 @@ export const PreviewPanel = () => {
                 <div className="p-3 border-b border-slate-200 bg-slate-50">
                   <h3 className="text-sm font-medium text-slate-700">HTML Structure</h3>
                 </div>
-                <div className="h-full p-4 overflow-hidden">
-                  <SyntaxHighlightedEditor
+                <div className="h-full">
+                  <MonacoEditor
                     value={editableHtml}
                     onChange={setEditableHtml}
                     language="html"
@@ -261,8 +261,8 @@ export const PreviewPanel = () => {
                 <div className="p-3 border-b border-slate-200 bg-slate-50">
                   <h3 className="text-sm font-medium text-slate-700">CSS Styles</h3>
                 </div>
-                <div className="h-full p-4 overflow-hidden">
-                  <SyntaxHighlightedEditor
+                <div className="h-full">
+                  <MonacoEditor
                     value={editableCss}
                     onChange={setEditableCss}
                     language="css"

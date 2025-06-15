@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Save, X } from 'lucide-react';
+import { MonacoEditor } from '@/components/MonacoEditor';
 
 export const CodeEditor = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
@@ -77,13 +77,14 @@ export const CodeEditor = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Textarea
-            value={editableHtml}
-            onChange={(e) => setEditableHtml(e.target.value)}
-            placeholder="HTML content will appear here..."
-            className="font-mono text-sm min-h-[200px] resize-none"
-            rows={12}
-          />
+          <div className="h-[300px] border border-slate-200 rounded-lg overflow-hidden">
+            <MonacoEditor
+              value={editableHtml}
+              onChange={setEditableHtml}
+              language="html"
+              placeholder="HTML content will appear here..."
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -96,13 +97,14 @@ export const CodeEditor = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Textarea
-            value={editableCss}
-            onChange={(e) => setEditableCss(e.target.value)}
-            placeholder="CSS styles will appear here..."
-            className="font-mono text-sm min-h-[200px] resize-none"
-            rows={12}
-          />
+          <div className="h-[300px] border border-slate-200 rounded-lg overflow-hidden">
+            <MonacoEditor
+              value={editableCss}
+              onChange={setEditableCss}
+              language="css"
+              placeholder="CSS styles will appear here..."
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
