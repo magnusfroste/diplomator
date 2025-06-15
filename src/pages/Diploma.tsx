@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,6 +46,7 @@ const Diploma = () => {
       console.log('=== DIPLOMA FETCH DEBUG ===');
       console.log('Fetching diploma with ID:', diplomaId);
       
+      // Use the same query pattern as the Verify page
       const { data, error } = await supabase
         .from('signed_diplomas')
         .select('*')
