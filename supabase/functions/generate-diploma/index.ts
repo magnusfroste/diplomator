@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -25,6 +24,13 @@ serve(async (req) => {
     let systemPrompt = `You are an expert diploma designer. Your task is to create beautiful, professional diplomas based on user requirements. 
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
+CSS SHAPE CREATION GUIDELINES:
+- For hearts: Use the ::before and ::after pseudo-elements with border-radius to create proper heart shapes
+- Hearts should use transform: rotate(-45deg) on the main element, then position ::before and ::after with border-radius: 50% 50% 0 0
+- Make shapes prominent with good contrast and adequate sizing
+- Use proper CSS transforms for animations (translateY, scale, rotate)
+- Ensure animated elements have smooth transitions with easing functions
 
 MODIFICATIONS: Users can request adjustments to their diplomas after creation. Be ready to:
 - Add or modify text, colors, fonts, and layouts
@@ -138,7 +144,13 @@ ${currentHtml}
 CURRENT CSS:
 ${currentCss}
 
-Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design and structure. Keep the same layout, fonts, and styling unless specifically asked to change them.`;
+Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design and structure. Keep the same layout, fonts, and styling unless specifically asked to change them.
+
+SPECIAL FOCUS FOR SHAPE IMPROVEMENTS:
+- If modifying hearts or other CSS shapes, ensure they are well-formed and visually clear
+- Hearts should use proper CSS techniques: main element with transform: rotate(-45deg), ::before and ::after positioned with border-radius: 50% 50% 0 0
+- Make sure shapes have adequate size, contrast, and are positioned properly
+- Use smooth animations with appropriate easing functions`;
       }
       
       requestBody = {
