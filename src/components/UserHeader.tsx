@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, User } from 'lucide-react';
+import { LogOut, Settings, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { DiplomaManager } from './DiplomaManager';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface UserHeaderProps {
   userEmail?: string;
@@ -13,6 +15,7 @@ interface UserHeaderProps {
 
 export const UserHeader = ({ userEmail = 'demo@diplomator.com', userName = 'Demo User' }: UserHeaderProps) => {
   const navigate = useNavigate();
+  const [showSignedDiplomas, setShowSignedDiplomas] = useState(false);
 
   const handleLogout = () => {
     // In a real app, this would handle actual logout
@@ -62,6 +65,10 @@ export const UserHeader = ({ userEmail = 'demo@diplomator.com', userName = 'Demo
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowSignedDiplomas(true)}>
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Signed</span>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
@@ -69,6 +76,15 @@ export const UserHeader = ({ userEmail = 'demo@diplomator.com', userName = 'Demo
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Dialog open={showSignedDiplomas} onOpenChange={setShowSignedDiplomas}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>My Signed Diplomas</DialogTitle>
+          </DialogHeader>
+          <DiplomaManager />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
