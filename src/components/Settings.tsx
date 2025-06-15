@@ -16,7 +16,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export const Settings = () => {
+// Settings content component for embedding in other dialogs
+export const SettingsContent = () => {
   const { toast } = useToast();
   const [apiKey, setApiKey] = useState('');
   const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
@@ -61,6 +62,81 @@ export const Settings = () => {
   };
 
   return (
+    <div className="space-y-6">
+      {/* API Key Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Key className="w-5 h-5" />
+            API Configuration
+          </CardTitle>
+          <CardDescription>
+            Configure your Anthropic API key for AI-powered diploma generation
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="api-key">Anthropic API Key</Label>
+            <Input
+              id="api-key"
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Enter your Anthropic API key"
+            />
+            <p className="text-xs text-muted-foreground">
+              Your API key is stored locally and never sent to our servers
+            </p>
+          </div>
+          <Button onClick={handleApiKeySave}>
+            Save API Key
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Diploma Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layout className="w-5 h-5" />
+            Diploma Settings
+          </CardTitle>
+          <CardDescription>
+            Configure your diploma generation preferences
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <Label>Diploma Format</Label>
+            <div className="flex gap-2">
+              <Toggle
+                pressed={diplomaFormat === 'landscape'}
+                onPressedChange={() => handleFormatChange('landscape')}
+                className="flex-1 justify-center"
+              >
+                Landscape
+              </Toggle>
+              <Toggle
+                pressed={diplomaFormat === 'portrait'}
+                onPressedChange={() => handleFormatChange('portrait')}
+                className="flex-1 justify-center"
+              >
+                Portrait
+              </Toggle>
+            </div>
+            <p className="text-sm text-gray-600">
+              Current format: <span className="font-medium capitalize">{diplomaFormat}</span>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Full settings component with trigger (for standalone use)
+export const Settings = () => {
+  return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
@@ -74,76 +150,7 @@ export const Settings = () => {
             Configure your application preferences and API settings
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-6">
-          {/* API Key Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="w-5 h-5" />
-                API Configuration
-              </CardTitle>
-              <CardDescription>
-                Configure your Anthropic API key for AI-powered diploma generation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="api-key">Anthropic API Key</Label>
-                <Input
-                  id="api-key"
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your Anthropic API key"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Your API key is stored locally and never sent to our servers
-                </p>
-              </div>
-              <Button onClick={handleApiKeySave}>
-                Save API Key
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Diploma Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Layout className="w-5 h-5" />
-                Diploma Settings
-              </CardTitle>
-              <CardDescription>
-                Configure your diploma generation preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <Label>Diploma Format</Label>
-                <div className="flex gap-2">
-                  <Toggle
-                    pressed={diplomaFormat === 'landscape'}
-                    onPressedChange={() => handleFormatChange('landscape')}
-                    className="flex-1 justify-center"
-                  >
-                    Landscape
-                  </Toggle>
-                  <Toggle
-                    pressed={diplomaFormat === 'portrait'}
-                    onPressedChange={() => handleFormatChange('portrait')}
-                    className="flex-1 justify-center"
-                  >
-                    Portrait
-                  </Toggle>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Current format: <span className="font-medium capitalize">{diplomaFormat}</span>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <SettingsContent />
       </DialogContent>
     </Dialog>
   );
