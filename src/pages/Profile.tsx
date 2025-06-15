@@ -4,15 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Award, User, Mail, Calendar } from 'lucide-react';
+import { ArrowLeft, Award, User, Mail, Calendar, Layout } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
+import { useDiploma } from '@/contexts/DiplomaContext';
+import { Toggle } from '@/components/ui/toggle';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { diplomaFormat, setDiplomaFormat } = useDiploma();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState({ name: '' });
   const [loading, setLoading] = useState(false);
@@ -77,6 +80,14 @@ const Profile = () => {
     navigate('/');
   };
 
+  const handleFormatChange = (format: 'portrait' | 'landscape') => {
+    setDiplomaFormat(format);
+    toast({
+      title: "Format Updated",
+      description: `Diploma format set to ${format}`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <div className="max-w-2xl mx-auto">
@@ -102,7 +113,7 @@ const Profile = () => {
         </div>
 
         {/* Profile Card */}
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5" />
@@ -167,6 +178,44 @@ const Profile = () => {
               >
                 Sign Out
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Diploma Settings Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Layout className="w-5 h-5" />
+              Diploma Settings
+            </CardTitle>
+            <CardDescription>
+              Configure your diploma generation preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Diploma Format */}
+            <div className="space-y-3">
+              <Label>Diploma Format</Label>
+              <div className="flex gap-2">
+                <Toggle
+                  pressed={diplomaFormat === 'landscape'}
+                  onPressedChange={() => handleFormatChange('landscape')}
+                  className="flex-1 justify-center"
+                >
+                  Landscape
+                </Toggle>
+                <Toggle
+                  pressed={diplomaFormat === 'portrait'}
+                  onPressedChange={() => handleFormatChange('portrait')}
+                  className="flex-1 justify-center"
+                >
+                  Portrait
+                </Toggle>
+              </div>
+              <p className="text-sm text-gray-600">
+                Current format: <span className="font-medium capitalize">{diplomaFormat}</span>
+              </p>
             </div>
           </CardContent>
         </Card>
