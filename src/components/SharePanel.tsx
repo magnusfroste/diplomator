@@ -149,7 +149,7 @@ export const SharePanel = () => {
         <div>
           <h4 className="text-sm font-medium mb-2">Share on Social Media</h4>
           <div className="grid grid-cols-2 gap-2">
-            <FacebookShareButton url={shareUrl} quote={shareTitle}>
+            <FacebookShareButton url={shareUrl} hashtag="#diploma">
               <div className="flex items-center gap-2 p-2 rounded border hover:bg-muted transition-colors w-full">
                 <FacebookIcon size={20} round />
                 <span className="text-sm">Facebook</span>
