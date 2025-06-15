@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -104,18 +105,24 @@ Create CSS-based decorative elements inspired by the image instead of referencin
         ]
       };
     } else if (requestType === 'url') {
-      systemPrompt = `You are an expert diploma designer. The user has provided a website URL. Create a diploma design that would be appropriate for or inspired by this type of website/organization.
+      systemPrompt = `You are an expert diploma designer. The user has provided a website URL. You should create a diploma design that captures the visual branding and aesthetic of well-known companies/organizations when possible.
+
+BRAND-SPECIFIC GUIDELINES:
+- For Telia (telia.se): Use their distinctive purple/magenta color palette (#990AE3, #FF6B35), modern Nordic design, clean typography
+- For telecommunications companies: Use colors associated with connectivity, technology, and innovation
+- For educational institutions: Use traditional academic colors and formal layouts
+- For corporate brands: Research and use their known color schemes and design principles
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
 MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
 Format your response like this:
-MESSAGE: [Explanation of the diploma you created based on the URL]
+MESSAGE: [Explanation of the diploma you created based on the URL and any brand recognition]
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Use CSS to create decorative elements instead of referencing image files.`;
+Use CSS to create decorative elements that reflect the organization's brand identity when recognizable.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -124,7 +131,7 @@ Use CSS to create decorative elements instead of referencing image files.`;
         messages: [
           {
             role: 'user',
-            content: `Please create a diploma design that would be appropriate for or inspired by this website: ${url}. Consider what type of organization this might be and create a suitable diploma design using only CSS for visual elements.`
+            content: `Please create a diploma design inspired by this website: ${url}. If you recognize this as a well-known brand (like Telia for telia.se), please use their actual brand colors and design aesthetic. For Telia specifically, use their purple/magenta branding (#990AE3, #FF6B35) and modern Nordic design principles. Create a professional diploma that reflects the organization's visual identity using only CSS for visual elements.`
           }
         ]
       };
@@ -132,7 +139,6 @@ Use CSS to create decorative elements instead of referencing image files.`;
       // Regular chat - filter out any system messages and use them as the system prompt
       const userMessages = messages.filter(msg => msg.role !== 'system');
       
-      // If we have existing diploma content, modify the system prompt to include it
       if (currentHtml && currentCss) {
         systemPrompt += `
 
