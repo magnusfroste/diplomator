@@ -21,19 +21,35 @@ export const SharePanel = () => {
   const { diplomaHtml, diplomaCss } = useDiploma();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [diplomaUrl, setDiplomaUrl] = useState('');
 
-  const shareUrl = window.location.href;
+  // Check if we have a signed diploma in localStorage or get from context
+  useEffect(() => {
+    // Try to get the last signed diploma URL from sessionStorage
+    const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
+    if (savedDiplomaUrl) {
+      setDiplomaUrl(savedDiplomaUrl);
+    } else {
+      setDiplomaUrl(window.location.href);
+    }
+  }, []);
+
+  const shareUrl = diplomaUrl || window.location.href;
   const shareTitle = "Check out my diploma created with Diploma Generator!";
 
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      // Create a temporary div with the diploma content
+      // Create a temporary div with the diploma content + verification badge
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
-        <div style="width: 800px; height: 600px; padding: 40px; background: white;">
+        <div style="width: 800px; height: 600px; padding: 40px; background: white; position: relative;">
           <style>${diplomaCss}</style>
           ${diplomaHtml}
+          <div style="position: absolute; bottom: 20px; right: 20px; background: #2563eb; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 14px;">🛡️</span>
+            Verified by Diplomator
+          </div>
         </div>
       `;
       tempDiv.style.position = 'absolute';
@@ -110,6 +126,15 @@ export const SharePanel = () => {
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Note about signing */}
+        {hasContent && !diplomaUrl.includes('/diploma/') && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              💡 Sign your diploma to the blockchain first to get a shareable link for CVs and LinkedIn
+            </p>
+          </div>
+        )}
+
         {/* PDF Download */}
         <div>
           <h4 className="text-sm font-medium mb-2">Export</h4>
@@ -121,11 +146,18 @@ export const SharePanel = () => {
             <Download className="w-4 h-4 mr-2" />
             {isGeneratingPDF ? 'Generating PDF...' : 'Download as PDF'}
           </Button>
+          {hasContent && (
+            <p className="text-xs text-muted-foreground mt-1">
+              PDF will include "Verified by Diplomator" badge
+            </p>
+          )}
         </div>
 
         {/* Copy Link */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Copy Link</h4>
+          <h4 className="text-sm font-medium mb-2">
+            {diplomaUrl.includes('/diploma/') ? 'Share Diploma Link' : 'Copy Link'}
+          </h4>
           <Button
             variant="outline"
             onClick={copyToClipboard}
@@ -143,6 +175,11 @@ export const SharePanel = () => {
               </>
             )}
           </Button>
+          {diplomaUrl.includes('/diploma/') && (
+            <p className="text-xs text-green-600 mt-1">
+              ✅ This is a direct diploma viewing link
+            </p>
+          )}
         </div>
 
         {/* Social Sharing */}

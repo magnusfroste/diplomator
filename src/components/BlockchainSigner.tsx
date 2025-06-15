@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +16,7 @@ export const BlockchainSigner = () => {
   const [isSigningTx, setIsSigningTx] = useState(false);
   const [signedRecord, setSignedRecord] = useState<DiplomaRecord | null>(null);
   const [verificationUrl, setVerificationUrl] = useState('');
+  const [diplomaUrl, setDiplomaUrl] = useState('');
   const [showQR, setShowQR] = useState(false);
 
   const handleSignToBlockchain = async () => {
@@ -40,8 +40,10 @@ export const BlockchainSigner = () => {
       );
       
       setSignedRecord(record);
-      const url = createVerificationUrl(record.id);
-      setVerificationUrl(url);
+      const verifyUrl = createVerificationUrl(record.id);
+      const directUrl = `${window.location.origin}/diploma/${record.id}`;
+      setVerificationUrl(verifyUrl);
+      setDiplomaUrl(directUrl);
       
       toast.success('Diploma successfully signed and stored on blockchain!');
     } catch (error) {
@@ -49,6 +51,15 @@ export const BlockchainSigner = () => {
       toast.error('Failed to sign diploma to blockchain');
     } finally {
       setIsSigningTx(false);
+    }
+  };
+
+  const copyDiplomaUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(diplomaUrl);
+      toast.success('Diploma link copied to clipboard!');
+    } catch (error) {
+      toast.error('Failed to copy URL');
     }
   };
 
@@ -139,6 +150,26 @@ export const BlockchainSigner = () => {
 
             <div className="space-y-3">
               <div>
+                <Label className="text-xs font-medium text-muted-foreground">SHARE LINK (Direct View)</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <code className="flex-1 text-sm bg-blue-50 px-2 py-1 rounded font-mono truncate border border-blue-200">
+                    {diplomaUrl}
+                  </code>
+                  <Button size="sm" variant="outline" onClick={copyDiplomaUrl}>
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => setShowQR(!showQR)}
+                  >
+                    <QrCode className="w-3 h-3" />
+                  </Button>
+                </div>
+                <p className="text-xs text-blue-600 mt-1">Recipients can view the diploma directly with this link</p>
+              </div>
+
+              <div>
                 <Label className="text-xs font-medium text-muted-foreground">DIPLOMA ID</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono">
@@ -159,19 +190,13 @@ export const BlockchainSigner = () => {
                   <Button size="sm" variant="outline" onClick={copyVerificationUrl}>
                     <Copy className="w-3 h-3" />
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setShowQR(!showQR)}
-                  >
-                    <QrCode className="w-3 h-3" />
-                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">For manual verification by employers</p>
                 </div>
               </div>
 
               {showQR && (
                 <div className="flex justify-center p-4 bg-white rounded-lg border">
-                  <QRCodeGenerator value={verificationUrl} size={120} />
+                  <QRCodeGenerator value={diplomaUrl} size={120} />
                 </div>
               )}
 
@@ -189,10 +214,10 @@ export const BlockchainSigner = () => {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => window.open(verificationUrl, '_blank')}
+                onClick={() => window.open(diplomaUrl, '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Open Verification Page
+                View Diploma
               </Button>
             </div>
 
@@ -202,6 +227,7 @@ export const BlockchainSigner = () => {
               onClick={() => {
                 setSignedRecord(null);
                 setVerificationUrl('');
+                setDiplomaUrl('');
                 setRecipientName('');
                 setInstitutionName('');
                 setShowQR(false);

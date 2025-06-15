@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,6 +7,7 @@ import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Signed from "./pages/Signed";
+import Diploma from "./pages/Diploma";
 import Verify from "./pages/Verify";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/demo" element={<Index />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/signed" element={<Signed />} />
+          <Route path="/diploma/:diplomaId" element={<Diploma />} />
           <Route path="/verify/:diplomaId?" element={<Verify />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

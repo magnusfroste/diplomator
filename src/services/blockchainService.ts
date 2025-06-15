@@ -79,6 +79,7 @@ export const signDiplomaToBlockchain = async (
   }
 
   const verificationUrl = createVerificationUrl(diplomaId);
+  const diplomaUrl = createDiplomaUrl(diplomaId);
 
   // Store in Supabase database
   const { error } = await supabase
@@ -100,6 +101,9 @@ export const signDiplomaToBlockchain = async (
     console.error('Error storing diploma in database:', error);
     throw new Error('Failed to store diploma in database');
   }
+
+  // Store the diploma URL for sharing
+  sessionStorage.setItem('lastDiplomaUrl', diplomaUrl);
 
   // Simulate blockchain transaction delay
   await new Promise(resolve => setTimeout(resolve, 1000));
@@ -198,4 +202,12 @@ export const getAllBlockchainRecords = async (): Promise<DiplomaRecord[]> => {
 export const createVerificationUrl = (diplomaId: string): string => {
   const baseUrl = window.location.origin;
   return `${baseUrl}/verify/${diplomaId}`;
+};
+
+/**
+ * Creates a direct diploma viewing URL
+ */
+export const createDiplomaUrl = (diplomaId: string): string => {
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/diploma/${diplomaId}`;
 };
