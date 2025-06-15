@@ -41,7 +41,8 @@ export const BlockchainSigner = () => {
       
       setSignedRecord(record);
       const verifyUrl = createVerificationUrl(record.id);
-      const directUrl = `${window.location.origin}/diploma/${record.id}`;
+      // Use the production URL for diploma viewing
+      const directUrl = `https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com/diploma/${record.id}`;
       setVerificationUrl(verifyUrl);
       setDiplomaUrl(directUrl);
       
@@ -166,7 +167,7 @@ export const BlockchainSigner = () => {
                     <QrCode className="w-3 h-3" />
                   </Button>
                 </div>
-                <p className="text-xs text-blue-600 mt-1">Recipients can view the diploma directly with this link</p>
+                <p className="text-xs text-blue-600 mt-1">✅ Production URL - Recipients can view the diploma directly</p>
               </div>
 
               <div>
