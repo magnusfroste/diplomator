@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Link, Sparkles, Info, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -204,7 +203,7 @@ export const ChatPanel = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Describe the diploma you want to create... (Press Enter to send)"
+                placeholder="Describe the diploma you want to create..."
                 className="resize-none min-h-[60px]"
                 rows={2}
                 disabled={isGenerating}
