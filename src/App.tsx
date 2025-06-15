@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Signed from "./pages/Signed";
 import Diploma from "./pages/Diploma";
+import TestDiploma from "./pages/TestDiploma";
 import Verify from "./pages/Verify";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/signed" element={<Signed />} />
           <Route path="/diploma/:diplomaId" element={<Diploma />} />
+          <Route path="/testdiploma/:diplomaId" element={<TestDiploma />} />
           <Route path="/verify/:diplomaId?" element={<Verify />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
