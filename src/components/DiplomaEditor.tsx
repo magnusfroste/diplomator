@@ -14,24 +14,30 @@ export const DiplomaEditor = () => {
     setDiplomaFields, 
     diplomaHtml, 
     diplomaCss,
-    setDiplomaHtml 
+    setDiplomaHtml,
+    setDiplomaCss 
   } = useDiploma();
 
   const handleFieldChange = (field: string, value: string) => {
     const newFields = { ...diplomaFields, [field]: value };
     setDiplomaFields(newFields);
-    updateDiplomaWithFields(newFields);
+    
+    // If we have existing HTML, update it with the new fields
+    if (diplomaHtml) {
+      updateDiplomaWithFields(newFields);
+    } else {
+      // If no HTML exists, generate a basic template with the fields
+      generateTemplateWithFields(newFields);
+    }
   };
 
   const updateDiplomaWithFields = (fields: any) => {
-    if (!diplomaHtml) return;
-    
     let updatedHtml = diplomaHtml;
     
     // Replace placeholders or specific text patterns
     Object.entries(fields).forEach(([key, value]) => {
       const patterns = {
-        recipientName: [/\[NAME\]/gi, /John Doe/gi, /Student Name/gi],
+        recipientName: [/\[NAME\]/gi, /John Doe/gi, /Student Name/gi, /Magnus Froste/gi],
         degree: [/\[DEGREE\]/gi, /Bachelor of Arts/gi, /Degree Title/gi],
         institution: [/\[INSTITUTION\]/gi, /University Name/gi, /Institution Name/gi],
         date: [/\[DATE\]/gi, /\d{4}-\d{2}-\d{2}/gi, /Date/gi],
@@ -47,22 +53,22 @@ export const DiplomaEditor = () => {
     setDiplomaHtml(updatedHtml);
   };
 
-  const generateTemplate = () => {
+  const generateTemplateWithFields = (fields: any) => {
     const template = `
       <div class="diploma-container">
         <div class="diploma-content">
           <h1 class="diploma-title">Certificate of Achievement</h1>
           <div class="diploma-text">
             <p>This is to certify that</p>
-            <h2 class="recipient-name">${diplomaFields.recipientName || '[NAME]'}</h2>
+            <h2 class="recipient-name">${fields.recipientName || 'Your Name Here'}</h2>
             <p>has successfully completed the requirements for</p>
-            <h3 class="degree-title">${diplomaFields.degree || '[DEGREE]'}</h3>
+            <h3 class="degree-title">${fields.degree || 'Your Degree'}</h3>
             <p>in</p>
-            <h4 class="field-of-study">${diplomaFields.field || '[FIELD]'}</h4>
+            <h4 class="field-of-study">${fields.field || 'Field of Study'}</h4>
             <p>at</p>
-            <h3 class="institution-name">${diplomaFields.institution || '[INSTITUTION]'}</h3>
+            <h3 class="institution-name">${fields.institution || 'Institution Name'}</h3>
             <p>on this</p>
-            <div class="date">${diplomaFields.date || '[DATE]'}</div>
+            <div class="date">${fields.date || new Date().toLocaleDateString()}</div>
           </div>
         </div>
       </div>
@@ -147,6 +153,11 @@ export const DiplomaEditor = () => {
     `;
     
     setDiplomaHtml(template);
+    setDiplomaCss(css);
+  };
+
+  const generateTemplate = () => {
+    generateTemplateWithFields(diplomaFields);
   };
 
   return (
@@ -216,7 +227,7 @@ export const DiplomaEditor = () => {
               </Button>
             )}
             <p className="text-xs text-muted-foreground">
-              💡 Tip: Use AI chat to create the initial design, then use this editor to customize the content.
+              💡 Tip: Start typing in any field above and a diploma will automatically appear in the preview!
             </p>
           </div>
         </CardContent>
