@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Award, Mail, Lock, User, ArrowLeft, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
@@ -26,6 +26,21 @@ const Auth = () => {
     }, 1500);
   };
 
+  const handleDemoLogin = () => {
+    setEmail('demo@diplomator.com');
+    setPassword('123456');
+    setIsSignUp(false);
+    
+    // Auto-submit after a brief moment
+    setTimeout(() => {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        navigate('/app');
+      }, 1500);
+    }, 500);
+  };
+
   const toggleAuthMode = () => {
     setIsSignUp(!isSignUp);
     setEmail('');
@@ -45,6 +60,26 @@ const Auth = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
+
+        {/* Demo User Card */}
+        <Card className="shadow-lg border-0 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-green-800 mb-1">Try Demo Account</h3>
+                <p className="text-sm text-green-600">Experience Diplomator instantly</p>
+              </div>
+              <Button 
+                onClick={handleDemoLogin}
+                className="bg-green-600 hover:bg-green-700"
+                disabled={loading}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Demo
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="shadow-2xl border-0">
           <CardHeader className="text-center space-y-4 pb-8">
