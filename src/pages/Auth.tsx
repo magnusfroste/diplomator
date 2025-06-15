@@ -1,272 +1,203 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Mail, Lock, User, ArrowLeft, Play } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Award, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/app`
-          }
-        });
-        
-        if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success('Check your email to confirm your account!');
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success('Signed in successfully!');
+  useEffect(() => {
+    // Check if user is already authenticated
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/app');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
           navigate('/app');
         }
       }
-    } catch (error) {
-      toast.error('An unexpected error occurred');
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Check your email",
+        description: "We've sent you a confirmation link to complete your registration.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDemoLogin = async () => {
-    // First prefill the form
-    setEmail('demo@diplomator.com');
-    setPassword('123456');
-    
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: 'demo@diplomator.com',
-        password: '123456',
+        email,
+        password,
       });
-      
-      if (error) {
-        toast.error('Demo login failed: ' + error.message);
-      } else {
-        toast.success('Demo login successful!');
-        navigate('/app');
-      }
-    } catch (error) {
-      toast.error('Demo login failed');
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleAuthMode = () => {
-    setIsSignUp(!isSignUp);
-    setEmail('');
-    setPassword('');
-    setName('');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Back to Home */}
-        <Button 
-          variant="ghost" 
-          className="mb-6"
-          onClick={() => navigate('/')}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
-        </Button>
+        {/* Header with Brand */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
+              <Award className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Diplomator</h1>
+          <p className="text-gray-600">Create and verify digital diplomas with blockchain technology</p>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/')}
+            className="mt-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+        </div>
 
-        {/* Demo User Card */}
-        <Card className="shadow-lg border-0 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-green-800 mb-1">Try Demo Account</h3>
-                <p className="text-sm text-green-600">Experience Diplomator instantly</p>
-              </div>
-              <Button 
-                onClick={handleDemoLogin}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={loading}
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Demo
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-2xl border-0">
-          <CardHeader className="text-center space-y-4 pb-8">
-            <div className="flex justify-center">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-2xl">
-                <Award className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                {isSignUp ? 'Create Account' : 'Welcome Back'}
-              </CardTitle>
-              <p className="text-gray-600 mt-2">
-                {isSignUp 
-                  ? 'Start creating authentic diplomas with AI' 
-                  : 'Sign in to your Diplomator account'
-                }
-              </p>
-            </div>
+        {/* Auth Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome</CardTitle>
+            <CardDescription>
+              Sign in to your account or create a new one to get started
+            </CardDescription>
           </CardHeader>
-
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email" className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Label>
                     <Input
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="pl-10"
+                      id="signin-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
                       required
                     />
                   </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              {!isSignUp && (
-                <div className="text-right">
-                  <button
-                    type="button"
-                    className="text-sm text-blue-600 hover:text-blue-700"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                disabled={loading}
-              >
-                {loading ? (
-                  'Please wait...'
-                ) : isSignUp ? (
-                  'Create Account'
-                ) : (
-                  'Sign In'
-                )}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                <button
-                  type="button"
-                  onClick={toggleAuthMode}
-                  className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  {isSignUp ? 'Sign in' : 'Sign up'}
-                </button>
-              </p>
-            </div>
-
-            {isSignUp && (
-              <div className="mt-4 text-xs text-gray-500 text-center">
-                By creating an account, you agree to our{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700">
-                  Privacy Policy
-                </a>
-              </div>
-            )}
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password" className="flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Password
+                    </Label>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Password
+                    </Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Create a password"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Creating account...' : 'Create Account'}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
-
-        {/* Trust Indicators */}
-        <div className="mt-8 text-center space-y-2">
-          <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              Blockchain Secured
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-              AI Powered
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-              Globally Verified
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

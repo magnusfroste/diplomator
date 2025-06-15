@@ -49,9 +49,13 @@ export const generateDiplomaId = (): string => {
 };
 
 /**
- * Gets the production base URL for diploma links
+ * Gets the current base URL (handles both development and production)
  */
-const getProductionBaseUrl = (): string => {
+const getCurrentBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  // Fallback for server-side or when window is not available
   return 'https://fabf66d2-6cc8-4995-9bf4-f98c6333f3ed.lovableproject.com';
 };
 
@@ -254,7 +258,7 @@ export const getAllBlockchainRecords = async (): Promise<DiplomaRecord[]> => {
  * Creates a verification URL for a diploma
  */
 export const createVerificationUrl = (diplomaId: string): string => {
-  const baseUrl = getProductionBaseUrl();
+  const baseUrl = getCurrentBaseUrl();
   return `${baseUrl}/verify/${diplomaId}`;
 };
 
@@ -262,6 +266,6 @@ export const createVerificationUrl = (diplomaId: string): string => {
  * Creates a direct diploma viewing URL
  */
 export const createDiplomaUrl = (diplomaId: string): string => {
-  const baseUrl = getProductionBaseUrl();
+  const baseUrl = getCurrentBaseUrl();
   return `${baseUrl}/diploma/${diplomaId}`;
 };
