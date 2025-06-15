@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Shield, CheckCircle, Copy, ExternalLink, QrCode } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { signDiplomaToBlockchain, createVerificationUrl, DiplomaRecord } from '@/services/blockchainService';
+import { supabase } from '@/integrations/supabase/client';
 import { QRCodeGenerator } from './QRCodeGenerator';
 import { toast } from 'sonner';
 
@@ -30,6 +30,13 @@ export const BlockchainSigner = () => {
       return;
     }
 
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('You must be logged in to sign diplomas');
+      return;
+    }
+
     setIsSigningTx(true);
     try {
       const record = await signDiplomaToBlockchain(
@@ -39,11 +46,34 @@ export const BlockchainSigner = () => {
         institutionName.trim()
       );
       
-      setSignedRecord(record);
       const url = createVerificationUrl(record.id);
+      
+      // Save to database
+      const { error: dbError } = await supabase
+        .from('signed_diplomas')
+        .insert({
+          blockchain_id: record.id,
+          issuer_id: user.id,
+          recipient_name: recipientName.trim(),
+          institution_name: institutionName.trim(),
+          diploma_html: diplomaHtml,
+          diploma_css: diplomaCss,
+          content_hash: record.contentHash,
+          signature: record.signature,
+          diplomator_seal: record.diplomatorSeal,
+          verification_url: url
+        });
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        toast.error('Failed to save diploma record to database');
+        return;
+      }
+      
+      setSignedRecord(record);
       setVerificationUrl(url);
       
-      toast.success('Diploma successfully signed and stored on blockchain!');
+      toast.success('Diploma successfully signed and stored!');
     } catch (error) {
       console.error('Error signing diploma:', error);
       toast.error('Failed to sign diploma to blockchain');

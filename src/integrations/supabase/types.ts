@@ -122,6 +122,54 @@ export type Database = {
         }
         Relationships: []
       }
+      signed_diplomas: {
+        Row: {
+          blockchain_id: string
+          content_hash: string
+          created_at: string
+          diploma_css: string
+          diploma_html: string
+          diplomator_seal: string
+          id: string
+          institution_name: string
+          issuer_id: string
+          recipient_name: string
+          signature: string
+          updated_at: string
+          verification_url: string
+        }
+        Insert: {
+          blockchain_id: string
+          content_hash: string
+          created_at?: string
+          diploma_css: string
+          diploma_html: string
+          diplomator_seal: string
+          id?: string
+          institution_name: string
+          issuer_id: string
+          recipient_name: string
+          signature: string
+          updated_at?: string
+          verification_url: string
+        }
+        Update: {
+          blockchain_id?: string
+          content_hash?: string
+          created_at?: string
+          diploma_css?: string
+          diploma_html?: string
+          diplomator_seal?: string
+          id?: string
+          institution_name?: string
+          issuer_id?: string
+          recipient_name?: string
+          signature?: string
+          updated_at?: string
+          verification_url?: string
+        }
+        Relationships: []
+      }
       standard_accounts: {
         Row: {
           account_number: string
