@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles } from 'lucide-react';
+import { Upload, Link, Sparkles, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,10 +10,12 @@ import { MessageList } from '@/components/MessageList';
 import { FileUpload } from '@/components/FileUpload';
 import { URLInput } from '@/components/URLInput';
 import { Message } from '@/contexts/DiplomaContext';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url'>('chat');
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const { 
     messages, 
     setMessages, 
@@ -97,6 +99,51 @@ export const ChatPanel = () => {
             <p className="text-xs text-slate-600">Create beautiful diplomas with AI</p>
           </div>
         </div>
+
+        {/* Guidelines Section */}
+        <Collapsible open={showGuidelines} onOpenChange={setShowGuidelines}>
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full mb-3 h-8 text-xs justify-start"
+            >
+              <Info className="w-3 h-3 mr-2" />
+              Design Guidelines & Tips
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mb-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs space-y-2">
+              <div>
+                <h4 className="font-medium text-blue-900 mb-1">✅ Works Great:</h4>
+                <ul className="text-blue-800 space-y-1 list-disc list-inside ml-2">
+                  <li>Text styling, fonts, and layouts</li>
+                  <li>Color gradients and backgrounds</li>
+                  <li>Borders, shadows, and simple decorations</li>
+                  <li>Basic animations (fade, slide, pulse)</li>
+                  <li>Geometric shapes (circles, squares, triangles)</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium text-amber-900 mb-1">⚠️ May Need Refinement:</h4>
+                <ul className="text-amber-800 space-y-1 list-disc list-inside ml-2">
+                  <li>Complex shapes (hearts, stars, logos)</li>
+                  <li>Intricate positioning and alignment</li>
+                  <li>Complex animations with multiple elements</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium text-green-900 mb-1">💡 Tips for Best Results:</h4>
+                <ul className="text-green-800 space-y-1 list-disc list-inside ml-2">
+                  <li>Be specific about colors, fonts, and layout</li>
+                  <li>Request one feature at a time for complex elements</li>
+                  <li>Use "make it more elegant" for refinements</li>
+                  <li>Ask for "simpler" versions if shapes don't look right</li>
+                </ul>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Tabs */}
         <div className="flex gap-1">
