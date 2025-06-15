@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Code, Eye, Maximize, Save, X, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -135,25 +136,22 @@ export const PreviewPanel = () => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200/50 bg-white/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={handleFullscreen}>
-              <Maximize className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleDownload}>
-              <Download className="w-4 h-4" />
-            </Button>
+      <Tabs defaultValue="preview" className="h-full flex flex-col">
+        {/* Header with Tabs */}
+        <div className="p-4 border-b border-slate-200/50 bg-white/50 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={handleFullscreen}>
+                <Maximize className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleDownload}>
+                <Download className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 bg-slate-50 flex flex-col">
-        <Tabs defaultValue="preview" className="h-full flex flex-col">
-          <TabsList className="w-fit mx-4 mt-4">
+          
+          <TabsList className="w-fit">
             <TabsTrigger value="preview">
               <Eye className="w-4 h-4 mr-1" />
               Preview
@@ -171,7 +169,10 @@ export const PreviewPanel = () => {
               Share
             </TabsTrigger>
           </TabsList>
-          
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 bg-slate-50 flex flex-col">
           <TabsContent value="preview" className="flex-1 p-4 m-0">
             <div className="h-full bg-white rounded-lg border border-slate-200 overflow-hidden shadow-lg">
               <iframe
@@ -282,8 +283,8 @@ export const PreviewPanel = () => {
               <SharePanel />
             </div>
           </TabsContent>
-        </Tabs>
-      </div>
+        </div>
+      </Tabs>
     </div>
   );
 };
