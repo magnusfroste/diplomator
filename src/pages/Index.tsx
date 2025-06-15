@@ -13,7 +13,7 @@ const Index = () => {
     <ThemeProvider>
       <DiplomaProvider>
         <div className="h-screen flex bg-background relative">
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-3">
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-4">
             <BlockchainMenu />
             <ApiKeySettings />
           </div>
