@@ -83,22 +83,41 @@ export const SharePanel = () => {
         ? `${window.location.origin}/verify/${currentDiplomaId}`
         : shareUrl;
       
-      // Create a temporary div with the diploma content + verification elements
+      // Create a temporary div with improved layout
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
-        <div style="width: 800px; height: 600px; padding: 40px; background: white; position: relative;">
-          <style>${diplomaCss}</style>
-          ${diplomaHtml}
-          <div style="position: absolute; bottom: 20px; right: 20px; background: #2563eb; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 14px;">🛡️</span>
+        <div style="width: 800px; height: 600px; padding: 0; background: white; position: relative; overflow: hidden;">
+          <style>
+            ${diplomaCss}
+            /* Improved containment styles */
+            * {
+              box-sizing: border-box;
+            }
+            .diploma-container > *,
+            .diploma-container *::before,
+            .diploma-container *::after {
+              max-width: 100% !important;
+              max-height: 100% !important;
+              overflow: hidden !important;
+            }
+          </style>
+          <div class="diploma-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; padding: 40px;">
+            ${diplomaHtml}
+          </div>
+          
+          <!-- Verification Badge - Better positioned -->
+          <div style="position: absolute; top: 15px; right: 15px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; backdrop-filter: blur(4px);">
+            <span style="font-size: 12px;">🛡️</span>
             Verified by Diplomator
           </div>
+          
           ${currentDiplomaId ? `
-          <div style="position: absolute; bottom: 20px; left: 20px; text-align: center;">
-            <div style="background: white; padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <div id="qr-code-container" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
+          <!-- QR Code and ID - Improved positioning -->
+          <div style="position: absolute; bottom: 15px; left: 15px; text-align: center; z-index: 1000;">
+            <div style="background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
+              <div id="qr-code-container" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;"></div>
             </div>
-            <div style="font-size: 10px; color: #666; font-family: monospace; word-break: break-all; max-width: 96px; background: white; padding: 4px; border-radius: 4px; border: 1px solid #e5e7eb;">
+            <div style="font-size: 9px; color: #444; font-family: 'Courier New', monospace; word-break: break-all; max-width: 86px; background: rgba(255, 255, 255, 0.9); padding: 3px 5px; border-radius: 4px; border: 1px solid #d1d5db; font-weight: 500;">
               ${currentDiplomaId}
             </div>
           </div>
@@ -107,27 +126,67 @@ export const SharePanel = () => {
       `;
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Convert to canvas
+      // Add QR code if available
+      if (currentDiplomaId) {
+        const qrContainer = tempDiv.querySelector('#qr-code-container');
+        if (qrContainer) {
+          const qrDiv = document.createElement('div');
+          qrDiv.innerHTML = `
+            <svg width="70" height="70" viewBox="0 0 70 70" style="background: white;">
+              <rect width="70" height="70" fill="white"/>
+              <rect x="5" y="5" width="60" height="60" fill="none" stroke="black" stroke-width="1"/>
+              <rect x="10" y="10" width="15" height="15" fill="black"/>
+              <rect x="45" y="10" width="15" height="15" fill="black"/>
+              <rect x="10" y="45" width="15" height="15" fill="black"/>
+              <rect x="30" y="30" width="10" height="10" fill="black"/>
+              <text x="35" y="38" text-anchor="middle" font-size="4" fill="white">QR</text>
+            </svg>
+          `;
+          qrContainer.appendChild(qrDiv.firstElementChild);
+        }
+      }
+
+      // Convert to canvas with improved settings
       const canvas = await html2canvas(tempDiv.firstElementChild as HTMLElement, {
         width: 800,
         height: 600,
-        scale: 2,
+        scale: 2.5,
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        removeContainer: true,
+        onclone: (clonedDoc) => {
+          const clonedContainer = clonedDoc.querySelector('.diploma-container');
+          if (clonedContainer) {
+            clonedContainer.style.overflow = 'hidden';
+          }
+        }
       });
 
-      // Create PDF
+      // Create PDF with better proportions
       const pdf = new jsPDF('landscape', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 0.95);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const aspectRatio = 600 / 800;
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * aspectRatio;
+      
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / aspectRatio;
+      }
+      
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+      
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
       pdf.save('diploma.pdf');
 
-      // Clean up
       document.body.removeChild(tempDiv);
     } catch (error) {
       console.error('Error generating PDF:', error);

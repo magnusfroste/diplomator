@@ -122,6 +122,56 @@ export type Database = {
         }
         Relationships: []
       }
+      scenes: {
+        Row: {
+          created_at: string
+          id: string
+          prompt: string
+          scene_order: number
+          settings: Json
+          speech: string | null
+          status: string
+          story_id: string
+          updated_at: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt: string
+          scene_order: number
+          settings: Json
+          speech?: string | null
+          status?: string
+          story_id: string
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt?: string
+          scene_order?: number
+          settings?: Json
+          speech?: string | null
+          status?: string
+          story_id?: string
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scenes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signed_diplomas: {
         Row: {
           blockchain_id: string
@@ -191,6 +241,30 @@ export type Database = {
           account_type?: string | null
           created_at?: string | null
           name?: string
+        }
+        Relationships: []
+      }
+      stories: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

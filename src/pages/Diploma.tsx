@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -99,21 +100,46 @@ const Diploma = () => {
     try {
       const verificationUrl = `${window.location.origin}/verify/${diplomaData.blockchain_id}`;
       
-      // Create a temporary div with the diploma content + verification elements
+      // Create a temporary div with improved layout for PDF
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
-        <div style="width: 800px; height: 600px; padding: 40px; background: white; position: relative;">
-          <style>${diplomaData.diploma_css}</style>
-          ${diplomaData.diploma_html}
-          <div style="position: absolute; bottom: 20px; right: 20px; background: #2563eb; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 14px;">🛡️</span>
+        <div style="width: 800px; height: 600px; padding: 0; background: white; position: relative; overflow: hidden;">
+          <style>
+            ${diplomaData.diploma_css}
+            /* Override styles to ensure containment */
+            * {
+              box-sizing: border-box;
+            }
+            .diploma-container > * {
+              max-width: 100% !important;
+              max-height: 100% !important;
+            }
+            /* Ensure decorative elements stay within bounds */
+            .diploma-container::before,
+            .diploma-container::after,
+            .diploma-container *::before,
+            .diploma-container *::after {
+              max-width: 100% !important;
+              max-height: 100% !important;
+              overflow: hidden !important;
+            }
+          </style>
+          <div class="diploma-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; padding: 40px;">
+            ${diplomaData.diploma_html}
+          </div>
+          
+          <!-- Verification Badge - Top Right -->
+          <div style="position: absolute; top: 15px; right: 15px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000;">
+            <span style="font-size: 12px;">🛡️</span>
             Verified by Diplomator
           </div>
-          <div style="position: absolute; bottom: 20px; left: 20px; text-align: center;">
-            <div style="background: white; padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 8px;">
-              <div id="qr-code-container" style="width: 80px; height: 80px;"></div>
+          
+          <!-- QR Code and ID - Bottom Left with better positioning -->
+          <div style="position: absolute; bottom: 15px; left: 15px; text-align: center; z-index: 1000;">
+            <div style="background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
+              <div id="qr-code-container" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;"></div>
             </div>
-            <div style="font-size: 10px; color: #666; font-family: monospace; word-break: break-all; max-width: 96px;">
+            <div style="font-size: 9px; color: #444; font-family: 'Courier New', monospace; word-break: break-all; max-width: 86px; background: rgba(255, 255, 255, 0.9); padding: 3px 5px; border-radius: 4px; border: 1px solid #d1d5db; font-weight: 500;">
               ${diplomaData.blockchain_id}
             </div>
           </div>
@@ -121,44 +147,69 @@ const Diploma = () => {
       `;
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Generate QR code for the verification URL and insert it
+      // Generate QR code with improved size and quality
       const qrContainer = tempDiv.querySelector('#qr-code-container');
       if (qrContainer) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 80;
-        canvas.height = 80;
-        
-        // Simple QR code placeholder (in a real implementation, you'd use a QR library)
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, 80, 80);
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(10, 10, 60, 60);
-        ctx.fillStyle = '#000';
-        ctx.font = '8px monospace';
-        ctx.fillText('QR', 35, 45);
-        
-        qrContainer.appendChild(canvas);
+        // Create a temporary QR component
+        const qrDiv = document.createElement('div');
+        qrDiv.innerHTML = `
+          <svg width="70" height="70" viewBox="0 0 70 70" style="background: white;">
+            <!-- Simple QR pattern for demo - in real app, this would be generated by QR library -->
+            <rect width="70" height="70" fill="white"/>
+            <rect x="5" y="5" width="60" height="60" fill="none" stroke="black" stroke-width="1"/>
+            <rect x="10" y="10" width="15" height="15" fill="black"/>
+            <rect x="45" y="10" width="15" height="15" fill="black"/>
+            <rect x="10" y="45" width="15" height="15" fill="black"/>
+            <rect x="30" y="30" width="10" height="10" fill="black"/>
+            <text x="35" y="38" text-anchor="middle" font-size="4" fill="white">QR</text>
+          </svg>
+        `;
+        qrContainer.appendChild(qrDiv.firstElementChild);
       }
 
-      // Convert to canvas
+      // Convert to canvas with higher quality settings
       const canvas = await html2canvas(tempDiv.firstElementChild as HTMLElement, {
         width: 800,
         height: 600,
-        scale: 2,
+        scale: 2.5, // Increased scale for better quality
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        removeContainer: true,
+        onclone: (clonedDoc) => {
+          // Ensure all elements are properly contained in the cloned document
+          const clonedContainer = clonedDoc.querySelector('.diploma-container');
+          if (clonedContainer) {
+            clonedContainer.style.overflow = 'hidden';
+          }
+        }
       });
 
-      // Create PDF
+      // Create PDF with optimized settings
       const pdf = new jsPDF('landscape', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 0.95); // High quality PNG
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Calculate aspect ratio to maintain proportions
+      const aspectRatio = 600 / 800; // height / width
+      let finalWidth = pdfWidth;
+      let finalHeight = pdfWidth * aspectRatio;
+      
+      // If height exceeds page height, scale down
+      if (finalHeight > pdfHeight) {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight / aspectRatio;
+      }
+      
+      // Center the image on the page
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+      
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
       pdf.save(`diploma_${diplomaData.recipient_name.replace(/\s+/g, '_')}.pdf`);
 
       // Clean up
@@ -199,6 +250,31 @@ const Diploma = () => {
         <title>${diplomaData.recipient_name} - Diploma</title>
         <style>
           ${diplomaData.diploma_css}
+          body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+          }
+          .diploma-wrapper {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+          }
+          .diploma-content {
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow: hidden;
+          }
+          /* Ensure all elements stay within bounds */
+          .diploma-content > *,
+          .diploma-content *::before,
+          .diploma-content *::after {
+            max-width: 100% !important;
+            overflow: hidden !important;
+          }
           .verification-section {
             position: fixed;
             bottom: 20px;
@@ -207,38 +283,61 @@ const Diploma = () => {
             z-index: 1000;
           }
           .qr-container {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 8px;
             border-radius: 8px;
             border: 2px solid #e5e7eb;
             margin-bottom: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
           }
           .diploma-id {
             font-size: 10px;
-            color: #666;
-            font-family: monospace;
+            color: #444;
+            font-family: 'Courier New', monospace;
             word-break: break-all;
             max-width: 96px;
-            background: white;
-            padding: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 6px;
             border-radius: 4px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #d1d5db;
+            font-weight: 500;
+          }
+          .verification-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(37, 99, 235, 0.95);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
           }
         </style>
       </head>
       <body>
-        ${diplomaData.diploma_html}
-        <div class="verification-section">
-          <div class="qr-container">
-            <div id="qr-code-placeholder" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
+        <div class="diploma-wrapper">
+          <div class="diploma-content">
+            ${diplomaData.diploma_html}
           </div>
-          <div class="diploma-id">${diplomaData.blockchain_id}</div>
+          <div class="verification-badge">
+            <span style="font-size: 14px;">🛡️</span>
+            Verified by Diplomator
+          </div>
+          <div class="verification-section">
+            <div class="qr-container">
+              <div id="qr-code-placeholder" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
+            </div>
+            <div class="diploma-id">${diplomaData.blockchain_id}</div>
+          </div>
         </div>
-        <script>
-          // This would be where we'd inject the actual QR code
-          // For now, we'll use a placeholder
-        </script>
       </body>
       </html>
     `;
