@@ -100,46 +100,58 @@ const Diploma = () => {
     try {
       const verificationUrl = `${window.location.origin}/verify/${diplomaData.blockchain_id}`;
       
-      // Create a temporary div with improved layout for PDF
+      // Create a temporary div with improved containment
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
         <div style="width: 800px; height: 600px; padding: 0; background: white; position: relative; overflow: hidden;">
           <style>
             ${diplomaData.diploma_css}
-            /* Override styles to ensure containment */
+            /* Strict containment styles */
             * {
-              box-sizing: border-box;
+              box-sizing: border-box !important;
             }
-            .diploma-container > * {
-              max-width: 100% !important;
-              max-height: 100% !important;
+            .diploma-container {
+              width: 100% !important;
+              height: 100% !important;
+              position: relative !important;
+              overflow: hidden !important;
+              padding: 40px !important;
             }
-            /* Ensure decorative elements stay within bounds */
-            .diploma-container::before,
-            .diploma-container::after,
+            .diploma-container *,
             .diploma-container *::before,
             .diploma-container *::after {
-              max-width: 100% !important;
-              max-height: 100% !important;
+              max-width: calc(100% - 80px) !important;
+              max-height: calc(100% - 80px) !important;
               overflow: hidden !important;
+              contain: layout style !important;
+            }
+            /* Prevent absolute positioned elements from escaping */
+            .diploma-container [style*="position: absolute"],
+            .diploma-container [style*="position:absolute"] {
+              max-width: calc(100% - 80px) !important;
+              max-height: calc(100% - 80px) !important;
+              left: auto !important;
+              right: auto !important;
+              top: auto !important;
+              bottom: auto !important;
             }
           </style>
-          <div class="diploma-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; padding: 40px;">
+          <div class="diploma-container">
             ${diplomaData.diploma_html}
           </div>
           
-          <!-- Verification Badge - Top Right -->
-          <div style="position: absolute; top: 15px; right: 15px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000;">
+          <!-- Verification Badge -->
+          <div style="position: absolute; top: 12px; right: 12px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000;">
             <span style="font-size: 12px;">🛡️</span>
             Verified by Diplomator
           </div>
           
-          <!-- QR Code and ID - Bottom Left with better positioning -->
-          <div style="position: absolute; bottom: 15px; left: 15px; text-align: center; z-index: 1000;">
-            <div style="background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
-              <div id="qr-code-container" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;"></div>
+          <!-- QR Code and ID -->
+          <div style="position: absolute; bottom: 12px; left: 12px; text-align: center; z-index: 1000;">
+            <div style="background: rgba(255, 255, 255, 0.95); padding: 6px; border-radius: 6px; border: 2px solid #e5e7eb; margin-bottom: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
+              <div id="qr-code-container" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;"></div>
             </div>
-            <div style="font-size: 9px; color: #444; font-family: 'Courier New', monospace; word-break: break-all; max-width: 86px; background: rgba(255, 255, 255, 0.9); padding: 3px 5px; border-radius: 4px; border: 1px solid #d1d5db; font-weight: 500;">
+            <div style="font-size: 8px; color: #444; font-family: 'Courier New', monospace; word-break: break-all; max-width: 72px; background: rgba(255, 255, 255, 0.9); padding: 2px 4px; border-radius: 3px; border: 1px solid #d1d5db; font-weight: 500;">
               ${diplomaData.blockchain_id}
             </div>
           </div>
@@ -150,38 +162,35 @@ const Diploma = () => {
       tempDiv.style.top = '0';
       document.body.appendChild(tempDiv);
 
-      // Generate QR code with improved size and quality
-      const qrContainer = tempDiv.querySelector('#qr-code-container');
+      // Generate QR code
+      const qrContainer = tempDiv.querySelector('#qr-code-container') as HTMLElement;
       if (qrContainer) {
-        // Create a temporary QR component
         const qrDiv = document.createElement('div');
         qrDiv.innerHTML = `
-          <svg width="70" height="70" viewBox="0 0 70 70" style="background: white;">
-            <!-- Simple QR pattern for demo - in real app, this would be generated by QR library -->
-            <rect width="70" height="70" fill="white"/>
-            <rect x="5" y="5" width="60" height="60" fill="none" stroke="black" stroke-width="1"/>
-            <rect x="10" y="10" width="15" height="15" fill="black"/>
-            <rect x="45" y="10" width="15" height="15" fill="black"/>
-            <rect x="10" y="45" width="15" height="15" fill="black"/>
-            <rect x="30" y="30" width="10" height="10" fill="black"/>
-            <text x="35" y="38" text-anchor="middle" font-size="4" fill="white">QR</text>
+          <svg width="60" height="60" viewBox="0 0 60 60" style="background: white;">
+            <rect width="60" height="60" fill="white"/>
+            <rect x="5" y="5" width="50" height="50" fill="none" stroke="black" stroke-width="1"/>
+            <rect x="8" y="8" width="12" height="12" fill="black"/>
+            <rect x="40" y="8" width="12" height="12" fill="black"/>
+            <rect x="8" y="40" width="12" height="12" fill="black"/>
+            <rect x="26" y="26" width="8" height="8" fill="black"/>
+            <text x="30" y="32" text-anchor="middle" font-size="3" fill="white">QR</text>
           </svg>
         `;
-        qrContainer.appendChild(qrDiv.firstElementChild);
+        qrContainer.appendChild(qrDiv.firstElementChild as HTMLElement);
       }
 
       // Convert to canvas with higher quality settings
       const canvas = await html2canvas(tempDiv.firstElementChild as HTMLElement, {
         width: 800,
         height: 600,
-        scale: 2.5, // Increased scale for better quality
+        scale: 2.5,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         removeContainer: true,
         onclone: (clonedDoc) => {
-          // Ensure all elements are properly contained in the cloned document
-          const clonedContainer = clonedDoc.querySelector('.diploma-container');
+          const clonedContainer = clonedDoc.querySelector('.diploma-container') as HTMLElement;
           if (clonedContainer) {
             clonedContainer.style.overflow = 'hidden';
           }
@@ -267,13 +276,26 @@ const Diploma = () => {
             padding: 40px;
             box-sizing: border-box;
             overflow: hidden;
+            position: relative;
           }
-          /* Ensure all elements stay within bounds */
-          .diploma-content > *,
+          /* Strict containment for preview */
+          .diploma-content *,
           .diploma-content *::before,
           .diploma-content *::after {
-            max-width: 100% !important;
+            max-width: calc(100% - 80px) !important;
+            max-height: calc(100% - 80px) !important;
             overflow: hidden !important;
+            contain: layout style !important;
+          }
+          /* Prevent absolute positioned elements from escaping */
+          .diploma-content [style*="position: absolute"],
+          .diploma-content [style*="position:absolute"] {
+            max-width: calc(100% - 160px) !important;
+            max-height: calc(100% - 160px) !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
           }
           .verification-section {
             position: fixed;

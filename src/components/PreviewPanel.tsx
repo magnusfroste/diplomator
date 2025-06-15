@@ -107,10 +107,44 @@ export const PreviewPanel = () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Diploma Preview</title>
-        <style>${diplomaCss}</style>
+        <style>
+          ${diplomaCss}
+          /* Enhanced containment styles for preview */
+          body {
+            margin: 0;
+            padding: 40px;
+            overflow: hidden;
+          }
+          .diploma-wrapper {
+            width: 100%;
+            height: calc(100vh - 80px);
+            position: relative;
+            overflow: hidden;
+          }
+          .diploma-wrapper *,
+          .diploma-wrapper *::before,
+          .diploma-wrapper *::after {
+            max-width: calc(100% - 80px) !important;
+            max-height: calc(100% - 80px) !important;
+            overflow: hidden !important;
+            contain: layout style !important;
+          }
+          /* Prevent absolute positioned elements from escaping */
+          .diploma-wrapper [style*="position: absolute"],
+          .diploma-wrapper [style*="position:absolute"] {
+            max-width: calc(100% - 160px) !important;
+            max-height: calc(100% - 160px) !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+          }
+        </style>
       </head>
       <body>
-        ${diplomaHtml}
+        <div class="diploma-wrapper">
+          ${diplomaHtml}
+        </div>
       </body>
       </html>
     `;
