@@ -108,7 +108,13 @@ serve(async (req) => {
 
     let systemPrompt = `You are an expert diploma designer. Your task is to create beautiful, professional diplomas based on user requirements. 
 
-CRITICAL: NEVER include QR codes, QR code placeholders, or any QR-related elements in your designs. Do not use any QR code libraries, canvas elements for QR codes, or SVG QR codes.
+ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
+- QR codes of any kind (SVG, canvas, image, or text placeholders)
+- QR code containers, divs, or sections
+- Any element with "QR" text or placeholders
+- QR-related CSS classes or IDs
+- Verification codes displayed as images
+- Any visual QR code representations
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
@@ -126,13 +132,6 @@ MODIFICATIONS: Users can request adjustments to their diplomas after creation. B
 - Change decorative elements or add new ones
 - Create interactive effects using CSS :hover, :focus, or keyframe animations
 - Modify the overall style, theme, or visual hierarchy
-
-FORBIDDEN ELEMENTS:
-- QR codes of any kind
-- QR code placeholders
-- Canvas elements for QR generation
-- SVG QR codes
-- Any mention of QR in class names or IDs
 
 Always respond with:
 1. A friendly message explaining what you've created or modified
@@ -156,14 +155,20 @@ Make diplomas that are:
 - Use CSS gradients, shadows, and transforms for visual appeal
 - Never include <img> tags or src attributes pointing to image files
 - Be easily modifiable for user adjustments and animations
-- Never include QR codes or QR-related elements`;
+- NEVER include any QR code elements or placeholders`;
 
     let requestBody;
 
     if (requestType === 'image') {
       systemPrompt = `You are an expert diploma designer. Analyze the uploaded image and create a diploma design inspired by its style, colors, layout, and aesthetic elements.
 
-CRITICAL: NEVER include QR codes, QR code placeholders, or any QR-related elements in your designs.
+ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
+- QR codes of any kind (SVG, canvas, image, or text placeholders)
+- QR code containers, divs, or sections
+- Any element with "QR" text or placeholders
+- QR-related CSS classes or IDs
+- Verification codes displayed as images
+- Any visual QR code representations
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
@@ -174,7 +179,7 @@ MESSAGE: [Explanation of how you used the image as inspiration]
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include QR codes.`;
+Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include any QR code elements.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -186,7 +191,7 @@ Create CSS-based decorative elements inspired by the image instead of referencin
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes.'
+                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes or QR placeholders.'
               },
               {
                 type: 'image',
@@ -221,7 +226,13 @@ Use this actual website data to create an authentic diploma design that reflects
 
       systemPrompt = `You are an expert diploma designer. The user has provided a website URL and I have scraped the actual content from that website. Create a diploma design that authentically reflects the website's actual branding, colors, and design elements.${websiteInfo}
 
-CRITICAL: NEVER include QR codes, QR code placeholders, or any QR-related elements in your designs.
+ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
+- QR codes of any kind (SVG, canvas, image, or text placeholders)
+- QR code containers, divs, or sections
+- Any element with "QR" text or placeholders
+- QR-related CSS classes or IDs
+- Verification codes displayed as images
+- Any visual QR code representations
 
 BRAND-SPECIFIC GUIDELINES:
 - For Telia (telia.se): Use their distinctive purple/magenta color palette (#990AE3, #FF6B35), modern Nordic design, clean typography
@@ -238,11 +249,11 @@ MESSAGE: [Explanation of the diploma you created based on the actual website dat
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include QR codes.`;
+Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include any QR code elements.`;
 
       const userMessage = websiteData 
-        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes.`
-        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes.`;
+        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes or QR placeholders.`
+        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes or QR placeholders.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -272,7 +283,7 @@ ${currentCss}
 
 Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design and structure. Keep the same layout, fonts, and styling unless specifically asked to change them.
 
-CRITICAL: Never add QR codes or QR-related elements during modifications.
+CRITICAL: Never add QR codes, QR placeholders, or any QR-related elements during modifications.
 
 SPECIAL FOCUS FOR SHAPE IMPROVEMENTS:
 - If modifying hearts or other CSS shapes, ensure they are well-formed and visually clear
