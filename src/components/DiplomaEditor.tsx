@@ -81,10 +81,14 @@ export const DiplomaEditor = () => {
       });
     });
 
-    // Ensure the signature section shows the user's name
+    // Ensure the signature section shows the user's name - with more comprehensive patterns
     if (userFullName) {
+      // Replace various signature name patterns
       updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, userFullName);
       updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Diplomator Demo'}/gi, userFullName);
+      updatedHtml = updatedHtml.replace(/Authorized Signature/gi, userFullName);
+      updatedHtml = updatedHtml.replace(/<div class="signature-name">[^<]*<\/div>/gi, `<div class="signature-name">${userFullName}</div>`);
+      updatedHtml = updatedHtml.replace(/class="signature-name">[^<]*</gi, `class="signature-name">${userFullName}<`);
     }
     
     setDiplomaHtml(updatedHtml);
