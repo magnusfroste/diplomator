@@ -23,26 +23,28 @@ export const SyntaxHighlightedEditor: React.FC<SyntaxHighlightedEditorProps> = (
 
     if (lang === 'html') {
       return code
-        // HTML comments first (to avoid interfering with other patterns)
-        .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span style="color: #6B7280; font-style: italic; opacity: 0.8;">$1</span>')
-        // HTML tags with attributes
-        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z-]+=(?:&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;))*?)(\s*\/?)(&gt;)/g, 
-          '<span style="color: #8B5CF6; font-weight: 500;">$1</span><span style="color: #2563EB; font-weight: 600;">$2</span><span style="color: #D97706; font-weight: 500;">$3</span><span style="color: #8B5CF6; font-weight: 500;">$4$5</span>')
-        // Attribute values
-        .replace(/(&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;)/g, '<span style="color: #059669; font-weight: 500;">$1</span>');
+        // HTML comments first
+        .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span style="color: #6a737d; font-style: italic;">$1</span>')
+        // HTML tags - simplified approach
+        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9-]*)(.*?)(&gt;)/g, (match, openTag, tagName, attributes, closeTag) => {
+          const styledTag = `<span style="color: #22863a; font-weight: 600;">${openTag}${tagName}</span>`;
+          const styledAttributes = attributes.replace(/([a-zA-Z-]+)=(&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;)/g, 
+            '<span style="color: #6f42c1;">$1</span>=<span style="color: #032f62;">$2</span>');
+          const styledClose = `<span style="color: #22863a; font-weight: 600;">${closeTag}</span>`;
+          return styledTag + styledAttributes + styledClose;
+        });
     } else if (lang === 'css') {
       return code
         // CSS comments first
-        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: #6B7280; font-style: italic; opacity: 0.8;">$1</span>')
-        // CSS selectors (at start of line, before {)
-        .replace(/^(\s*)([.#]?[a-zA-Z][a-zA-Z0-9_-]*|\*|::?[a-zA-Z-]+)(\s*\{)/gm, 
-          '$1<span style="color: #7C3AED; font-weight: 600;">$2</span>$3')
-        // CSS properties
-        .replace(/(\s+)([a-zA-Z-]+)(\s*:)/g, '$1<span style="color: #2563EB; font-weight: 500;">$2</span><span style="color: #8B5CF6; font-weight: 500;">$3</span>')
-        // CSS values
-        .replace(/(:\s*)([^;{}]+)(;?)/g, '$1<span style="color: #059669; font-weight: 500;">$2</span>$3')
-        // Important declarations
-        .replace(/(!important)/g, '<span style="color: #DC2626; font-weight: 700;">$1</span>');
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: #6a737d; font-style: italic;">$1</span>')
+        // CSS selectors (simplified)
+        .replace(/^(\s*)([.#]?[a-zA-Z][a-zA-Z0-9_-]*|\*|::[a-zA-Z-]+|:[a-zA-Z-]+)(\s*\{)/gm, 
+          '$1<span style="color: #6f42c1; font-weight: 600;">$2</span>$3')
+        // CSS properties (property: value;)
+        .replace(/(\s+)([a-zA-Z-]+)(\s*:\s*)([^;}]+)(;?)/g, 
+          '$1<span style="color: #005cc5; font-weight: 500;">$2</span><span style="color: #6f42c1;">$3</span><span style="color: #032f62;">$4</span>$5')
+        // !important
+        .replace(/(!important)/g, '<span style="color: #d73a49; font-weight: 700;">$1</span>');
     }
 
     return code;
