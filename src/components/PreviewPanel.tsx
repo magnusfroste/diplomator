@@ -1,13 +1,46 @@
 
-import React, { useRef } from 'react';
-import { Download, Code, Eye, Maximize } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Download, Code, Eye, Maximize, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const PreviewPanel = () => {
-  const { diplomaHtml, diplomaCss } = useDiploma();
+  const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Local state for editing
+  const [editableHtml, setEditableHtml] = useState(diplomaHtml || '');
+  const [editableCss, setEditableCss] = useState(diplomaCss || '');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Update local state when context changes (from AI generation)
+  useEffect(() => {
+    setEditableHtml(diplomaHtml || '');
+    setEditableCss(diplomaCss || '');
+    setHasUnsavedChanges(false);
+  }, [diplomaHtml, diplomaCss]);
+
+  // Check for unsaved changes
+  useEffect(() => {
+    const htmlChanged = editableHtml !== (diplomaHtml || '');
+    const cssChanged = editableCss !== (diplomaCss || '');
+    setHasUnsavedChanges(htmlChanged || cssChanged);
+  }, [editableHtml, editableCss, diplomaHtml, diplomaCss]);
+
+  const handleSave = () => {
+    setDiplomaHtml(editableHtml);
+    setDiplomaCss(editableCss);
+    setHasUnsavedChanges(false);
+  };
+
+  const handleDiscard = () => {
+    setEditableHtml(diplomaHtml || '');
+    setEditableCss(diplomaCss || '');
+    setHasUnsavedChanges(false);
+  };
 
   const getPreviewContent = () => {
     if (!diplomaHtml && !diplomaCss) {
@@ -119,7 +152,7 @@ export const PreviewPanel = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 bg-slate-50">
+      <div className="flex-1 bg-slate-50 flex flex-col">
         <Tabs defaultValue="preview" className="h-full flex flex-col">
           <TabsList className="w-fit mx-4 mt-4">
             <TabsTrigger value="preview">
@@ -143,11 +176,70 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="code" className="flex-1 p-4 m-0">
-            <div className="h-full bg-slate-900 rounded-lg overflow-hidden">
-              <pre className="h-full overflow-auto p-4 text-sm text-green-400 font-mono">
-                <code>{diplomaHtml || diplomaCss ? getPreviewContent() : '// Your generated code will appear here'}</code>
-              </pre>
+          <TabsContent value="code" className="flex-1 p-4 m-0 overflow-hidden">
+            <div className="h-full flex flex-col">
+              {/* Unsaved Changes Bar */}
+              {hasUnsavedChanges && (
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between">
+                  <span className="text-sm text-amber-800 font-medium">
+                    You have unsaved changes
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDiscard}
+                      className="h-8 text-xs"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Discard
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSave}
+                      className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Save className="w-3 h-3 mr-1" />
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Code Editors */}
+              <div className="flex-1 space-y-4 overflow-y-auto">
+                {/* HTML Editor */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm">HTML</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Textarea
+                      value={editableHtml}
+                      onChange={(e) => setEditableHtml(e.target.value)}
+                      placeholder="HTML content will appear here..."
+                      className="font-mono text-xs min-h-[150px] resize-none"
+                      rows={8}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* CSS Editor */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm">CSS</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Textarea
+                      value={editableCss}
+                      onChange={(e) => setEditableCss(e.target.value)}
+                      placeholder="CSS styles will appear here..."
+                      className="font-mono text-xs min-h-[150px] resize-none"
+                      rows={8}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

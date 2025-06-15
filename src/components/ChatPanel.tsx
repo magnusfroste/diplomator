@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles, Info, Edit, Code } from 'lucide-react';
+import { Upload, Link, Sparkles, Info, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,13 +9,12 @@ import { MessageList } from '@/components/MessageList';
 import { FileUpload } from '@/components/FileUpload';
 import { URLInput } from '@/components/URLInput';
 import { DiplomaEditor } from '@/components/DiplomaEditor';
-import { CodeEditor } from '@/components/CodeEditor';
 import { Message } from '@/contexts/DiplomaContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export const ChatPanel = () => {
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'editor' | 'code'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'editor'>('chat');
   const [showGuidelines, setShowGuidelines] = useState(false);
   
   const { 
@@ -185,15 +184,6 @@ export const ChatPanel = () => {
             <Edit className="w-3 h-3 mr-1" />
             Editor
           </Button>
-          <Button
-            variant={activeTab === 'code' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('code')}
-            className="h-7 text-xs"
-          >
-            <Code className="w-3 h-3 mr-1" />
-            Code
-          </Button>
         </div>
       </div>
 
@@ -219,7 +209,6 @@ export const ChatPanel = () => {
         {activeTab === 'upload' && <FileUpload />}
         {activeTab === 'url' && <URLInput />}
         {activeTab === 'editor' && <DiplomaEditor />}
-        {activeTab === 'code' && <CodeEditor />}
       </div>
     </div>
   );
