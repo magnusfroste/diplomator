@@ -92,9 +92,7 @@ export const ChatPanel = () => {
       {/* Header */}
       <div className="p-4 border-b border-slate-200/50 bg-white/90 backdrop-blur-sm">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
+        
       
         </div>
 
