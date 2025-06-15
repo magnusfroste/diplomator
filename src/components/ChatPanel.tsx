@@ -91,10 +91,7 @@ export const ChatPanel = () => {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-slate-200/50 bg-white/90 backdrop-blur-sm">
-        <div className="flex items-center gap-3 mb-3">
-        
-      
-        </div>
+     
 
         {/* Guidelines Section */}
         <Collapsible open={showGuidelines} onOpenChange={setShowGuidelines}>
