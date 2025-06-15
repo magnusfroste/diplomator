@@ -1,4 +1,6 @@
 
+import { supabase } from '@/integrations/supabase/client';
+
 export interface DiplomaRecord {
   id: string;
   contentHash: string;
@@ -8,9 +10,6 @@ export interface DiplomaRecord {
   institutionInfo: string;
   diplomatorSeal: string;
 }
-
-// Simulated blockchain storage (in production, this would be a real blockchain)
-const blockchainStorage = new Map<string, DiplomaRecord>();
 
 // Diplomator's private key (in production, this would be securely stored)
 const DIPLOMATOR_PRIVATE_KEY = 'diplomator_secure_key_2024';
@@ -50,7 +49,7 @@ export const generateDiplomaId = (): string => {
 };
 
 /**
- * Signs a diploma and stores it on the blockchain
+ * Signs a diploma and stores it in Supabase
  */
 export const signDiplomaToBlockchain = async (
   html: string,
@@ -73,9 +72,35 @@ export const signDiplomaToBlockchain = async (
     diplomatorSeal
   };
 
-  // Store on "blockchain" (simulated)
-  blockchainStorage.set(diplomaId, record);
-  
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated to sign diplomas');
+  }
+
+  const verificationUrl = createVerificationUrl(diplomaId);
+
+  // Store in Supabase database
+  const { error } = await supabase
+    .from('signed_diplomas')
+    .insert({
+      blockchain_id: diplomaId,
+      issuer_id: user.id,
+      recipient_name: recipientName,
+      institution_name: institutionName,
+      diploma_html: html,
+      diploma_css: css,
+      content_hash: contentHash,
+      signature: signature,
+      diplomator_seal: diplomatorSeal,
+      verification_url: verificationUrl
+    });
+
+  if (error) {
+    console.error('Error storing diploma in database:', error);
+    throw new Error('Failed to store diploma in database');
+  }
+
   // Simulate blockchain transaction delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
@@ -97,12 +122,28 @@ export const verifyDiplomaFromBlockchain = async (
 }> => {
   const issues: string[] = [];
   
-  // Check if diploma exists on blockchain
-  const record = blockchainStorage.get(diplomaId);
-  if (!record) {
+  // Check if diploma exists in Supabase
+  const { data: diplomaData, error } = await supabase
+    .from('signed_diplomas')
+    .select('*')
+    .eq('blockchain_id', diplomaId)
+    .single();
+
+  if (error || !diplomaData) {
     issues.push('Diploma not found on blockchain');
     return { isValid: false, issues };
   }
+
+  // Convert database record to DiplomaRecord format
+  const record: DiplomaRecord = {
+    id: diplomaData.blockchain_id,
+    contentHash: diplomaData.content_hash,
+    signature: diplomaData.signature,
+    timestamp: new Date(diplomaData.created_at).getTime(),
+    recipientInfo: await createWebCryptoHash(diplomaData.recipient_name),
+    institutionInfo: diplomaData.institution_name,
+    diplomatorSeal: diplomaData.diplomator_seal
+  };
 
   // Verify content hash
   const currentContentHash = await createContentHash(html, css);
@@ -127,10 +168,28 @@ export const verifyDiplomaFromBlockchain = async (
 };
 
 /**
- * Gets all blockchain records (for demonstration)
+ * Gets all blockchain records from Supabase (for demonstration)
  */
-export const getAllBlockchainRecords = (): DiplomaRecord[] => {
-  return Array.from(blockchainStorage.values()).sort((a, b) => b.timestamp - a.timestamp);
+export const getAllBlockchainRecords = async (): Promise<DiplomaRecord[]> => {
+  const { data, error } = await supabase
+    .from('signed_diplomas')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching blockchain records:', error);
+    return [];
+  }
+
+  return data.map(diploma => ({
+    id: diploma.blockchain_id,
+    contentHash: diploma.content_hash,
+    signature: diploma.signature,
+    timestamp: new Date(diploma.created_at).getTime(),
+    recipientInfo: diploma.recipient_name, // For display purposes
+    institutionInfo: diploma.institution_name,
+    diplomatorSeal: diploma.diplomator_seal
+  }));
 };
 
 /**
