@@ -100,29 +100,29 @@ const DiplomaEmbed = () => {
             bottom: 8px;
             left: 8px;
             z-index: 1000;
-            text-align: center;
+            text-align: left;
           }
           .diploma-id {
             background: rgba(255, 255, 255, 0.95);
             color: #374151;
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 9px;
             font-family: 'Courier New', monospace;
             font-weight: 600;
             border: 1px solid rgba(229, 231, 235, 0.8);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             backdrop-filter: blur(4px);
             word-break: break-all;
-            max-width: 120px;
+            max-width: 100px;
           }
           .diploma-label {
-            font-size: 8px;
+            font-size: 7px;
             color: #6b7280;
             font-weight: 500;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
           }
         </style>
       </head>
@@ -138,7 +138,7 @@ const DiplomaEmbed = () => {
             </a>
           </div>
           <div class="diploma-id-section">
-            <div class="diploma-label">Diploma ID</div>
+            <div class="diploma-label">ID</div>
             <div class="diploma-id">${diplomaData.blockchain_id}</div>
           </div>
         </div>
