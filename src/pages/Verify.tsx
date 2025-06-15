@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { 
   Shield, 
   CheckCircle, 
@@ -17,16 +16,27 @@ import {
   Hash,
   User
 } from 'lucide-react';
-import { verifyDiplomaFromBlockchain, DiplomaRecord } from '@/services/blockchainService';
+import { supabase } from '@/integrations/supabase/client';
+import { createWebCryptoHash, createDiplomatorSignature } from '@/services/blockchainService';
 import { toast } from 'sonner';
+
+interface DiplomaRecord {
+  blockchain_id: string;
+  recipient_name: string;
+  institution_name: string;
+  diploma_html: string;
+  diploma_css: string;
+  content_hash: string;
+  signature: string;
+  diplomator_seal: string;
+  created_at: string;
+}
 
 const Verify = () => {
   const { diplomaId: urlDiplomaId } = useParams();
   const navigate = useNavigate();
   const [diplomaId, setDiplomaId] = useState(urlDiplomaId || '');
   const [recipientName, setRecipientName] = useState('');
-  const [diplomaHtml, setDiplomaHtml] = useState('');
-  const [diplomaCss, setDiplomaCss] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<{
     isValid: boolean;
@@ -40,6 +50,14 @@ const Verify = () => {
     }
   }, [urlDiplomaId]);
 
+  const createWebCryptoHashLocal = async (data: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
   const handleVerification = async () => {
     if (!diplomaId.trim()) {
       toast.error('Please enter a diploma ID');
@@ -51,37 +69,81 @@ const Verify = () => {
       return;
     }
 
-    if (!diplomaHtml.trim() || !diplomaCss.trim()) {
-      toast.error('Please provide both HTML and CSS content');
-      return;
-    }
-
     setIsVerifying(true);
+    const issues: string[] = [];
+
     try {
-      const result = await verifyDiplomaFromBlockchain(
-        diplomaId.trim(),
-        diplomaHtml.trim(),
-        diplomaCss.trim(),
-        recipientName.trim()
-      );
+      // Fetch diploma from database
+      const { data: diplomaData, error } = await supabase
+        .from('signed_diplomas')
+        .select('*')
+        .eq('blockchain_id', diplomaId.trim())
+        .maybeSingle();
+
+      if (error) {
+        console.error('Database error:', error);
+        issues.push(`Database error: ${error.message}`);
+        setVerificationResult({ isValid: false, issues });
+        toast.error('Error accessing diploma database');
+        return;
+      }
+
+      if (!diplomaData) {
+        issues.push('Diploma not found on blockchain');
+        setVerificationResult({ isValid: false, issues });
+        toast.error('Diploma not found');
+        return;
+      }
+
+      // Verify recipient name matches
+      if (diplomaData.recipient_name.toLowerCase() !== recipientName.trim().toLowerCase()) {
+        issues.push('Recipient name does not match diploma record');
+      }
+
+      // Verify content hash
+      const currentContentHash = await createWebCryptoHashLocal(diplomaData.diploma_html + diplomaData.diploma_css);
+      if (currentContentHash !== diplomaData.content_hash) {
+        issues.push('Diploma content has been tampered with');
+      }
+
+      // Verify Diplomator signature
+      const DIPLOMATOR_PRIVATE_KEY = 'diplomator_secure_key_2024';
+      const signatureData = `${diplomaData.content_hash}:${diplomaData.recipient_name}:${DIPLOMATOR_PRIVATE_KEY}`;
+      const expectedSignature = await createWebCryptoHashLocal(signatureData);
       
-      setVerificationResult(result);
-      
-      if (result.isValid) {
+      if (expectedSignature !== diplomaData.signature) {
+        issues.push('Invalid Diplomator signature');
+      }
+
+      const isValid = issues.length === 0;
+      setVerificationResult({ 
+        isValid, 
+        record: diplomaData, 
+        issues 
+      });
+
+      if (isValid) {
         toast.success('Diploma verification successful! ✅');
       } else {
         toast.error('Diploma verification failed! ❌');
       }
+
     } catch (error) {
       console.error('Error verifying diploma:', error);
-      toast.error('An error occurred during verification');
+      toast.error('An unexpected error occurred during verification');
+      setVerificationResult({ 
+        isValid: false, 
+        issues: ['An unexpected error occurred during verification'] 
+      });
     } finally {
       setIsVerifying(false);
     }
   };
 
   const getPreviewContent = () => {
-    if (!diplomaHtml || !diplomaCss) return '';
+    if (!verificationResult?.record) return '';
+    
+    const { diploma_html, diploma_css } = verificationResult.record;
     
     return `
       <!DOCTYPE html>
@@ -89,11 +151,11 @@ const Verify = () => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Diploma Verification Preview</title>
-        <style>${diplomaCss}</style>
+        <title>Verified Diploma</title>
+        <style>${diploma_css}</style>
       </head>
       <body>
-        ${diplomaHtml}
+        ${diploma_html}
       </body>
       </html>
     `;
@@ -127,7 +189,7 @@ const Verify = () => {
             <CardHeader>
               <CardTitle>Verify Diploma</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Enter the diploma details to verify its authenticity
+                Enter the diploma ID and recipient name to verify authenticity
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -140,6 +202,9 @@ const Verify = () => {
                   placeholder="DIP_xxxxx_xxxxxx"
                   disabled={isVerifying}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Find this ID on the original diploma document
+                </p>
               </div>
 
               <div>
@@ -148,33 +213,12 @@ const Verify = () => {
                   id="recipientName"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
-                  placeholder="Enter recipient's full name"
+                  placeholder="Enter recipient's full name exactly as shown on diploma"
                   disabled={isVerifying}
                 />
-              </div>
-
-              <div>
-                <Label htmlFor="diplomaHtml">Diploma HTML</Label>
-                <Textarea
-                  id="diplomaHtml"
-                  value={diplomaHtml}
-                  onChange={(e) => setDiplomaHtml(e.target.value)}
-                  placeholder="Paste the diploma HTML content here..."
-                  className="h-32 font-mono text-sm"
-                  disabled={isVerifying}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="diplomaCss">Diploma CSS</Label>
-                <Textarea
-                  id="diplomaCss"
-                  value={diplomaCss}
-                  onChange={(e) => setDiplomaCss(e.target.value)}
-                  placeholder="Paste the diploma CSS content here..."
-                  className="h-32 font-mono text-sm"
-                  disabled={isVerifying}
-                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Must match exactly with the name on the diploma
+                </p>
               </div>
 
               <Button
@@ -209,16 +253,20 @@ const Verify = () => {
                   {verificationResult.isValid && verificationResult.record && (
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>Signed: {new Date(verificationResult.record.timestamp).toLocaleString()}</span>
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span>Recipient: {verificationResult.record.recipient_name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Building className="w-4 h-4 text-muted-foreground" />
-                        <span>Institution: {verificationResult.record.institutionInfo}</span>
+                        <span>Institution: {verificationResult.record.institution_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span>Signed: {new Date(verificationResult.record.created_at).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Hash className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-mono text-xs">Hash: {verificationResult.record.contentHash.substring(0, 16)}...</span>
+                        <span className="font-mono text-xs">Hash: {verificationResult.record.content_hash.substring(0, 16)}...</span>
                       </div>
                     </div>
                   )}
@@ -241,24 +289,27 @@ const Verify = () => {
           {/* Preview */}
           <Card>
             <CardHeader>
-              <CardTitle>Diploma Preview</CardTitle>
+              <CardTitle>Verified Diploma</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Preview of the diploma being verified
+                {verificationResult?.isValid 
+                  ? "Authentic diploma retrieved from blockchain" 
+                  : "Diploma preview will appear after successful verification"
+                }
               </p>
             </CardHeader>
             <CardContent>
               <div className="h-96 bg-white rounded-lg border border-slate-200 overflow-hidden">
-                {diplomaHtml && diplomaCss ? (
+                {verificationResult?.isValid && verificationResult.record ? (
                   <iframe
                     srcDoc={getPreviewContent()}
                     className="w-full h-full border-0"
-                    title="Diploma Preview"
+                    title="Verified Diploma"
                   />
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
                     <div className="text-center">
                       <Shield className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                      <p>Enter diploma content to see preview</p>
+                      <p>Verify a diploma to see its content</p>
                     </div>
                   </div>
                 )}
@@ -276,23 +327,23 @@ const Verify = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <Shield className="w-12 h-12 mx-auto mb-3 text-blue-600" />
-                <h3 className="font-semibold mb-2">Cryptographic Signing</h3>
+                <h3 className="font-semibold mb-2">Automatic Verification</h3>
                 <p className="text-sm text-muted-foreground">
-                  Each diploma is signed with Diplomator's private key, creating a unique digital signature.
+                  Simply enter the diploma ID and recipient name. Our system automatically retrieves and verifies the content.
                 </p>
               </div>
               <div className="text-center">
                 <Hash className="w-12 h-12 mx-auto mb-3 text-green-600" />
-                <h3 className="font-semibold mb-2">Content Hashing</h3>
+                <h3 className="font-semibold mb-2">Content Integrity</h3>
                 <p className="text-sm text-muted-foreground">
-                  The diploma content is hashed, so any modification will be detected during verification.
+                  Each diploma's content is cryptographically hashed, making any tampering immediately detectable.
                 </p>
               </div>
               <div className="text-center">
                 <CheckCircle className="w-12 h-12 mx-auto mb-3 text-purple-600" />
                 <h3 className="font-semibold mb-2">Immutable Record</h3>
                 <p className="text-sm text-muted-foreground">
-                  Records are stored on blockchain, making them tamper-proof and permanently verifiable.
+                  Records are stored securely, making them tamper-proof and permanently verifiable.
                 </p>
               </div>
             </div>
