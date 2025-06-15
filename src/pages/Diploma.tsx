@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,8 +29,16 @@ const Diploma = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
+    console.log('=== DIPLOMA COMPONENT MOUNTED ===');
+    console.log('diplomaId from params:', diplomaId);
+    console.log('Full URL:', window.location.href);
+    console.log('Pathname:', window.location.pathname);
+    
     if (diplomaId) {
       fetchDiplomaData();
+    } else {
+      console.error('No diplomaId found in URL parameters');
+      setIsLoading(false);
     }
   }, [diplomaId]);
 
@@ -174,6 +183,7 @@ const Diploma = () => {
           <Shield className="w-12 h-12 mx-auto mb-4 text-blue-600 animate-pulse" />
           <p className="text-lg text-gray-600">Loading diploma...</p>
           <p className="text-sm text-gray-500 mt-2">Diploma ID: {diplomaId}</p>
+          <p className="text-xs text-gray-400 mt-1">Route params working: {diplomaId ? 'Yes' : 'No'}</p>
         </div>
       </div>
     );
