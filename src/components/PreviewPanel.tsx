@@ -6,6 +6,7 @@ import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MonacoEditor } from '@/components/MonacoEditor';
 import { SharePanel } from '@/components/SharePanel';
+import { BlockchainSigner } from '@/components/BlockchainSigner';
 
 export const PreviewPanel = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
@@ -279,7 +280,8 @@ export const PreviewPanel = () => {
           </TabsContent>
 
           <TabsContent value="share" className="flex-1 p-4 m-0">
-            <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto space-y-6">
+              <BlockchainSigner />
               <SharePanel />
             </div>
           </TabsContent>
