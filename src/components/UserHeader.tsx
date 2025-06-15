@@ -7,6 +7,11 @@ import { LogOut, Settings, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Settings as SettingsDialog } from '@/components/Settings';
+import {
+  Dialog,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface UserHeaderProps {
   userEmail: string;
@@ -77,10 +82,15 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
+          <Dialog>
+            <DialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <SettingsDialog />
+          </Dialog>
           <DropdownMenuItem onClick={handleSignedClick}>
             <FileText className="mr-2 h-4 w-4" />
             <span>Signed</span>
