@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Copy, Calendar, User, Building2 } from 'lucide-react';
+import { ExternalLink, Copy, Calendar, User, Building2, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -14,6 +14,7 @@ interface SignedDiploma {
   recipient_name: string;
   institution_name: string;
   verification_url: string;
+  diploma_url: string;
   created_at: string;
 }
 
@@ -23,7 +24,7 @@ export const DiplomaManager = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('signed_diplomas')
-        .select('id, blockchain_id, recipient_name, institution_name, verification_url, created_at')
+        .select('id, blockchain_id, recipient_name, institution_name, verification_url, diploma_url, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -31,22 +32,17 @@ export const DiplomaManager = () => {
     },
   });
 
-  const copyVerificationUrl = async (url: string) => {
+  const copyToClipboard = async (text: string, type: string) => {
     try {
-      await navigator.clipboard.writeText(url);
-      toast.success('Verification URL copied to clipboard!');
+      await navigator.clipboard.writeText(text);
+      toast.success(`${type} copied to clipboard!`);
     } catch (error) {
-      toast.error('Failed to copy URL');
+      toast.error(`Failed to copy ${type}`);
     }
   };
 
-  const copyDiplomaId = async (id: string) => {
-    try {
-      await navigator.clipboard.writeText(id);
-      toast.success('Diploma ID copied to clipboard!');
-    } catch (error) {
-      toast.error('Failed to copy Diploma ID');
-    }
+  const openUrl = (url: string) => {
+    window.open(url, '_blank');
   };
 
   if (isLoading) {
@@ -120,9 +116,34 @@ export const DiplomaManager = () => {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => copyDiplomaId(diploma.blockchain_id)}
+                      onClick={() => copyToClipboard(diploma.blockchain_id, 'Diploma ID')}
                     >
                       <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Diploma URL
+                  </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <code className="flex-1 text-sm bg-muted px-2 py-1 rounded font-mono truncate">
+                      {diploma.diploma_url}
+                    </code>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => copyToClipboard(diploma.diploma_url, 'Diploma URL')}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => openUrl(diploma.diploma_url)}
+                    >
+                      <FileText className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
@@ -138,14 +159,14 @@ export const DiplomaManager = () => {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => copyVerificationUrl(diploma.verification_url)}
+                      onClick={() => copyToClipboard(diploma.verification_url, 'Verification URL')}
                     >
                       <Copy className="w-3 h-3" />
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => window.open(diploma.verification_url, '_blank')}
+                      onClick={() => openUrl(diploma.verification_url)}
                     >
                       <ExternalLink className="w-3 h-3" />
                     </Button>
