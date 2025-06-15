@@ -27,7 +27,12 @@ const callDiplomaFunction = async (payload: any): Promise<DiplomaResponse> => {
   return data;
 };
 
-export const generateDiploma = async (userMessage: string, conversationHistory: Message[]): Promise<DiplomaResponse> => {
+export const generateDiploma = async (
+  userMessage: string, 
+  conversationHistory: Message[], 
+  currentHtml?: string, 
+  currentCss?: string
+): Promise<DiplomaResponse> => {
   const messages = [
     ...conversationHistory.map(msg => ({
       role: msg.isUser ? 'user' : 'assistant',
@@ -39,7 +44,9 @@ export const generateDiploma = async (userMessage: string, conversationHistory: 
   try {
     const response = await callDiplomaFunction({
       messages,
-      requestType: 'chat'
+      requestType: 'chat',
+      currentHtml,
+      currentCss
     });
     
     return response;

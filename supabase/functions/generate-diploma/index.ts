@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, requestType, imageData, url } = await req.json();
+    const { messages, requestType, imageData, url, currentHtml, currentCss } = await req.json();
     
     const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
     
@@ -34,8 +34,10 @@ MODIFICATIONS: Users can request adjustments to their diplomas after creation. B
 - Create interactive effects using CSS :hover, :focus, or keyframe animations
 - Modify the overall style, theme, or visual hierarchy
 
+ITERATION MODE: If existing HTML and CSS are provided, you are modifying an existing diploma. Make only the requested changes while preserving the overall design and structure. Focus on the specific modification requested.
+
 Always respond with:
-1. A friendly message explaining what you've created
+1. A friendly message explaining what you've created or modified
 2. Complete HTML code for the diploma
 3. Complete CSS code for styling
 
@@ -125,6 +127,24 @@ Use CSS to create decorative elements instead of referencing image files.`;
     } else {
       // Regular chat - filter out any system messages and use them as the system prompt
       const userMessages = messages.filter(msg => msg.role !== 'system');
+      
+      // If we have existing diploma content, include it in the context
+      if (currentHtml && currentCss) {
+        const modificationPrompt = `
+CURRENT DIPLOMA CONTENT:
+HTML:
+${currentHtml}
+
+CSS:
+${currentCss}
+
+Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design.`;
+        
+        userMessages.unshift({
+          role: 'assistant',
+          content: modificationPrompt
+        });
+      }
       
       requestBody = {
         model: 'claude-3-sonnet-20240229',

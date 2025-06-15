@@ -19,6 +19,8 @@ export const ChatPanel = () => {
     setMessages, 
     isGenerating, 
     setIsGenerating,
+    diplomaHtml,
+    diplomaCss,
     setDiplomaHtml,
     setDiplomaCss 
   } = useDiploma();
@@ -38,7 +40,13 @@ export const ChatPanel = () => {
     setIsGenerating(true);
 
     try {
-      const response = await generateDiploma(message, messages);
+      // Pass current diploma content for iteration
+      const response = await generateDiploma(
+        message, 
+        messages, 
+        diplomaHtml || undefined, 
+        diplomaCss || undefined
+      );
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
