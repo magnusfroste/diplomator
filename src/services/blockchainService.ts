@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DiplomaRecord {
@@ -64,11 +63,24 @@ export const signDiplomaToBlockchain = async (
   recipientName: string,
   institutionName: string
 ): Promise<DiplomaRecord> => {
+  console.log('=== BLOCKCHAIN SERVICE DEBUG ===');
+  console.log('Starting signDiplomaToBlockchain with:');
+  console.log('- HTML length:', html.length);
+  console.log('- CSS length:', css.length);
+  console.log('- Recipient:', recipientName);
+  console.log('- Institution:', institutionName);
+
   const contentHash = await createContentHash(html, css);
   const diplomaId = generateDiplomaId();
   const signature = await createDiplomatorSignature(contentHash, recipientName);
   const diplomatorSeal = await createWebCryptoHash(`DIPLOMATOR_SEAL_${diplomaId}`);
   
+  console.log('Generated blockchain data:');
+  console.log('- Diploma ID:', diplomaId);
+  console.log('- Content hash:', contentHash);
+  console.log('- Signature:', signature);
+  console.log('- Diplomator seal:', diplomatorSeal);
+
   const record: DiplomaRecord = {
     id: diplomaId,
     contentHash,
@@ -80,35 +92,67 @@ export const signDiplomaToBlockchain = async (
   };
 
   // Get current user
-  const { data: { user } } = await supabase.auth.getUser();
+  console.log('Checking user authentication...');
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) {
+    console.error('Authentication error:', authError);
+    throw new Error('Authentication error: ' + authError.message);
+  }
   if (!user) {
+    console.error('No authenticated user found');
     throw new Error('User must be authenticated to sign diplomas');
   }
+  console.log('User authenticated:', user.id);
 
   const verificationUrl = createVerificationUrl(diplomaId);
   const diplomaUrl = createDiplomaUrl(diplomaId);
 
-  // Store in Supabase database - now including diploma_url
+  console.log('Generated URLs:');
+  console.log('- Verification URL:', verificationUrl);
+  console.log('- Diploma URL:', diplomaUrl);
+
+  // Store in Supabase database
+  console.log('Inserting into database...');
+  const insertData = {
+    blockchain_id: diplomaId,
+    issuer_id: user.id,
+    recipient_name: recipientName,
+    institution_name: institutionName,
+    diploma_html: html,
+    diploma_css: css,
+    content_hash: contentHash,
+    signature: signature,
+    diplomator_seal: diplomatorSeal,
+    verification_url: verificationUrl,
+    diploma_url: diplomaUrl
+  };
+  
+  console.log('Insert data prepared:', {
+    blockchain_id: insertData.blockchain_id,
+    issuer_id: insertData.issuer_id,
+    recipient_name: insertData.recipient_name,
+    institution_name: insertData.institution_name,
+    diploma_html_length: insertData.diploma_html.length,
+    diploma_css_length: insertData.diploma_css.length,
+    verification_url: insertData.verification_url,
+    diploma_url: insertData.diploma_url
+  });
+
   const { error } = await supabase
     .from('signed_diplomas')
-    .insert({
-      blockchain_id: diplomaId,
-      issuer_id: user.id,
-      recipient_name: recipientName,
-      institution_name: institutionName,
-      diploma_html: html,
-      diploma_css: css,
-      content_hash: contentHash,
-      signature: signature,
-      diplomator_seal: diplomatorSeal,
-      verification_url: verificationUrl,
-      diploma_url: diplomaUrl
-    });
+    .insert(insertData);
 
   if (error) {
-    console.error('Error storing diploma in database:', error);
-    throw new Error('Failed to store diploma in database');
+    console.error('=== DATABASE INSERT ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error hint:', error.hint);
+    throw new Error('Failed to store diploma in database: ' + error.message);
   }
+
+  console.log('=== DATABASE INSERT SUCCESS ===');
+  console.log('Diploma successfully stored with ID:', diplomaId);
 
   // Store the diploma URL for sharing
   sessionStorage.setItem('lastDiplomaUrl', diplomaUrl);
@@ -116,6 +160,7 @@ export const signDiplomaToBlockchain = async (
   // Simulate blockchain transaction delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
+  console.log('=== BLOCKCHAIN SIGNING COMPLETE ===');
   return record;
 };
 

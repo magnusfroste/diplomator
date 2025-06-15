@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +31,14 @@ export const BlockchainSigner = () => {
     }
 
     setIsSigningTx(true);
+    console.log('=== SIGNING PROCESS START ===');
+    console.log('Recipient:', recipientName.trim());
+    console.log('Institution:', institutionName.trim());
+    console.log('Has HTML content:', !!diplomaHtml);
+    console.log('Has CSS content:', !!diplomaCss);
+
     try {
+      console.log('Calling signDiplomaToBlockchain...');
       const record = await signDiplomaToBlockchain(
         diplomaHtml,
         diplomaCss,
@@ -40,16 +46,28 @@ export const BlockchainSigner = () => {
         institutionName.trim()
       );
       
+      console.log('=== SIGNING SUCCESS ===');
+      console.log('Generated record:', record);
+      
       setSignedRecord(record);
       const verifyUrl = createVerificationUrl(record.id);
       const directUrl = createDiplomaUrl(record.id);
+      
+      console.log('Generated URLs:');
+      console.log('- Verification URL:', verifyUrl);
+      console.log('- Direct URL:', directUrl);
+      
       setVerificationUrl(verifyUrl);
       setDiplomaUrl(directUrl);
       
       toast.success('Diploma successfully signed and stored on blockchain!');
     } catch (error) {
-      console.error('Error signing diploma:', error);
-      toast.error('Failed to sign diploma to blockchain');
+      console.error('=== SIGNING ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      
+      toast.error('Failed to sign diploma to blockchain: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSigningTx(false);
     }
