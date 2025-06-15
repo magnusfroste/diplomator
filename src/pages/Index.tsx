@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
 import { UserHeader } from "@/components/UserHeader";
 import { DiplomaProvider } from "@/contexts/DiplomaContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ApiKeySettings } from "@/components/ApiKeySettings";
+import { Settings } from "@/components/Settings";
 import { BlockchainMenu } from "@/components/BlockchainMenu";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +77,7 @@ const Index = () => {
               
               <div className="flex items-center gap-4">
                 <BlockchainMenu />
-                <ApiKeySettings />
+                <Settings />
                 <UserHeader 
                   userEmail={user.email || 'Unknown'} 
                   userName={user.user_metadata?.name || user.email?.split('@')[0] || 'User'} 
