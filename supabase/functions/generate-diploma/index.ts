@@ -98,7 +98,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, requestType, imageData, url, currentHtml, currentCss } = await req.json();
+    const { messages, requestType, imageData, url, currentHtml, currentCss, userFullName } = await req.json();
     
     const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
     
@@ -117,6 +117,13 @@ ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
 - Any visual QR code representations
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
+
+SIGNATURE SECTION: Always include a professional signature section with the following elements:
+- A signature line (using CSS border-bottom)
+- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- Position it appropriately on the diploma (usually bottom right or center)
+- Style it professionally with appropriate fonts and spacing
+- Include a title like "Authorized Signature" or "Official Signature"
 
 CSS SHAPE CREATION GUIDELINES:
 - For hearts: Use the ::before and ::after pseudo-elements with border-radius to create proper heart shapes
@@ -155,7 +162,8 @@ Make diplomas that are:
 - Use CSS gradients, shadows, and transforms for visual appeal
 - Never include <img> tags or src attributes pointing to image files
 - Be easily modifiable for user adjustments and animations
-- NEVER include any QR code elements or placeholders`;
+- NEVER include any QR code elements or placeholders
+- ALWAYS include a signature section with "${userFullName || 'Diplomator Demo'}" as the signatory`;
 
     let requestBody;
 
@@ -172,6 +180,12 @@ ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
 
 IMPORTANT: Never use <img> tags or reference external image files. Use only CSS to create all visual elements including seals, decorative borders, and emblems.
 
+SIGNATURE SECTION: Always include a professional signature section with:
+- A signature line (using CSS border-bottom)
+- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- Position it appropriately on the diploma
+- Style it professionally with appropriate fonts and spacing
+
 MODIFICATIONS: Users can request adjustments after creation. Be ready to add animations, move elements, change colors, fonts, or any other modifications they request.
 
 Format your response like this:
@@ -179,7 +193,7 @@ MESSAGE: [Explanation of how you used the image as inspiration]
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include any QR code elements.`;
+Create CSS-based decorative elements inspired by the image instead of referencing external files. Never include any QR code elements. Always include the signature section.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -191,7 +205,7 @@ Create CSS-based decorative elements inspired by the image instead of referencin
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes or QR placeholders.'
+                text: 'Please analyze this image and create a diploma design inspired by its style, colors, and layout elements. Use only CSS for all visual elements - no image files and absolutely no QR codes or QR placeholders. Include a signature section with the signatory name.'
               },
               {
                 type: 'image',
@@ -234,6 +248,12 @@ ABSOLUTELY FORBIDDEN - NEVER INCLUDE ANY OF THESE:
 - Verification codes displayed as images
 - Any visual QR code representations
 
+SIGNATURE SECTION: Always include a professional signature section with:
+- A signature line (using CSS border-bottom)
+- The text "${userFullName || 'Diplomator Demo'}" below the signature line
+- Position it appropriately on the diploma
+- Style it professionally with appropriate fonts and spacing
+
 BRAND-SPECIFIC GUIDELINES:
 - For Telia (telia.se): Use their distinctive purple/magenta color palette (#990AE3, #FF6B35), modern Nordic design, clean typography
 - For telecommunications companies: Use colors associated with connectivity, technology, and innovation
@@ -249,11 +269,11 @@ MESSAGE: [Explanation of the diploma you created based on the actual website dat
 HTML: [Complete HTML code]
 CSS: [Complete CSS code]
 
-Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include any QR code elements.`;
+Use CSS to create decorative elements that reflect the organization's actual brand identity from the scraped data. Never include any QR code elements. Always include the signature section.`;
 
       const userMessage = websiteData 
-        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes or QR placeholders.`
-        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes or QR placeholders.`;
+        ? `Please create a diploma design based on the actual website data I scraped from: ${url}. Use the real brand colors, fonts, and styling information I extracted from the live website to create an authentic diploma that reflects their actual visual identity. Do not include any QR codes or QR placeholders. Include a signature section with the signatory name.`
+        : `Please create a diploma design inspired by this website: ${url}. I couldn't scrape the website data, so please use your knowledge about this brand to create an appropriate diploma design. Do not include any QR codes or QR placeholders. Include a signature section with the signatory name.`;
 
       requestBody = {
         model: 'claude-3-sonnet-20240229',
@@ -284,6 +304,8 @@ ${currentCss}
 Please modify the above diploma based on the user's request. Make only the specific changes requested while preserving the overall design and structure. Keep the same layout, fonts, and styling unless specifically asked to change them.
 
 CRITICAL: Never add QR codes, QR placeholders, or any QR-related elements during modifications.
+
+SIGNATURE REQUIREMENT: If there's no signature section in the current diploma, add one with "${userFullName || 'Diplomator Demo'}" as the signatory. If there is already a signature section, ensure it uses the correct name.
 
 SPECIAL FOCUS FOR SHAPE IMPROVEMENTS:
 - If modifying hearts or other CSS shapes, ensure they are well-formed and visually clear
