@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,12 +56,16 @@ const Auth = () => {
   };
 
   const handleDemoLogin = async () => {
+    // First prefill the form
+    setEmail('demo@diplomator.com');
+    setPassword('123456');
+    
     setLoading(true);
     
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: 'demo@diplomator.com',
-        password: 'demo123456',
+        password: '123456',
       });
       
       if (error) {
