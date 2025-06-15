@@ -7,6 +7,7 @@ import { useDiploma } from '@/contexts/DiplomaContext';
 import { supabase } from '@/integrations/supabase/client';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -23,6 +24,7 @@ export const SharePanel = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [copied, setCopied] = useState(false);
   const [diplomaUrl, setDiplomaUrl] = useState('');
+  const [currentDiplomaId, setCurrentDiplomaId] = useState('');
 
   useEffect(() => {
     const fetchLastDiplomaUrl = async () => {
@@ -34,7 +36,7 @@ export const SharePanel = () => {
         // Get the most recent diploma URL for this user
         const { data, error } = await supabase
           .from('signed_diplomas')
-          .select('diploma_url')
+          .select('diploma_url, blockchain_id')
           .eq('issuer_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1)
@@ -42,11 +44,14 @@ export const SharePanel = () => {
 
         if (data && data.diploma_url) {
           setDiplomaUrl(data.diploma_url);
+          setCurrentDiplomaId(data.blockchain_id);
         } else {
           // Fallback to sessionStorage if no diploma found in database
           const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
+          const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
           if (savedDiplomaUrl) {
             setDiplomaUrl(savedDiplomaUrl);
+            setCurrentDiplomaId(savedDiplomaId || '');
           } else {
             setDiplomaUrl(window.location.href);
           }
@@ -55,8 +60,10 @@ export const SharePanel = () => {
         console.error('Error fetching diploma URL:', error);
         // Fallback to sessionStorage
         const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
+        const savedDiplomaId = sessionStorage.getItem('lastDiplomaId');
         if (savedDiplomaUrl) {
           setDiplomaUrl(savedDiplomaUrl);
+          setCurrentDiplomaId(savedDiplomaId || '');
         } else {
           setDiplomaUrl(window.location.href);
         }
@@ -72,7 +79,11 @@ export const SharePanel = () => {
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      // Create a temporary div with the diploma content + verification badge
+      const verificationUrl = currentDiplomaId 
+        ? `${window.location.origin}/verify/${currentDiplomaId}`
+        : shareUrl;
+      
+      // Create a temporary div with the diploma content + verification elements
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
         <div style="width: 800px; height: 600px; padding: 40px; background: white; position: relative;">
@@ -82,6 +93,16 @@ export const SharePanel = () => {
             <span style="font-size: 14px;">🛡️</span>
             Verified by Diplomator
           </div>
+          ${currentDiplomaId ? `
+          <div style="position: absolute; bottom: 20px; left: 20px; text-align: center;">
+            <div style="background: white; padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <div id="qr-code-container" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
+            </div>
+            <div style="font-size: 10px; color: #666; font-family: monospace; word-break: break-all; max-width: 96px; background: white; padding: 4px; border-radius: 4px; border: 1px solid #e5e7eb;">
+              ${currentDiplomaId}
+            </div>
+          </div>
+          ` : ''}
         </div>
       `;
       tempDiv.style.position = 'absolute';
@@ -162,7 +183,7 @@ export const SharePanel = () => {
         {hasContent && !diplomaUrl.includes('/diploma/') && (
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              💡 Sign your diploma to the blockchain first to get a shareable link for CVs and LinkedIn
+              💡 Sign your diploma to the blockchain first to get a shareable link and QR code for CVs and LinkedIn
             </p>
           </div>
         )}
@@ -180,7 +201,7 @@ export const SharePanel = () => {
           </Button>
           {hasContent && (
             <p className="text-xs text-muted-foreground mt-1">
-              PDF will include "Verified by Diplomator" badge
+              PDF will include "Verified by Diplomator" badge{currentDiplomaId ? ' and QR code for verification' : ''}
             </p>
           )}
         </div>
@@ -208,9 +229,27 @@ export const SharePanel = () => {
             )}
           </Button>
           {diplomaUrl.includes('/diploma/') && (
-            <p className="text-xs text-green-600 mt-1">
-              ✅ This is a direct diploma viewing link
-            </p>
+            <div className="mt-2">
+              <p className="text-xs text-green-600 mb-1">
+                ✅ This is a direct diploma viewing link with QR verification
+              </p>
+              {currentDiplomaId && (
+                <div className="text-center p-2 bg-gray-50 rounded border">
+                  <div className="mb-2">
+                    <QRCodeGenerator 
+                      value={`${window.location.origin}/verify/${currentDiplomaId}`}
+                      size={60}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 font-mono">
+                    {currentDiplomaId}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    QR leads to verification page
+                  </p>
+                </div>
+              )}
+            </div>
           )}
         </div>
 

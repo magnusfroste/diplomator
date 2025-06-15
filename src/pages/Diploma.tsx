@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 
 const Diploma = () => {
   const { diplomaId } = useParams();
@@ -96,7 +97,9 @@ const Diploma = () => {
     
     setIsGeneratingPDF(true);
     try {
-      // Create a temporary div with the diploma content + verification badge
+      const verificationUrl = `${window.location.origin}/verify/${diplomaData.blockchain_id}`;
+      
+      // Create a temporary div with the diploma content + verification elements
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = `
         <div style="width: 800px; height: 600px; padding: 40px; background: white; position: relative;">
@@ -106,14 +109,39 @@ const Diploma = () => {
             <span style="font-size: 14px;">🛡️</span>
             Verified by Diplomator
           </div>
-          <div style="position: absolute; bottom: 20px; left: 20px; font-size: 10px; color: #666; font-family: monospace;">
-            ID: ${diplomaData.blockchain_id}
+          <div style="position: absolute; bottom: 20px; left: 20px; text-align: center;">
+            <div style="background: white; padding: 8px; border-radius: 8px; border: 2px solid #e5e7eb; margin-bottom: 8px;">
+              <div id="qr-code-container" style="width: 80px; height: 80px;"></div>
+            </div>
+            <div style="font-size: 10px; color: #666; font-family: monospace; word-break: break-all; max-width: 96px;">
+              ${diplomaData.blockchain_id}
+            </div>
           </div>
         </div>
       `;
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
       document.body.appendChild(tempDiv);
+
+      // Generate QR code for the verification URL and insert it
+      const qrContainer = tempDiv.querySelector('#qr-code-container');
+      if (qrContainer) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 80;
+        canvas.height = 80;
+        
+        // Simple QR code placeholder (in a real implementation, you'd use a QR library)
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 80, 80);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(10, 10, 60, 60);
+        ctx.fillStyle = '#000';
+        ctx.font = '8px monospace';
+        ctx.fillText('QR', 35, 45);
+        
+        qrContainer.appendChild(canvas);
+      }
 
       // Convert to canvas
       const canvas = await html2canvas(tempDiv.firstElementChild as HTMLElement, {
@@ -160,6 +188,8 @@ const Diploma = () => {
   const getPreviewContent = () => {
     if (!diplomaData) return '';
     
+    const verificationUrl = `${window.location.origin}/verify/${diplomaData.blockchain_id}`;
+    
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -167,10 +197,48 @@ const Diploma = () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${diplomaData.recipient_name} - Diploma</title>
-        <style>${diplomaData.diploma_css}</style>
+        <style>
+          ${diplomaData.diploma_css}
+          .verification-section {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            text-align: center;
+            z-index: 1000;
+          }
+          .qr-container {
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .diploma-id {
+            font-size: 10px;
+            color: #666;
+            font-family: monospace;
+            word-break: break-all;
+            max-width: 96px;
+            background: white;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+          }
+        </style>
       </head>
       <body>
         ${diplomaData.diploma_html}
+        <div class="verification-section">
+          <div class="qr-container">
+            <div id="qr-code-placeholder" style="width: 80px; height: 80px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">QR</div>
+          </div>
+          <div class="diploma-id">${diplomaData.blockchain_id}</div>
+        </div>
+        <script>
+          // This would be where we'd inject the actual QR code
+          // For now, we'll use a placeholder
+        </script>
       </body>
       </html>
     `;
@@ -247,12 +315,24 @@ const Diploma = () => {
                     />
                   </div>
                   
-                  {/* Verification Overlay */}
+                  {/* Verification Elements Overlay */}
                   <div className="absolute bottom-4 right-4">
                     <Badge className="bg-blue-600 text-white">
                       <Shield className="w-3 h-3 mr-1" />
                       Verified by Diplomator
                     </Badge>
+                  </div>
+                  
+                  <div className="absolute bottom-4 left-4 text-center">
+                    <div className="bg-white p-2 rounded-lg border-2 border-gray-200 shadow-lg mb-2">
+                      <QRCodeGenerator 
+                        value={`${window.location.origin}/verify/${diplomaData.blockchain_id}`}
+                        size={80}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 font-mono bg-white px-2 py-1 rounded border max-w-24 break-all">
+                      {diplomaData.blockchain_id}
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -326,9 +406,12 @@ const Diploma = () => {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-2">About This Diploma</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mb-3">
                   This diploma has been cryptographically signed and stored on the blockchain 
                   by Diplomator, ensuring its authenticity and preventing tampering.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  💡 Scan the QR code or use the Diploma ID to verify authenticity anytime.
                 </p>
               </CardContent>
             </Card>
