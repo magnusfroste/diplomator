@@ -36,17 +36,28 @@ const Diploma = () => {
 
   const fetchDiplomaData = async () => {
     try {
+      console.log('Fetching diploma with ID:', diplomaId);
       const { data, error } = await supabase
         .from('signed_diplomas')
         .select('*')
         .eq('blockchain_id', diplomaId)
         .single();
 
-      if (error || !data) {
+      console.log('Supabase response:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        toast.error('Error loading diploma: ' + error.message);
+        return;
+      }
+
+      if (!data) {
+        console.error('No diploma found with ID:', diplomaId);
         toast.error('Diploma not found');
         return;
       }
 
+      console.log('Diploma data found:', data);
       setDiplomaData(data);
     } catch (error) {
       console.error('Error fetching diploma:', error);

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Share2, Mail, Copy, Check } from 'lucide-react';
@@ -23,7 +22,6 @@ export const SharePanel = () => {
   const [copied, setCopied] = useState(false);
   const [diplomaUrl, setDiplomaUrl] = useState('');
 
-  // Check if we have a signed diploma in localStorage or get from context
   useEffect(() => {
     // Try to get the last signed diploma URL from sessionStorage
     const savedDiplomaUrl = sessionStorage.getItem('lastDiplomaUrl');
