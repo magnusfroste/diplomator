@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Code, Eye, Maximize, Save, X, Share } from 'lucide-react';
+import { Download, Code, Eye, Maximize, Save, X, Share, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -165,6 +165,10 @@ export const PreviewPanel = () => {
               <Code className="w-4 h-4 mr-1" />
               CSS
             </TabsTrigger>
+            <TabsTrigger value="sign">
+              <Shield className="w-4 h-4 mr-1" />
+              Sign
+            </TabsTrigger>
             <TabsTrigger value="share">
               <Share className="w-4 h-4 mr-1" />
               Share
@@ -279,9 +283,14 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="share" className="flex-1 p-4 m-0">
-            <div className="max-w-md mx-auto space-y-6">
+          <TabsContent value="sign" className="flex-1 p-4 m-0">
+            <div className="max-w-md mx-auto">
               <BlockchainSigner />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="share" className="flex-1 p-4 m-0">
+            <div className="max-w-md mx-auto">
               <SharePanel />
             </div>
           </TabsContent>
