@@ -1,20 +1,12 @@
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DiplomaProvider } from "@/contexts/DiplomaContext";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
-import { DiplomaEditor } from "@/components/DiplomaEditor";
-import { SharePanel } from "@/components/SharePanel";
-import { BlockchainSigner } from "@/components/BlockchainSigner";
-import { DiplomaManager } from "@/components/DiplomaManager";
 import { BlockchainMenu } from "@/components/BlockchainMenu";
 import { UserHeader } from "@/components/UserHeader";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("chat");
-
   return (
     <DiplomaProvider>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -35,40 +27,12 @@ const Index = () => {
 
         <div className="container mx-auto p-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[calc(100vh-120px)]">
-            {/* Left Panel */}
+            {/* Left Panel - Chat Only */}
             <div className="space-y-4">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="chat">Chat</TabsTrigger>
-                  <TabsTrigger value="editor">Editor</TabsTrigger>
-                  <TabsTrigger value="share">Share</TabsTrigger>
-                  <TabsTrigger value="sign">Sign</TabsTrigger>
-                  <TabsTrigger value="manage">Manage</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="chat" className="mt-4">
-                  <ChatPanel />
-                </TabsContent>
-                
-                <TabsContent value="editor" className="mt-4">
-                  <DiplomaEditor />
-                </TabsContent>
-                
-                <TabsContent value="share" className="mt-4">
-                  <SharePanel />
-                </TabsContent>
-                
-                <TabsContent value="sign" className="mt-4">
-                  <BlockchainSigner />
-                </TabsContent>
-
-                <TabsContent value="manage" className="mt-4">
-                  <DiplomaManager />
-                </TabsContent>
-              </Tabs>
+              <ChatPanel />
             </div>
 
-            {/* Right Panel */}
+            {/* Right Panel - Preview with Sign */}
             <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-120px)]">
               <PreviewPanel />
             </div>
