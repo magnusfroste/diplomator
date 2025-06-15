@@ -33,6 +33,10 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -68,7 +72,7 @@ export const UserHeader = ({ userEmail, userName }: UserHeaderProps) => {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleProfileClick}>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>
