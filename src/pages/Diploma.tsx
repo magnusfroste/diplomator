@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,7 @@ const Diploma = () => {
         .from('signed_diplomas')
         .select('*')
         .eq('blockchain_id', diplomaId)
-        .single();
+        .maybeSingle();
 
       console.log('Supabase response:', { data, error });
 
