@@ -148,10 +148,6 @@ const Verify = () => {
 
       if (isValid) {
         toast.success('Diploma verification successful! ✅');
-        // Redirect to the authentic diploma page after a short delay
-        setTimeout(() => {
-          navigate(`/diploma/${diplomaId}`);
-        }, 2000);
       } else {
         toast.error('Diploma verification failed! ❌');
       }
@@ -286,14 +282,14 @@ const Verify = () => {
                       
                       <div className="text-center">
                         <p className="text-sm text-green-800 mb-3">
-                          Redirecting to authentic diploma in 2 seconds...
+                          Diploma is authentic! Click below to view the verified diploma.
                         </p>
                         <Button
                           onClick={viewAuthenticDiploma}
                           className="bg-green-600 hover:bg-green-700"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
-                          View Authentic Diploma Now
+                          View Authentic Diploma
                         </Button>
                       </div>
                     </>
