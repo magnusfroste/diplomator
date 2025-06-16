@@ -29,7 +29,7 @@ export const BlockchainMenu = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-blue-600" />
-            <span className="hidden sm:inline">Blockchain</span>
+            <span className="hidden sm:inline">Blockchain Verification</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64 bg-white border shadow-lg">
