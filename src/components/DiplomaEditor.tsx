@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +20,7 @@ export const DiplomaEditor = () => {
   } = useDiploma();
 
   const [userFullName, setUserFullName] = useState<string>('');
-  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
     // Get the user's full name for the signature

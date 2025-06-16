@@ -20,7 +20,7 @@ import {
 export const SettingsContent = () => {
   const { toast } = useToast();
   const [apiKey, setApiKey] = useState('');
-  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
     // Load saved API key from localStorage

@@ -45,7 +45,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [signingRecipientName, setSigningRecipientName] = useState('');
   const [signingInstitutionName, setSigningInstitutionName] = useState('');
-  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('landscape');
+  const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
   const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
     recipientName: '',
     degree: '',
