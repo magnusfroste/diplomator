@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Copy, Calendar, User, Building2, FileText, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ExternalLink, Copy, Calendar, User, Building2, FileText, Clock, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -19,6 +20,8 @@ interface SignedDiploma {
 }
 
 export const DiplomaManager = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { data: signedDiplomas, isLoading, error } = useQuery({
     queryKey: ['signed-diplomas'],
     queryFn: async () => {
@@ -53,6 +56,11 @@ export const DiplomaManager = () => {
     };
   };
 
+  // Filter diplomas based on search term
+  const filteredDiplomas = signedDiplomas?.filter((diploma) =>
+    diploma.recipient_name.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -82,8 +90,38 @@ export const DiplomaManager = () => {
 
   return (
     <div className="space-y-4">
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+        <Input
+          placeholder="Search by recipient name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Results Count */}
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground">
+          {filteredDiplomas.length} diploma{filteredDiplomas.length !== 1 ? 's' : ''} found
+          {filteredDiplomas.length !== signedDiplomas.length && ` (${signedDiplomas.length} total)`}
+        </div>
+      )}
+
+      {/* No Search Results */}
+      {searchTerm && filteredDiplomas.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="text-muted-foreground mb-2">No diplomas found</div>
+          <p className="text-sm text-muted-foreground">
+            Try searching with a different recipient name.
+          </p>
+        </div>
+      )}
+
+      {/* Diploma Cards */}
       <div className="grid gap-4">
-        {signedDiplomas.map((diploma) => {
+        {filteredDiplomas.map((diploma) => {
           const { date, time } = formatDate(diploma.created_at);
           
           return (
