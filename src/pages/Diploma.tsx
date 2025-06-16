@@ -297,7 +297,21 @@ const Diploma = () => {
 
             {/* Embed Tab */}
             <TabsContent value="embed">
-              <EmbedGenerator diplomaId={diplomaData.blockchain_id} />
+              {diplomaData?.blockchain_id ? (
+                <EmbedGenerator diplomaId={diplomaData.blockchain_id} />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="w-5 h-5" />
+                      Embed Not Available
+                    </CardTitle>
+                    <CardDescription>
+                      This diploma cannot be embedded because it doesn't have a blockchain ID.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              )}
             </TabsContent>
 
             {/* Share Tab */}
