@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import { Upload, Link, Sparkles, Info, Wand2 } from 'lucide-react';
+import { Upload, Link, Sparkles, Info, Wand2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -218,15 +217,25 @@ export const ChatPanel = () => {
           <>
             <MessageList />
             <div className="p-3 border-t border-slate-200/50 bg-white/90 backdrop-blur-sm">
-              <Textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Describe the diploma you want to create..."
-                className="resize-none min-h-[60px]"
-                rows={3}
-                disabled={isGenerating}
-              />
+              <div className="relative">
+                <Textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Describe the diploma you want to create..."
+                  className="resize-none min-h-[60px] pr-12"
+                  rows={3}
+                  disabled={isGenerating}
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!message.trim() || isGenerating}
+                  size="sm"
+                  className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </>
         )}
