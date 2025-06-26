@@ -223,8 +223,8 @@ export const ChatPanel = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Describe the diploma you want to create..."
-                  className="resize-none min-h-[60px] pr-12"
-                  rows={3}
+                  className="resize-none min-h-[80px] pr-12"
+                  rows={4}
                   disabled={isGenerating}
                 />
                 <Button
