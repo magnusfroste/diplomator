@@ -71,6 +71,36 @@ export type Database = {
           },
         ]
       }
+      meeting_invites: {
+        Row: {
+          available_slots: Json
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          inviter_name: string
+          title: string
+        }
+        Insert: {
+          available_slots: Json
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          inviter_name: string
+          title: string
+        }
+        Update: {
+          available_slots?: Json
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          inviter_name?: string
+          title?: string
+        }
+        Relationships: []
+      }
       migraine_entries: {
         Row: {
           amount: string
@@ -103,6 +133,44 @@ export type Database = {
           where?: string
         }
         Relationships: []
+      }
+      participant_responses: {
+        Row: {
+          created_at: string
+          id: string
+          invite_id: string
+          participant_initials: string
+          participant_name: string
+          selected_slots: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_id: string
+          participant_initials: string
+          participant_name: string
+          selected_slots: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_id?: string
+          participant_initials?: string
+          participant_name?: string
+          selected_slots?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_responses_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "meeting_invites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
