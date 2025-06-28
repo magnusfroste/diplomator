@@ -33,6 +33,438 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_impressions: {
+        Row: {
+          advertisement_id: string
+          content_link_id: string
+          id: string
+          user_agent: string | null
+          viewed_at: string | null
+          visitor_ip: string | null
+        }
+        Insert: {
+          advertisement_id: string
+          content_link_id: string
+          id?: string
+          user_agent?: string | null
+          viewed_at?: string | null
+          visitor_ip?: string | null
+        }
+        Update: {
+          advertisement_id?: string
+          content_link_id?: string
+          id?: string
+          user_agent?: string | null
+          viewed_at?: string | null
+          visitor_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_impressions_advertisement_id_fkey"
+            columns: ["advertisement_id"]
+            isOneToOne: false
+            referencedRelation: "advertisements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_impressions_content_link_id_fkey"
+            columns: ["content_link_id"]
+            isOneToOne: false
+            referencedRelation: "content_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advertisements: {
+        Row: {
+          ad_type: Database["public"]["Enums"]["ad_type"]
+          advertiser_id: string
+          click_url: string
+          clicks_count: number | null
+          created_at: string | null
+          html_content: string | null
+          id: string
+          image_url: string | null
+          status: Database["public"]["Enums"]["ad_status"]
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          advertiser_id: string
+          click_url: string
+          clicks_count?: number | null
+          created_at?: string | null
+          html_content?: string | null
+          id?: string
+          image_url?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          advertiser_id?: string
+          click_url?: string
+          clicks_count?: number | null
+          created_at?: string | null
+          html_content?: string | null
+          id?: string
+          image_url?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advertisements_advertiser_id_fkey"
+            columns: ["advertiser_id"]
+            isOneToOne: false
+            referencedRelation: "advertisers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advertisers: {
+        Row: {
+          company_name: string
+          contact_email: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      ai_agents: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          description: string | null
+          developer_id: string
+          id: string
+          is_active: boolean | null
+          is_public: boolean | null
+          model: string | null
+          name: string
+          system_prompt: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          developer_id: string
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          model?: string | null
+          name: string
+          system_prompt: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          developer_id?: string
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          model?: string | null
+          name?: string
+          system_prompt?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_agents_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_clicks: {
+        Row: {
+          advertisement_id: string | null
+          clicked_at: string | null
+          content_link_id: string
+          id: string
+          user_agent: string | null
+          visitor_ip: string | null
+        }
+        Insert: {
+          advertisement_id?: string | null
+          clicked_at?: string | null
+          content_link_id: string
+          id?: string
+          user_agent?: string | null
+          visitor_ip?: string | null
+        }
+        Update: {
+          advertisement_id?: string | null
+          clicked_at?: string | null
+          content_link_id?: string
+          id?: string
+          user_agent?: string | null
+          visitor_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_clicks_advertisement_id_fkey"
+            columns: ["advertisement_id"]
+            isOneToOne: false
+            referencedRelation: "advertisements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_clicks_content_link_id_fkey"
+            columns: ["content_link_id"]
+            isOneToOne: false
+            referencedRelation: "content_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_links: {
+        Row: {
+          clicks_count: number | null
+          content_provider_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          original_url: string
+          short_code: string
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          clicks_count?: number | null
+          content_provider_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          original_url: string
+          short_code: string
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          clicks_count?: number | null
+          content_provider_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          original_url?: string
+          short_code?: string
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_links_content_provider_id_fkey"
+            columns: ["content_provider_id"]
+            isOneToOne: false
+            referencedRelation: "content_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_providers: {
+        Row: {
+          contact_email: string
+          created_at: string | null
+          id: string
+          organization_name: string
+          updated_at: string | null
+          user_id: string
+          website_domain: string
+        }
+        Insert: {
+          contact_email: string
+          created_at?: string | null
+          id?: string
+          organization_name: string
+          updated_at?: string | null
+          user_id: string
+          website_domain: string
+        }
+        Update: {
+          contact_email?: string
+          created_at?: string | null
+          id?: string
+          organization_name?: string
+          updated_at?: string | null
+          user_id?: string
+          website_domain?: string
+        }
+        Relationships: []
+      }
+      conversation_invites: {
+        Row: {
+          conversation_id: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invite_token: string
+          invitee_email: string
+          inviter_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          invitee_email: string
+          inviter_id: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          invitee_email?: string
+          inviter_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_invites_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_invites_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          id: string
+          joined_at: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          ai_agent_id: string | null
+          avatar_url: string | null
+          created_at: string | null
+          created_by: string
+          id: string
+          name: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_agent_id?: string | null
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by: string
+          id?: string
+          name?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_agent_id?: string | null
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          name?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_ai_agent_id_fkey"
+            columns: ["ai_agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incoming_balances: {
         Row: {
           account_number: string
@@ -100,6 +532,54 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          is_ai_response: boolean | null
+          message_type: string | null
+          metadata: Json | null
+          sender_id: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          is_ai_response?: boolean | null
+          message_type?: string | null
+          metadata?: Json | null
+          sender_id?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          is_ai_response?: boolean | null
+          message_type?: string | null
+          metadata?: Json | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       migraine_entries: {
         Row: {
@@ -174,19 +654,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
           id: string
+          is_developer: boolean | null
           name: string | null
+          status: string | null
           updated_at: string | null
+          username: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
           id: string
+          is_developer?: boolean | null
           name?: string | null
+          status?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
           id?: string
+          is_developer?: boolean | null
           name?: string | null
+          status?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
@@ -388,10 +889,50 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_conversation_invite: {
+        Args: { invite_token_param: string }
+        Returns: Json
+      }
+      generate_short_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_random_advertisement: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          ad_type: Database["public"]["Enums"]["ad_type"]
+          advertiser_id: string
+          click_url: string
+          clicks_count: number | null
+          created_at: string | null
+          html_content: string | null
+          id: string
+          image_url: string | null
+          status: Database["public"]["Enums"]["ad_status"]
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+      }
+      user_can_access_conversation: {
+        Args: { conversation_uuid: string }
+        Returns: boolean
+      }
+      verify_counter_consistency: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          record_id: string
+          stored_count: number
+          actual_count: number
+          discrepancy: number
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      ad_status: "active" | "inactive" | "pending"
+      ad_type: "image" | "html"
+      user_type: "content_provider" | "advertiser"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -506,6 +1047,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ad_status: ["active", "inactive", "pending"],
+      ad_type: ["image", "html"],
+      user_type: ["content_provider", "advertiser"],
+    },
   },
 } as const
