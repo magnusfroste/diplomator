@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Home, Loader2 } from 'lucide-react';
+import { Shield, Users, FileText, Home, Loader2, Settings } from 'lucide-react';
+import AdminIntegrations from '@/components/AdminIntegrations';
 import { toast } from 'sonner';
 
 interface DiplomaRow {
@@ -149,6 +150,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" /> Användare & Roller
             </TabsTrigger>
+            <TabsTrigger value="integrations" className="gap-2">
+              <Settings className="h-4 w-4" /> Integrationer
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="diplomas">
@@ -247,6 +251,10 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="integrations">
+            <AdminIntegrations />
           </TabsContent>
         </Tabs>
       </div>
