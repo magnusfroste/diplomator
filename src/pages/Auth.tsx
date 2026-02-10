@@ -14,8 +14,8 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('demo@diplomator.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
   useEffect(() => {
@@ -104,15 +104,23 @@ const Auth = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Diplomator</h1>
           <p className="text-gray-600">Create and verify digital diplomas with blockchain technology</p>
           
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => navigate('/')}
-            className="mt-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
+          <div className="flex justify-center gap-3 mt-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/demo')}
+            >
+              Try Free – No Sign Up
+            </Button>
+          </div>
         </div>
 
         {/* Auth Card */}
