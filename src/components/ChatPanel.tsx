@@ -25,7 +25,17 @@ const stunningDiplomaPrompts = [
   "Create a sophisticated medical diploma with clean white background, medical blue accents, professional typography, caduceus symbols, and elegant simplicity for a Doctor of Medicine"
 ];
 
-export const ChatPanel = () => {
+interface ChatPanelProps {
+  isGuest?: boolean;
+  guestAccess?: {
+    remainingGenerations: number;
+    canGenerate: boolean;
+    incrementUsage: () => void;
+    maxGenerations: number;
+  };
+}
+
+export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'chat' | 'upload' | 'url' | 'magic'>('chat');
   const [showGuidelines, setShowGuidelines] = useState(false);
@@ -50,6 +60,18 @@ export const ChatPanel = () => {
 
   const handleSendMessage = async () => {
     if (!message.trim() || isGenerating) return;
+
+    // Guest usage limit check
+    if (isGuest && guestAccess && !guestAccess.canGenerate) {
+      const limitMessage: Message = {
+        id: Date.now().toString(),
+        content: 'Du har använt alla dina gratis-genereringar. Skapa ett konto för obegränsad åtkomst!',
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages((prev: Message[]) => [...prev, limitMessage]);
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -98,6 +120,11 @@ export const ChatPanel = () => {
       }
       if (response.css) {
         setDiplomaCss(response.css);
+      }
+
+      // Track guest usage
+      if (isGuest && guestAccess) {
+        guestAccess.incrementUsage();
       }
     } catch (error) {
       console.error('Error generating diploma:', error);

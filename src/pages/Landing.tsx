@@ -37,9 +37,14 @@ const Landing = () => {
               Easy Sharing
             </Badge>
           </div>
-          <Button size="lg" onClick={() => navigate('/auth')}>
-            Get Started <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button size="lg" onClick={() => navigate('/auth')}>
+              Get Started <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}>
+              Try Free – No Sign Up
+            </Button>
+          </div>
         </section>
 
         {/* Value Proposition Banner */}
