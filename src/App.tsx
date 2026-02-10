@@ -12,6 +12,7 @@ import Diploma from "./pages/Diploma";
 import DiplomaEmbed from "./pages/DiplomaEmbed";
 import TestDiploma from "./pages/TestDiploma";
 import Verify from "./pages/Verify";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/embed/:diplomaId" element={<DiplomaEmbed />} />
           <Route path="/testdiploma/:diplomaId" element={<TestDiploma />} />
           <Route path="/verify/:diplomaId?" element={<Verify />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
