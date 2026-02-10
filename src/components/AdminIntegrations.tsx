@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckCircle, XCircle, Loader2, ExternalLink, Zap, Globe, Brain, Sparkles } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ExternalLink, Zap, Globe, Brain, Sparkles, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface IntegrationConfig {
@@ -27,7 +27,7 @@ const integrations: IntegrationConfig[] = [
     description: 'Claude-modeller för diplomgenerering. Standard-integration.',
     secretName: 'ANTHROPIC_API_KEY',
     getKeyUrl: 'https://console.anthropic.com/settings/keys',
-    getKeyInstructions: 'Skapa ett konto på console.anthropic.com → Settings → API Keys → Create Key',
+    getKeyInstructions: 'Skapa konto på console.anthropic.com → Settings → API Keys → Create Key',
     supabaseSecretCommand: 'supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx',
     models: [
       { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Senaste)' },
@@ -80,9 +80,7 @@ const integrations: IntegrationConfig[] = [
     getKeyUrl: 'https://www.firecrawl.dev/app/api-keys',
     getKeyInstructions: 'Skapa konto på firecrawl.dev → Dashboard → API Keys → Create API Key',
     supabaseSecretCommand: 'supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx',
-    models: [
-      { value: 'scrape', label: 'Scrape (Standard)' },
-    ],
+    models: [{ value: 'scrape', label: 'Scrape (Standard)' }],
   },
 ];
 
@@ -97,55 +95,133 @@ const AdminIntegrations = () => {
   const [testing, setTesting] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [selectedModels, setSelectedModels] = useState<Record<string, string>>({});
+  const [activeProvider, setActiveProvider] = useState('anthropic');
+  const [activeModel, setActiveModel] = useState('claude-3-sonnet-20240229');
+  const [saving, setSaving] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    const { data } = await supabase
+      .from('app_settings')
+      .select('value')
+      .eq('key', 'ai_provider')
+      .single();
+
+    if (data?.value) {
+      const val = data.value as { provider: string; model: string };
+      setActiveProvider(val.provider);
+      setActiveModel(val.model);
+    }
+    setLoadingSettings(false);
+  };
+
+  const saveActiveProvider = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from('app_settings')
+      .update({
+        value: { provider: activeProvider, model: activeModel } as any,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('key', 'ai_provider');
+
+    if (error) {
+      toast.error('Kunde inte spara inställningen');
+    } else {
+      toast.success(`Aktiv provider: ${activeProvider} / ${activeModel}`);
+    }
+    setSaving(false);
+  };
 
   const testIntegration = async (integration: IntegrationConfig) => {
     const model = selectedModels[integration.id] || integration.models[0].value;
     setTesting(integration.id);
-
     try {
       const { data, error } = await supabase.functions.invoke('test-integration', {
         body: { provider: integration.id, model },
       });
-
       if (error) {
         setResults(prev => ({ ...prev, [integration.id]: { success: false, message: error.message, model, latencyMs: 0 } }));
         toast.error(`${integration.name}: Test misslyckades`);
       } else {
         setResults(prev => ({ ...prev, [integration.id]: data }));
-        if (data.success) {
-          toast.success(`${integration.name}: Test OK (${data.latencyMs}ms)`);
-        } else {
-          toast.error(`${integration.name}: ${data.message}`);
-        }
+        data.success ? toast.success(`${integration.name}: OK (${data.latencyMs}ms)`) : toast.error(`${integration.name}: ${data.message}`);
       }
     } catch (err: any) {
       setResults(prev => ({ ...prev, [integration.id]: { success: false, message: err.message, model, latencyMs: 0 } }));
-      toast.error(`${integration.name}: Oväntat fel`);
     } finally {
       setTesting(null);
     }
   };
 
+  const activeIntegration = integrations.find(i => i.id === activeProvider);
+
   return (
     <div className="space-y-4">
+      {/* Active provider selector */}
+      <Card className="border-primary/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Zap className="h-4 w-4 text-primary" />
+            Aktiv AI-provider för diplomgenerering
+          </CardTitle>
+          <CardDescription>Denna provider används för alla diplomgenereringar.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingSettings ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Select value={activeProvider} onValueChange={(v) => {
+                setActiveProvider(v);
+                const integration = integrations.find(i => i.id === v);
+                if (integration) setActiveModel(integration.models[0].value);
+              }}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {integrations.filter(i => i.id !== 'firecrawl').map(i => (
+                    <SelectItem key={i.id} value={i.id}>{i.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {activeIntegration && (
+                <Select value={activeModel} onValueChange={setActiveModel}>
+                  <SelectTrigger className="w-full sm:flex-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeIntegration.models.map(m => (
+                      <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              <Button onClick={saveActiveProvider} disabled={saving} className="gap-1">
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Spara
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Self-hosting info */}
       <Card className="border-dashed">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">🔧 Self-hosting / VPS Setup</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>
-            Diplomator är open source. För att köra på egen VPS behöver du konfigurera API-nycklar som Supabase secrets:
-          </p>
+          <p>Diplomator är open source. Konfigurera API-nycklar som Supabase secrets:</p>
           <pre className="bg-muted p-3 rounded-md text-xs overflow-x-auto">
-{`# Installera Supabase CLI
-npm install -g supabase
-
-# Logga in och länka projektet
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-
-# Lägg till secrets
+{`# Supabase CLI
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx
 supabase secrets set OPENAI_API_KEY=sk-xxxxx
 supabase secrets set GEMINI_API_KEY=AIzaxxxxx
@@ -159,15 +235,19 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
         const result = results[integration.id];
         const isTesting = testing === integration.id;
         const selectedModel = selectedModels[integration.id] || integration.models[0].value;
+        const isActive = integration.id === activeProvider;
 
         return (
-          <Card key={integration.id}>
+          <Card key={integration.id} className={isActive ? 'border-primary/50 bg-primary/5' : ''}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {integration.icon}
                   <div>
-                    <CardTitle className="text-base">{integration.name}</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      {integration.name}
+                      {isActive && <Badge variant="default" className="text-xs">Aktiv</Badge>}
+                    </CardTitle>
                     <CardDescription className="text-xs">{integration.description}</CardDescription>
                   </div>
                 </div>
@@ -180,7 +260,6 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {/* Model selector + test */}
               <div className="flex items-center gap-2">
                 {integration.models.length > 1 && (
                   <Select
@@ -197,40 +276,27 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
                     </SelectContent>
                   </Select>
                 )}
-                <Button
-                  onClick={() => testIntegration(integration)}
-                  disabled={isTesting}
-                  size="sm"
-                >
+                <Button onClick={() => testIntegration(integration)} disabled={isTesting} size="sm">
                   {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
                   {isTesting ? 'Testar...' : 'Testa'}
                 </Button>
               </div>
 
-              {/* Result message */}
               {result && (
                 <div className={`text-xs p-2 rounded ${result.success ? 'bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
                   <p className="font-mono break-all">{result.message}</p>
                 </div>
               )}
 
-              {/* Setup instructions */}
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>Secret: <code className="bg-muted px-1 rounded">{integration.secretName}</code></span>
                 <span>·</span>
-                <a
-                  href={integration.getKeyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
+                <a href={integration.getKeyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                   Hämta API-nyckel <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
               <p className="text-xs text-muted-foreground">{integration.getKeyInstructions}</p>
-              <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">
-                {integration.supabaseSecretCommand}
-              </pre>
+              <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">{integration.supabaseSecretCommand}</pre>
             </CardContent>
           </Card>
         );
