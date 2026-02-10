@@ -1,1 +1,4 @@
 project_id = "jiokwdsnmgmcjoyxrwax"
+
+[functions.generate-diploma]
+verify_jwt = false
