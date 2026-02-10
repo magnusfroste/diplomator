@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      signed_diplomas: {
+        Row: {
+          blockchain_id: string
+          content_hash: string
+          created_at: string
+          diploma_css: string
+          diploma_html: string
+          diploma_url: string | null
+          diplomator_seal: string
+          id: string
+          institution_name: string
+          issuer_id: string
+          recipient_name: string
+          signature: string
+          updated_at: string
+          verification_url: string
+        }
+        Insert: {
+          blockchain_id: string
+          content_hash: string
+          created_at?: string
+          diploma_css: string
+          diploma_html: string
+          diploma_url?: string | null
+          diplomator_seal: string
+          id?: string
+          institution_name: string
+          issuer_id: string
+          recipient_name: string
+          signature: string
+          updated_at?: string
+          verification_url: string
+        }
+        Update: {
+          blockchain_id?: string
+          content_hash?: string
+          created_at?: string
+          diploma_css?: string
+          diploma_html?: string
+          diploma_url?: string | null
+          diplomator_seal?: string
+          id?: string
+          institution_name?: string
+          issuer_id?: string
+          recipient_name?: string
+          signature?: string
+          updated_at?: string
+          verification_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
