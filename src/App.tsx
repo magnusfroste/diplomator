@@ -9,15 +9,32 @@ import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import HealthCheck from "./pages/HealthCheck";
 
-const Auth = lazy(() => import("./pages/Auth"));
-const Index = lazy(() => import("./pages/Index"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Signed = lazy(() => import("./pages/Signed"));
-const Diploma = lazy(() => import("./pages/Diploma"));
-const DiplomaEmbed = lazy(() => import("./pages/DiplomaEmbed"));
-const TestDiploma = lazy(() => import("./pages/TestDiploma"));
-const Verify = lazy(() => import("./pages/Verify"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+function lazyRetry(importFn: () => Promise<any>, retries = 3, delay = 1500): Promise<any> {
+  return new Promise((resolve, reject) => {
+    importFn()
+      .then(resolve)
+      .catch((error: Error) => {
+        if (retries > 0) {
+          console.warn(`Lazy import failed, retrying (${retries} left)...`);
+          setTimeout(() => {
+            lazyRetry(importFn, retries - 1, delay).then(resolve, reject);
+          }, delay);
+        } else {
+          reject(error);
+        }
+      });
+  });
+}
+
+const Auth = lazy(() => lazyRetry(() => import("./pages/Auth")));
+const Index = lazy(() => lazyRetry(() => import("./pages/Index")));
+const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
+const Signed = lazy(() => lazyRetry(() => import("./pages/Signed")));
+const Diploma = lazy(() => lazyRetry(() => import("./pages/Diploma")));
+const DiplomaEmbed = lazy(() => lazyRetry(() => import("./pages/DiplomaEmbed")));
+const TestDiploma = lazy(() => lazyRetry(() => import("./pages/TestDiploma")));
+const Verify = lazy(() => lazyRetry(() => import("./pages/Verify")));
+const AdminDashboard = lazy(() => lazyRetry(() => import("./pages/AdminDashboard")));
 
 const queryClient = new QueryClient();
 
