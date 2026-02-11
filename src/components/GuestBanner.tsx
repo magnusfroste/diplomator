@@ -15,9 +15,9 @@ export const GuestBanner = ({ remainingGenerations, maxGenerations }: GuestBanne
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 flex items-center justify-between text-sm">
       <div className="flex items-center gap-2">
         <Sparkles className="w-4 h-4" />
-        <span>Gästläge</span>
+        <span>Guest Mode</span>
         <Badge variant="secondary" className="text-xs">
-          {remainingGenerations}/{maxGenerations} genereringar kvar
+          {remainingGenerations}/{maxGenerations} generations left
         </Badge>
       </div>
       <Button
@@ -26,7 +26,7 @@ export const GuestBanner = ({ remainingGenerations, maxGenerations }: GuestBanne
         onClick={() => navigate('/auth')}
         className="h-7 text-xs"
       >
-        Skapa konto för obegränsad åtkomst
+        Create account for unlimited access
       </Button>
     </div>
   );
