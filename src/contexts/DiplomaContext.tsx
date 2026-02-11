@@ -41,13 +41,6 @@ interface Message {
   timestamp: Date;
 }
 
-const INITIAL_MESSAGE: Message = {
-  id: '1',
-  content: "Hello! I'm here to help you create beautiful diplomas. You can either Chat, Upload an image for inspiration, provide a website URL or try the Magic! What would you like to create today?",
-  isUser: false,
-  timestamp: new Date(),
-};
-
 const DiplomaContext = createContext<DiplomaContextType | undefined>(undefined);
 
 export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
@@ -65,7 +58,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
     institution: '',
     date: ''
   });
-  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const wasGenerating = useRef(false);
 
   // Auto-save after generation completes
@@ -90,7 +83,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
     setDiplomaCss('');
     setDiplomaFormat('portrait');
     setDiplomaFields({ recipientName: '', degree: '', field: '', institution: '', date: '' });
-    setMessages([{ ...INITIAL_MESSAGE, id: crypto.randomUUID(), timestamp: new Date() }]);
+    setMessages([]);
   }, []);
 
   const loadSession = useCallback(async (id: string) => {
@@ -114,7 +107,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
         timestamp: new Date(m.timestamp),
       })));
     } else {
-      setMessages([{ ...INITIAL_MESSAGE, id: crypto.randomUUID(), timestamp: new Date() }]);
+      setMessages([]);
     }
   }, []);
 
