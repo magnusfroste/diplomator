@@ -135,28 +135,31 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
+        <div className="flex items-center justify-between">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip="Diplomator" className="pointer-events-none">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-md">
+                  <Award className="h-4 w-4 text-white" />
+                </div>
+                {!collapsed && <span className="font-bold text-foreground">Diplomator</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 shrink-0"
+            onClick={() => toggleSidebar()}
+          >
+            {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </Button>
+        </div>
         <SidebarMenu>
-          {/* Logo + brand */}
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Diplomator" className="pointer-events-none">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-md">
-                <Award className="h-4 w-4 text-white" />
-              </div>
-              {!collapsed && <span className="font-bold text-foreground">Diplomator</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          {/* New diploma */}
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleNewDiploma} tooltip="New Diploma">
               <Plus className="h-4 w-4" />
               {!collapsed && <span>New Diploma</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          {/* Collapse trigger */}
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => toggleSidebar()} tooltip={collapsed ? 'Expand' : 'Collapse'}>
-              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-              {!collapsed && <span>Collapse</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
