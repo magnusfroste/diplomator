@@ -105,9 +105,11 @@ export interface SealBlock {
 // ── Signature Block ──
 
 export type SignatureStyle = 
-  | 'handwriting'         // Cursive handwriting (default Mr Diploma)
-  | 'formal'              // Formal printed name with line
-  | 'elegant';            // Elegant script
+  | 'handwriting'
+  | 'formal'
+  | 'elegant'
+  | 'stamp'
+  | 'digital';
 
 export interface SignatureBlock {
   style: SignatureStyle;
@@ -151,7 +153,7 @@ export const DSL_BLOCK_OPTIONS = {
   borderStyles: ['ornamental', 'double-line', 'modern', 'minimal', 'classical', 'art-deco', 'celtic-knot', 'botanical-vine', 'wave', 'geometric-deco', 'none'] as const,
   sealStyles: ['classical-round', 'star', 'shield', 'ribbon', 'modern-circle', 'rosette', 'compass', 'laurel-wreath', 'none'] as const,
   sealPositions: ['bottom-right', 'bottom-left', 'bottom-center', 'top-right'] as const,
-  signatureStyles: ['handwriting', 'formal', 'elegant'] as const,
+  signatureStyles: ['handwriting', 'formal', 'elegant', 'stamp', 'digital'] as const,
   backgroundStyles: ['parchment', 'clean-white', 'ivory', 'gradient-warm', 'gradient-cool', 'linen', 'marble', 'ocean-deep', 'cosmic-dark', 'botanical-green', 'vintage-sepia', 'watercolor-soft', 'royal-burgundy'] as const,
   layoutOrientations: ['landscape', 'portrait'] as const,
   layoutPaddings: ['compact', 'normal', 'spacious'] as const,

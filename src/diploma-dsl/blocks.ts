@@ -617,6 +617,79 @@ export const signatureStyles: Record<string, (name: string, title?: string, colo
     `,
     html: `<div class="diploma-signature"><div class="sig-name">${name}</div>${title ? `<div class="sig-title">${title}</div>` : ''}</div>`,
   }),
+  'stamp': (name, title, color = '#333') => ({
+    css: `
+      .diploma-signature {
+        text-align: center;
+      }
+      .diploma-signature .sig-stamp {
+        display: inline-block;
+        border: 3px solid ${color};
+        border-radius: 4px;
+        padding: 6px 18px;
+        transform: rotate(-3deg);
+        position: relative;
+      }
+      .diploma-signature .sig-name {
+        font-family: 'Georgia', serif;
+        font-size: 14px;
+        font-weight: bold;
+        color: ${color};
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+      .diploma-signature .sig-title {
+        font-size: 10px;
+        color: ${color}80;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+    `,
+    html: `<div class="diploma-signature"><div class="sig-stamp"><div class="sig-name">${name}</div>${title ? `<div class="sig-title">${title}</div>` : ''}</div></div>`,
+  }),
+  'digital': (name, title, color = '#333') => ({
+    css: `
+      .diploma-signature {
+        text-align: center;
+      }
+      .diploma-signature .sig-digital {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: ${color}08;
+        border: 1px solid ${color}20;
+        border-radius: 6px;
+        padding: 8px 16px;
+      }
+      .diploma-signature .sig-icon {
+        font-size: 18px;
+        color: ${color};
+      }
+      .diploma-signature .sig-info {
+        text-align: left;
+      }
+      .diploma-signature .sig-name {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: ${color};
+      }
+      .diploma-signature .sig-title {
+        font-size: 10px;
+        color: #888;
+        margin-top: 1px;
+      }
+      .diploma-signature .sig-verified {
+        font-size: 9px;
+        color: ${color}90;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+    `,
+    html: `<div class="diploma-signature"><div class="sig-digital"><span class="sig-icon">🔏</span><div class="sig-info"><div class="sig-name">${name}</div>${title ? `<div class="sig-title">${title}</div>` : ''}<div class="sig-verified">Digitally signed</div></div></div></div>`,
+  }),
 };
 
 // ── Layout padding values ──
