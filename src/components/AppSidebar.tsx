@@ -82,10 +82,11 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
   const [sessions, setSessions] = useState<DiplomaSession[]>([]);
   const [profileName, setProfileName] = useState(userName || '');
 
+  // Refresh sessions when currentSessionId changes (new session created or switched)
   useEffect(() => {
     fetchSessions();
     if (userEmail) fetchProfile();
-  }, []);
+  }, [currentSessionId]);
 
   const fetchProfile = async () => {
     try {
