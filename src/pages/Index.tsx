@@ -13,7 +13,7 @@ import { User } from "@supabase/supabase-js";
 import { Award } from "lucide-react";
 import { useGuestAccess } from "@/hooks/useGuestAccess";
 import { GuestBanner } from "@/components/GuestBanner";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
 const IndexContent = ({ user, isGuest, guestAccess }: {
@@ -40,11 +40,14 @@ const IndexContent = ({ user, isGuest, guestAccess }: {
         <div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center justify-between px-4 py-2">
             <div className="flex items-center gap-2">
-              {!isGuest && <SidebarTrigger />}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
-                <Award className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-lg font-bold text-foreground">Diplomator</h1>
+              {isGuest && (
+                <>
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <h1 className="text-lg font-bold text-foreground">Diplomator</h1>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {!isGuest && hasStarted && <BlockchainMenu />}

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Plus, Settings, LogOut, FileText, User } from 'lucide-react';
+import { Plus, Settings, LogOut, FileText, User, Award, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -76,7 +76,7 @@ function groupByDate(sessions: DiplomaSession[]) {
 
 export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
   const navigate = useNavigate();
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const collapsed = state === 'collapsed';
   const { currentSessionId, loadSession, resetSession } = useDiploma();
   const [sessions, setSessions] = useState<DiplomaSession[]>([]);
@@ -136,10 +136,27 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
+          {/* Logo + brand */}
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Diplomator" className="pointer-events-none">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-md">
+                <Award className="h-4 w-4 text-white" />
+              </div>
+              {!collapsed && <span className="font-bold text-foreground">Diplomator</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          {/* New diploma */}
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleNewDiploma} tooltip="New Diploma">
               <Plus className="h-4 w-4" />
               {!collapsed && <span>New Diploma</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          {/* Collapse trigger */}
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => toggleSidebar()} tooltip={collapsed ? 'Expand' : 'Collapse'}>
+              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              {!collapsed && <span>Collapse</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
