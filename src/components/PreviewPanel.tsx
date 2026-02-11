@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Code, Eye, Maximize, Save, X, Share, Shield } from 'lucide-react';
+import { AnimationTemplates } from '@/components/AnimationTemplates';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -166,6 +167,7 @@ export const PreviewPanel = () => {
               <h2 className="text-sm font-medium text-foreground">Canvas</h2>
             </div>
             <div className="flex gap-1">
+              <AnimationTemplates />
               <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={handleFullscreen}>
                 <Maximize className="w-3.5 h-3.5" />
               </Button>
