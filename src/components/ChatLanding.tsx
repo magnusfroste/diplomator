@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { Upload, Link, Wand2, Send, Globe } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Upload, Link, Wand2, Send, Globe, X, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { generateDiploma, generateDiplomaFromImage, generateDiplomaFromUrl } from '@/services/anthropicService';
-import { MessageList } from '@/components/MessageList';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useDropzone } from 'react-dropzone';
@@ -20,7 +19,7 @@ const stunningDiplomaPrompts = [
   "Design a nature-inspired diploma with forest green colors, botanical illustrations, organic flowing lines, earth-tone gradients, and handwritten-style fonts for an Environmental Science degree",
 ];
 
-interface ChatPanelProps {
+interface ChatLandingProps {
   isGuest?: boolean;
   guestAccess?: {
     remainingGenerations: number;
@@ -30,11 +29,13 @@ interface ChatPanelProps {
   };
 }
 
-export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
+export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
   const [message, setMessage] = useState('');
   const [urlValue, setUrlValue] = useState('');
   const [urlOpen, setUrlOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
     messages,
@@ -51,10 +52,13 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file && file.type.startsWith('image/')) {
+      setUploadedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
       setUploadOpen(false);
+      // Auto-generate from image
       handleGenerateFromImage(file);
     }
-  }, [isGenerating]);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -76,12 +80,13 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
 
     try {
       const response = await generateDiplomaFromImage(file);
-      setMessages((prev: Message[]) => [...prev, {
+      const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         content: response.message,
         isUser: false,
         timestamp: new Date(),
-      }]);
+      };
+      setMessages((prev: Message[]) => [...prev, aiMsg]);
       if (response.html) setDiplomaHtml(response.html);
       if (response.css) setDiplomaCss(response.css);
       if (isGuest && guestAccess) guestAccess.incrementUsage();
@@ -114,12 +119,13 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
 
     try {
       const response = await generateDiplomaFromUrl(urlValue);
-      setMessages((prev: Message[]) => [...prev, {
+      const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         content: response.message,
         isUser: false,
         timestamp: new Date(),
-      }]);
+      };
+      setMessages((prev: Message[]) => [...prev, aiMsg]);
       if (response.html) setDiplomaHtml(response.html);
       if (response.css) setDiplomaCss(response.css);
       if (isGuest && guestAccess) guestAccess.incrementUsage();
@@ -138,15 +144,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
 
   const handleSendMessage = async () => {
     if (!message.trim() || isGenerating) return;
-    if (isGuest && guestAccess && !guestAccess.canGenerate) {
-      setMessages((prev: Message[]) => [...prev, {
-        id: Date.now().toString(),
-        content: 'You have used all your free generations. Create an account for unlimited access!',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      return;
-    }
+    if (isGuest && guestAccess && !guestAccess.canGenerate) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -159,10 +157,12 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
     setIsGenerating(true);
 
     try {
-      const chatMessages: ChatMessage[] = messages.map(msg => ({
-        role: msg.isUser ? 'user' as const : 'assistant' as const,
-        content: msg.content,
-      }));
+      const chatMessages: ChatMessage[] = messages
+        .filter(m => m.id !== '1')
+        .map(msg => ({
+          role: msg.isUser ? 'user' as const : 'assistant' as const,
+          content: msg.content,
+        }));
       chatMessages.push({ role: 'user' as const, content: userMessage.content });
 
       const response = await generateDiploma({
@@ -207,29 +207,38 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Messages */}
-      <MessageList />
+    <div className="h-full flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-2xl space-y-8 text-center">
+        {/* Logo & tagline */}
+        <div className="space-y-3">
+          <div className="w-14 h-14 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+            <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">What diploma would you like to create today?</h1>
+          <p className="text-muted-foreground text-sm">Describe your vision, upload an image, paste a URL, or let the magic decide.</p>
+        </div>
 
-      {/* Input area with inline actions */}
-      <div className="p-3 border-t border-border bg-background">
-        <div className="relative bg-background border border-border rounded-xl">
+        {/* Input area */}
+        <div className="relative bg-background border border-border rounded-2xl shadow-sm">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Describe changes or a new diploma..."
-            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[60px] rounded-xl pb-10"
-            rows={3}
+            placeholder="Describe the diploma you want to create..."
+            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[100px] rounded-2xl pb-14"
+            rows={4}
             disabled={isGenerating}
           />
-          <div className="absolute bottom-1 left-1 right-1 flex items-center justify-between">
-            <div className="flex items-center gap-0.5">
+          {/* Bottom bar with actions */}
+          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+            <div className="flex items-center gap-1">
               {/* Upload */}
               <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
-                    <Upload className="w-3.5 h-3.5" />
+                  <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                    <Upload className="w-4 h-4" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -245,6 +254,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
                     <input {...getInputProps()} />
                     <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                     <p className="text-sm text-muted-foreground">Drop an image here, or click to select</p>
+                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF up to 10MB</p>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -252,11 +262,11 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               {/* URL */}
               <Popover open={urlOpen} onOpenChange={setUrlOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
-                    <Link className="w-3.5 h-3.5" />
+                  <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                    <Link className="w-4 h-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-72" align="start">
+                <PopoverContent className="w-80" align="start">
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Website URL</p>
                     <div className="flex gap-2">
@@ -267,7 +277,9 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
                         className="text-sm"
                         onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
                       />
-                      <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>Go</Button>
+                      <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>
+                        Go
+                      </Button>
                     </div>
                   </div>
                 </PopoverContent>
@@ -277,11 +289,11 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                className="h-8 px-2 text-muted-foreground hover:text-foreground"
                 onClick={generateRandomPrompt}
                 disabled={isGenerating}
               >
-                <Wand2 className="w-3.5 h-3.5" />
+                <Wand2 className="w-4 h-4" />
               </Button>
             </div>
 
@@ -289,12 +301,16 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               onClick={handleSendMessage}
               disabled={!message.trim() || isGenerating}
               size="sm"
-              className="h-7 w-7 p-0 rounded-full"
+              className="h-8 w-8 p-0 rounded-full"
             >
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-4 h-4" />
             </Button>
           </div>
         </div>
+
+        {isGenerating && (
+          <p className="text-sm text-muted-foreground animate-pulse">Generating your diploma...</p>
+        )}
       </div>
     </div>
   );
