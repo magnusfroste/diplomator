@@ -11,19 +11,16 @@ export const PreviewPanel = () => {
   const { diplomaHtml, diplomaCss, setDiplomaHtml, setDiplomaCss } = useDiploma();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  // Local state for editing
   const [editableHtml, setEditableHtml] = useState(diplomaHtml || '');
   const [editableCss, setEditableCss] = useState(diplomaCss || '');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Update local state when context changes (from AI generation)
   useEffect(() => {
     setEditableHtml(diplomaHtml || '');
     setEditableCss(diplomaCss || '');
     setHasUnsavedChanges(false);
   }, [diplomaHtml, diplomaCss]);
 
-  // Check for unsaved changes
   useEffect(() => {
     const htmlChanged = editableHtml !== (diplomaHtml || '');
     const cssChanged = editableCss !== (diplomaCss || '');
@@ -55,44 +52,44 @@ export const PreviewPanel = () => {
             body {
               margin: 0;
               padding: 40px;
-              font-family: 'Georgia', serif;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              font-family: 'Inter', system-ui, sans-serif;
+              background: #121212;
               min-height: 100vh;
               display: flex;
               align-items: center;
               justify-content: center;
             }
             .placeholder {
-              background: white;
+              background: #1a1a1a;
               padding: 60px;
-              border-radius: 20px;
-              box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+              border-radius: 16px;
               text-align: center;
-              max-width: 600px;
-              border: 8px solid #f8f9fa;
+              max-width: 500px;
+              border: 1px solid #2a2a2a;
             }
             .placeholder h1 {
-              color: #2d3748;
-              margin-bottom: 20px;
-              font-size: 28px;
+              color: #e8e8e8;
+              margin-bottom: 16px;
+              font-size: 22px;
+              font-weight: 500;
             }
             .placeholder p {
-              color: #718096;
-              font-size: 16px;
+              color: #888;
+              font-size: 14px;
               line-height: 1.6;
             }
-            .sparkle {
-              font-size: 48px;
-              margin-bottom: 20px;
-              opacity: 0.7;
+            .icon {
+              font-size: 40px;
+              margin-bottom: 16px;
+              opacity: 0.5;
             }
           </style>
         </head>
         <body>
           <div class="placeholder">
-            <div class="sparkle">✨</div>
+            <div class="icon">✨</div>
             <h1>Your diploma will appear here</h1>
-            <p>Start by describing the diploma you want to create, uploading an image for inspiration, or entering a website URL to scrape design elements.</p>
+            <p>Describe what you want to create and the canvas will come to life.</p>
           </div>
         </body>
         </html>
@@ -108,7 +105,6 @@ export const PreviewPanel = () => {
         <title>Diploma Preview</title>
         <style>
           ${diplomaCss}
-          /* Gentle containment styles for preview */
           body {
             margin: 0;
             padding: 20px;
@@ -121,12 +117,10 @@ export const PreviewPanel = () => {
             position: relative;
             overflow-x: hidden;
           }
-          /* Only prevent horizontal overflow, allow vertical */
           .diploma-wrapper * {
             max-width: 100% !important;
             box-sizing: border-box !important;
           }
-          /* Handle absolutely positioned elements more gently */
           .diploma-wrapper [style*="position: absolute"],
           .diploma-wrapper [style*="position:absolute"] {
             max-width: 95% !important;
@@ -165,47 +159,50 @@ export const PreviewPanel = () => {
     <div className="h-full flex flex-col">
       <Tabs defaultValue="preview" className="h-full flex flex-col">
         {/* Header with Tabs */}
-        <div className="p-4 border-b border-slate-200/50 bg-white/50 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={handleFullscreen}>
-                <Maximize className="w-4 h-4" />
+        <div className="px-4 py-3 border-b border-border bg-background/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse-dot" />
+              <h2 className="text-sm font-medium text-foreground">Canvas</h2>
+            </div>
+            <div className="flex gap-1">
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={handleFullscreen}>
+                <Maximize className="w-3.5 h-3.5" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleDownload}>
-                <Download className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={handleDownload}>
+                <Download className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
           
-          <TabsList className="w-fit">
-            <TabsTrigger value="preview">
-              <Eye className="w-4 h-4 mr-1" />
+          <TabsList className="w-fit h-8 bg-secondary">
+            <TabsTrigger value="preview" className="text-xs h-6 px-2.5">
+              <Eye className="w-3 h-3 mr-1" />
               Preview
             </TabsTrigger>
-            <TabsTrigger value="html">
-              <Code className="w-4 h-4 mr-1" />
+            <TabsTrigger value="html" className="text-xs h-6 px-2.5">
+              <Code className="w-3 h-3 mr-1" />
               HTML
             </TabsTrigger>
-            <TabsTrigger value="css">
-              <Code className="w-4 h-4 mr-1" />
+            <TabsTrigger value="css" className="text-xs h-6 px-2.5">
+              <Code className="w-3 h-3 mr-1" />
               CSS
             </TabsTrigger>
-            <TabsTrigger value="sign">
-              <Shield className="w-4 h-4 mr-1" />
+            <TabsTrigger value="sign" className="text-xs h-6 px-2.5">
+              <Shield className="w-3 h-3 mr-1" />
               Sign
             </TabsTrigger>
-            <TabsTrigger value="share">
-              <Share className="w-4 h-4 mr-1" />
+            <TabsTrigger value="share" className="text-xs h-6 px-2.5">
+              <Share className="w-3 h-3 mr-1" />
               Share
             </TabsTrigger>
           </TabsList>
         </div>
 
         {/* Content */}
-        <div className="flex-1 bg-slate-50 flex flex-col">
-          <TabsContent value="preview" className="flex-1 p-4 m-0">
-            <div className="h-full bg-white rounded-lg border border-slate-200 overflow-hidden shadow-lg">
+        <div className="flex-1 bg-background flex flex-col">
+          <TabsContent value="preview" className="flex-1 p-3 m-0">
+            <div className="h-full rounded-xl border border-border overflow-hidden shadow-lg shadow-black/20">
               <iframe
                 ref={iframeRef}
                 srcDoc={getPreviewContent()}
@@ -215,40 +212,28 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="html" className="flex-1 p-4 m-0 overflow-hidden">
+          <TabsContent value="html" className="flex-1 p-3 m-0 overflow-hidden">
             <div className="h-full flex flex-col">
-              {/* Unsaved Changes Bar */}
               {hasUnsavedChanges && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between">
-                  <span className="text-sm text-amber-800 font-medium">
-                    You have unsaved changes
+                <div className="mb-3 p-2.5 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-between">
+                  <span className="text-xs text-foreground font-medium">
+                    Unsaved changes
                   </span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDiscard}
-                      className="h-8 text-xs"
-                    >
+                  <div className="flex gap-1.5">
+                    <Button variant="outline" size="sm" onClick={handleDiscard} className="h-6 text-xs px-2">
                       <X className="w-3 h-3 mr-1" />
                       Discard
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleSave}
-                      className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button size="sm" onClick={handleSave} className="h-6 text-xs px-2">
                       <Save className="w-3 h-3 mr-1" />
                       Save
                     </Button>
                   </div>
                 </div>
               )}
-
-              {/* HTML Editor */}
-              <div className="flex-1 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-3 border-b border-slate-200 bg-slate-50">
-                  <h3 className="text-sm font-medium text-slate-700">HTML Structure</h3>
+              <div className="flex-1 rounded-xl border border-border overflow-hidden">
+                <div className="px-3 py-2 border-b border-border bg-secondary/50">
+                  <h3 className="text-xs font-medium text-muted-foreground">HTML</h3>
                 </div>
                 <div className="h-full">
                   <MonacoEditor
@@ -262,40 +247,28 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="css" className="flex-1 p-4 m-0 overflow-hidden">
+          <TabsContent value="css" className="flex-1 p-3 m-0 overflow-hidden">
             <div className="h-full flex flex-col">
-              {/* Unsaved Changes Bar */}
               {hasUnsavedChanges && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between">
-                  <span className="text-sm text-amber-800 font-medium">
-                    You have unsaved changes
+                <div className="mb-3 p-2.5 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-between">
+                  <span className="text-xs text-foreground font-medium">
+                    Unsaved changes
                   </span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDiscard}
-                      className="h-8 text-xs"
-                    >
+                  <div className="flex gap-1.5">
+                    <Button variant="outline" size="sm" onClick={handleDiscard} className="h-6 text-xs px-2">
                       <X className="w-3 h-3 mr-1" />
                       Discard
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleSave}
-                      className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button size="sm" onClick={handleSave} className="h-6 text-xs px-2">
                       <Save className="w-3 h-3 mr-1" />
                       Save
                     </Button>
                   </div>
                 </div>
               )}
-
-              {/* CSS Editor */}
-              <div className="flex-1 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-3 border-b border-slate-200 bg-slate-50">
-                  <h3 className="text-sm font-medium text-slate-700">CSS Styles</h3>
+              <div className="flex-1 rounded-xl border border-border overflow-hidden">
+                <div className="px-3 py-2 border-b border-border bg-secondary/50">
+                  <h3 className="text-xs font-medium text-muted-foreground">CSS</h3>
                 </div>
                 <div className="h-full">
                   <MonacoEditor
@@ -309,13 +282,13 @@ export const PreviewPanel = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="sign" className="flex-1 p-4 m-0">
+          <TabsContent value="sign" className="flex-1 p-3 m-0">
             <div className="max-w-md mx-auto">
               <BlockchainSigner />
             </div>
           </TabsContent>
 
-          <TabsContent value="share" className="flex-1 p-4 m-0">
+          <TabsContent value="share" className="flex-1 p-3 m-0">
             <div className="max-w-md mx-auto">
               <SharePanel />
             </div>

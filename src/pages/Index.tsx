@@ -67,10 +67,12 @@ const IndexContent = ({ user, isGuest, guestAccess }: {
         <div className="flex-1 min-h-0">
           {!hasStarted ? (
             /* State 1: Landing - centered input */
-            <ChatLanding isGuest={isGuest} guestAccess={isGuest ? guestAccess : undefined} />
+            <div className="h-full animate-fade-in">
+              <ChatLanding isGuest={isGuest} guestAccess={isGuest ? guestAccess : undefined} />
+            </div>
           ) : !hasCanvas ? (
             /* State 2: Chat only - generating, no canvas yet */
-            <div className="h-full max-w-3xl mx-auto">
+            <div className="h-full max-w-3xl mx-auto animate-fade-in">
               <ChatPanel isGuest={isGuest} guestAccess={isGuest ? guestAccess : undefined} />
             </div>
           ) : (
@@ -81,9 +83,9 @@ const IndexContent = ({ user, isGuest, guestAccess }: {
                   <ChatPanel isGuest={isGuest} guestAccess={isGuest ? guestAccess : undefined} />
                 </div>
               </ResizablePanel>
-              <ResizableHandle withHandle />
+              <ResizableHandle withHandle className="bg-border hover:bg-primary/30 transition-colors data-[resize-handle-active]:bg-primary/50" />
               <ResizablePanel defaultSize={70} minSize={50} maxSize={80}>
-                <div className="h-full bg-muted/50">
+                <div className="h-full bg-card/30 animate-canvas-reveal">
                   <PreviewPanel />
                 </div>
               </ResizablePanel>

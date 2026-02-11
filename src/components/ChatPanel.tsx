@@ -212,23 +212,23 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
       <MessageList />
 
       {/* Input area with inline actions */}
-      <div className="p-3 border-t border-border bg-background">
-        <div className="relative bg-background border border-border rounded-xl">
+      <div className="p-3 border-t border-border bg-background/80 backdrop-blur-sm">
+        <div className="relative bg-card border border-border rounded-xl transition-colors focus-within:border-primary/30">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Describe changes or a new diploma..."
-            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[60px] rounded-xl pb-10"
+            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[60px] rounded-xl pb-10 bg-transparent text-foreground placeholder:text-muted-foreground"
             rows={3}
             disabled={isGenerating}
           />
-          <div className="absolute bottom-1 left-1 right-1 flex items-center justify-between">
+          <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between">
             <div className="flex items-center gap-0.5">
               {/* Upload */}
               <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
                     <Upload className="w-3.5 h-3.5" />
                   </Button>
                 </DialogTrigger>
@@ -239,7 +239,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
                   <div
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                      isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                      isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
                     }`}
                   >
                     <input {...getInputProps()} />
@@ -252,7 +252,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               {/* URL */}
               <Popover open={urlOpen} onOpenChange={setUrlOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
                     <Link className="w-3.5 h-3.5" />
                   </Button>
                 </PopoverTrigger>
@@ -277,7 +277,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                 onClick={generateRandomPrompt}
                 disabled={isGenerating}
               >
@@ -289,7 +289,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
               onClick={handleSendMessage}
               disabled={!message.trim() || isGenerating}
               size="sm"
-              className="h-7 w-7 p-0 rounded-full"
+              className="h-7 w-7 p-0 rounded-full bg-primary hover:bg-primary/90 transition-colors"
             >
               <Send className="w-3.5 h-3.5" />
             </Button>
