@@ -140,10 +140,10 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Diplomator" className="pointer-events-none">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-md">
-                  <Award className="h-4 w-4 text-white" />
+                <div className="bg-primary/15 border border-primary/20 p-1 rounded-md">
+                  <Award className="h-4 w-4 text-primary" />
                 </div>
-                {!collapsed && <span className="font-bold text-foreground">Diplomator</span>}
+                {!collapsed && <span className="font-semibold text-foreground tracking-tight">Diplomator</span>}
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
