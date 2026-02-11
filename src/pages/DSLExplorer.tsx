@@ -96,11 +96,11 @@ const DSLExplorer = () => {
     }), []);
 
   const tabs = [
-    { value: 'backgrounds', label: 'Bakgrunder', icon: Image, items: backgroundPreviews },
-    { value: 'borders', label: 'Ramar', icon: Frame, items: borderPreviews },
-    { value: 'headers', label: 'Rubriker', icon: Type, items: headerPreviews },
-    { value: 'seals', label: 'Sigill', icon: Stamp, items: sealPreviews, height: 120, width: 140 },
-    { value: 'signatures', label: 'Signaturer', icon: PenTool, items: signaturePreviews, height: 100 },
+    { value: 'backgrounds', label: 'Backgrounds', icon: Image, items: backgroundPreviews },
+    { value: 'borders', label: 'Borders', icon: Frame, items: borderPreviews },
+    { value: 'headers', label: 'Headers', icon: Type, items: headerPreviews },
+    { value: 'seals', label: 'Seals', icon: Stamp, items: sealPreviews, height: 120, width: 140 },
+    { value: 'signatures', label: 'Signatures', icon: PenTool, items: signaturePreviews, height: 100 },
   ];
 
   return (
@@ -111,7 +111,7 @@ const DSLExplorer = () => {
             <Layers className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-3xl font-bold text-foreground">DSL Block Explorer</h1>
-              <p className="text-sm text-muted-foreground">Alla tillgängliga block-kombinationer för diplom-generering</p>
+              <p className="text-sm text-muted-foreground">All available block combinations for diploma generation</p>
             </div>
           </div>
           <Button variant="outline" onClick={() => navigate('/admin')}>
@@ -144,7 +144,7 @@ const DSLExplorer = () => {
                 <span className="font-bold text-foreground text-lg">
                   {tabs.reduce((acc, t) => acc * t.items.length, 1).toLocaleString()}
                 </span>
-                {' '}möjliga unika kombinationer (exkl. färger, orientering & padding)
+                {' '}unique combinations possible (excl. colors, orientation & padding)
               </p>
             </div>
           </CardContent>

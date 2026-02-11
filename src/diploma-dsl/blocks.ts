@@ -28,6 +28,27 @@ export const backgroundStyles: Record<string, string> = {
   'marble': `
     background: linear-gradient(135deg, #f5f5f5 0%, #ececec 25%, #f8f8f8 50%, #e8e8e8 75%, #f5f5f5 100%);
   `,
+  'ocean-deep': `
+    background: linear-gradient(180deg, #e8f4f8 0%, #b8d8e8 30%, #a0c8d8 60%, #d4eaf0 100%);
+  `,
+  'cosmic-dark': `
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%);
+  `,
+  'botanical-green': `
+    background: linear-gradient(160deg, #f0f7f0 0%, #dcedc8 30%, #e8f5e0 60%, #f5faf0 100%);
+  `,
+  'vintage-sepia': `
+    background: linear-gradient(135deg, #f5e6d0 0%, #e8d5b5 30%, #f0dfc5 60%, #eddcc0 100%);
+    background-image: repeating-linear-gradient(
+      45deg, transparent, transparent 4px, rgba(139,109,63,0.03) 4px, rgba(139,109,63,0.03) 8px
+    );
+  `,
+  'watercolor-soft': `
+    background: linear-gradient(135deg, #fce4ec 0%, #e8eaf6 25%, #e0f7fa 50%, #f3e5f5 75%, #fff3e0 100%);
+  `,
+  'royal-burgundy': `
+    background: linear-gradient(145deg, #f8e8e8 0%, #f0d0d0 30%, #e8c0c0 60%, #f5dada 100%);
+  `,
 };
 
 // ── Border Styles ──
@@ -102,6 +123,92 @@ export const borderStyles: Record<string, (color: string) => string> = {
     .diploma-border::after {
       bottom: 8px; right: 8px;
       border-left: none; border-top: none;
+    }
+  `,
+  'celtic-knot': (color) => `
+    .diploma-border {
+      border: 3px solid ${color};
+      outline: 3px solid ${color};
+      outline-offset: 4px;
+      position: relative;
+    }
+    .diploma-border::before {
+      content: '⟐';
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      background: inherit;
+      padding: 0 8px;
+      color: ${color};
+      font-size: 18px;
+    }
+    .diploma-border::after {
+      content: '⟐';
+      position: absolute;
+      bottom: -10px; left: 50%;
+      transform: translateX(-50%);
+      background: inherit;
+      padding: 0 8px;
+      color: ${color};
+      font-size: 18px;
+    }
+  `,
+  'botanical-vine': (color) => `
+    .diploma-border {
+      border: 2px solid ${color};
+      position: relative;
+    }
+    .diploma-border::before {
+      content: '❦';
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      background: inherit;
+      padding: 0 10px;
+      color: ${color};
+      font-size: 20px;
+    }
+    .diploma-border::after {
+      content: '❦';
+      position: absolute;
+      bottom: -10px; left: 50%;
+      transform: translateX(-50%) rotate(180deg);
+      background: inherit;
+      padding: 0 10px;
+      color: ${color};
+      font-size: 20px;
+    }
+  `,
+  'wave': (color) => `
+    .diploma-border {
+      border: 2px solid ${color};
+      border-radius: 8px;
+      box-shadow: 0 0 0 4px ${color}15, 0 0 0 8px ${color}10, 0 0 0 12px ${color}05;
+    }
+  `,
+  'geometric-deco': (color) => `
+    .diploma-border {
+      border: 2px solid ${color};
+      position: relative;
+    }
+    .diploma-border::before,
+    .diploma-border::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border: 2px solid ${color};
+      transform: rotate(45deg);
+    }
+    .diploma-border::before {
+      top: -16px; left: 50%;
+      margin-left: -15px;
+      border-bottom: none; border-right: none;
+    }
+    .diploma-border::after {
+      bottom: -16px; left: 50%;
+      margin-left: -15px;
+      border-top: none; border-left: none;
     }
   `,
   'none': () => `
@@ -209,6 +316,30 @@ export const headerStyles: Record<string, (primaryColor: string) => string> = {
       font-size: 12px;
       color: #999;
       margin-top: 4px;
+    }
+  `,
+  'monumental': (color) => `
+    .diploma-header {
+      text-align: center;
+      margin-bottom: 1.5em;
+    }
+    .diploma-header .institution {
+      font-family: 'Georgia', serif;
+      font-size: 38px;
+      font-weight: bold;
+      color: ${color};
+      letter-spacing: 10px;
+      text-transform: uppercase;
+      border-bottom: 3px double ${color};
+      padding-bottom: 8px;
+      display: inline-block;
+    }
+    .diploma-header .subtitle {
+      font-size: 13px;
+      color: ${color}80;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-top: 10px;
     }
   `,
 };
@@ -339,6 +470,78 @@ export const sealStyles: Record<string, (color: string, text?: string) => { css:
       }
     `,
     html: `<div class="diploma-seal"><span class="seal-text">AWARD</span></div>`,
+  }),
+  'compass': (color, text = 'N') => ({
+    css: `
+      .diploma-seal {
+        width: 80px; height: 80px;
+        border: 2px solid ${color};
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .diploma-seal::before {
+        content: '';
+        position: absolute;
+        width: 60px; height: 60px;
+        border: 1px solid ${color}40;
+        transform: rotate(45deg);
+      }
+      .diploma-seal::after {
+        content: '✦';
+        position: absolute;
+        top: 4px; left: 50%;
+        transform: translateX(-50%);
+        color: ${color};
+        font-size: 10px;
+      }
+      .diploma-seal .seal-text {
+        font-size: 18px;
+        font-weight: bold;
+        color: ${color};
+      }
+    `,
+    html: `<div class="diploma-seal"><span class="seal-text">${text}</span></div>`,
+  }),
+  'laurel-wreath': (color, text = 'HONOR') => ({
+    css: `
+      .diploma-seal {
+        width: 90px; height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .diploma-seal::before {
+        content: '❧';
+        position: absolute;
+        left: 2px; top: 50%;
+        transform: translateY(-50%) scaleX(-1);
+        color: ${color};
+        font-size: 32px;
+      }
+      .diploma-seal::after {
+        content: '❧';
+        position: absolute;
+        right: 2px; top: 50%;
+        transform: translateY(-50%);
+        color: ${color};
+        font-size: 32px;
+      }
+      .diploma-seal .seal-text {
+        font-size: 9px;
+        font-weight: bold;
+        color: ${color};
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-top: 1px solid ${color}40;
+        border-bottom: 1px solid ${color}40;
+        padding: 4px 0;
+      }
+    `,
+    html: `<div class="diploma-seal"><span class="seal-text">${text}</span></div>`,
   }),
   'none': () => ({ css: '', html: '' }),
 };
