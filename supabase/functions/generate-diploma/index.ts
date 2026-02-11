@@ -200,7 +200,7 @@ serve(async (req) => {
 
     // Fetch active provider from app_settings
     const { data: settingData } = await supabaseAdmin.from('app_settings').select('value').eq('key', 'ai_provider').single();
-    const providerConfig = settingData?.value as { provider: string; model: string } || { provider: 'anthropic', model: 'claude-3-sonnet-20240229' };
+    const providerConfig = settingData?.value as { provider: string; model: string } || { provider: 'anthropic', model: 'claude-sonnet-4-20250514' };
     const { provider, model } = providerConfig;
 
     console.log(`Using AI provider: ${provider}, model: ${model}`);

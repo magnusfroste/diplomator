@@ -65,7 +65,7 @@ serve(async (req) => {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: model || 'claude-3-sonnet-20240229',
+          model: model || 'claude-sonnet-4-20250514',
           max_tokens: 50,
           messages: [{ role: 'user', content: 'Say "Integration test OK" in exactly those words.' }],
         }),
@@ -75,11 +75,11 @@ serve(async (req) => {
 
       if (!response.ok) {
         const err = await response.text();
-        result = { success: false, message: `API error ${response.status}: ${err.substring(0, 200)}`, model: model || 'claude-3-sonnet-20240229', latencyMs };
+        result = { success: false, message: `API error ${response.status}: ${err.substring(0, 200)}`, model: model || 'claude-sonnet-4-20250514', latencyMs };
       } else {
         const data = await response.json();
         const text = data.content?.[0]?.text || 'No response';
-        result = { success: true, message: text, model: model || 'claude-3-sonnet-20240229', latencyMs };
+        result = { success: true, message: text, model: model || 'claude-sonnet-4-20250514', latencyMs };
       }
 
     } else if (provider === 'openai') {

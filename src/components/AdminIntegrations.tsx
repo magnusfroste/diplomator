@@ -33,7 +33,7 @@ const integrations: IntegrationConfig[] = [
       { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Senaste)' },
       { value: 'claude-3-7-sonnet-20250219', label: 'Claude 3.7 Sonnet' },
       { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
-      { value: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet' },
+      { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
       { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku (Snabb/Billig)' },
       { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus (Mest kapabel)' },
     ],
@@ -96,7 +96,7 @@ const AdminIntegrations = () => {
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [selectedModels, setSelectedModels] = useState<Record<string, string>>({});
   const [activeProvider, setActiveProvider] = useState('anthropic');
-  const [activeModel, setActiveModel] = useState('claude-3-sonnet-20240229');
+  const [activeModel, setActiveModel] = useState('claude-sonnet-4-20250514');
   const [saving, setSaving] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
 
