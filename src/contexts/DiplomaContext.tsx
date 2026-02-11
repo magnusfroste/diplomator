@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DiplomaFields {
@@ -66,6 +66,23 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
     date: ''
   });
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+  const wasGenerating = useRef(false);
+
+  // Auto-save after generation completes
+  useEffect(() => {
+    if (isGenerating) {
+      wasGenerating.current = true;
+      return;
+    }
+    if (wasGenerating.current && diplomaHtml) {
+      wasGenerating.current = false;
+      // Generate title from first user message or diploma content
+      const userMessages = messages.filter(m => m.isUser);
+      const lastUserMsg = userMessages[userMessages.length - 1]?.content || '';
+      const autoTitle = lastUserMsg.slice(0, 50) || 'Untitled Diploma';
+      saveSession(autoTitle);
+    }
+  }, [isGenerating]);
 
   const resetSession = useCallback(() => {
     setCurrentSessionId(null);
