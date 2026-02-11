@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Home, Loader2, Settings } from 'lucide-react';
+import { Shield, Users, FileText, Home, Loader2, Settings, Layers } from 'lucide-react';
 import AdminIntegrations from '@/components/AdminIntegrations';
 import { toast } from 'sonner';
 
@@ -107,10 +107,16 @@ const AdminDashboard = () => {
             <Shield className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
           </div>
-          <Button variant="outline" onClick={() => navigate('/app')}>
-            <Home className="h-4 w-4 mr-2" />
-            Tillbaka
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/admin/dsl')}>
+              <Layers className="h-4 w-4 mr-2" />
+              DSL Block Explorer
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/app')}>
+              <Home className="h-4 w-4 mr-2" />
+              Tillbaka
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
