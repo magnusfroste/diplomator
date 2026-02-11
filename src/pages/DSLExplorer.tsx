@@ -21,6 +21,7 @@ const BlockPreview = ({ html, css, label, width = 280, height = 180 }: { html: s
   const srcDoc = `<!DOCTYPE html>
 <html><head><style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; width: 100%; }
   body { display: flex; align-items: center; justify-content: center; min-height: 100%; font-family: Georgia, serif; overflow: hidden; }
   @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&display=swap');
   ${css}
