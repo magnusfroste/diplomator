@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DiplomaFields {
   recipientName: string;
@@ -20,14 +21,17 @@ interface DiplomaContextType {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   diplomaFields: DiplomaFields;
   setDiplomaFields: (fields: DiplomaFields) => void;
-  // New fields for blockchain signing
   signingRecipientName: string;
   setSigningRecipientName: (name: string) => void;
   signingInstitutionName: string;
   setSigningInstitutionName: (name: string) => void;
-  // New field for diploma format
   diplomaFormat: 'portrait' | 'landscape';
   setDiplomaFormat: (format: 'portrait' | 'landscape') => void;
+  // Session management
+  currentSessionId: string | null;
+  loadSession: (id: string) => Promise<void>;
+  saveSession: (title?: string) => Promise<void>;
+  resetSession: () => void;
 }
 
 interface Message {
@@ -36,6 +40,13 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
 }
+
+const INITIAL_MESSAGE: Message = {
+  id: '1',
+  content: "Hello! I'm here to help you create beautiful diplomas. You can either Chat, Upload an image for inspiration, provide a website URL or try the Magic! What would you like to create today?",
+  isUser: false,
+  timestamp: new Date(),
+};
 
 const DiplomaContext = createContext<DiplomaContextType | undefined>(undefined);
 
@@ -46,6 +57,7 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [signingRecipientName, setSigningRecipientName] = useState('');
   const [signingInstitutionName, setSigningInstitutionName] = useState('');
   const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
     recipientName: '',
     degree: '',
@@ -53,14 +65,75 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
     institution: '',
     date: ''
   });
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: 'Hello! I\'m here to help you create beautiful diplomas. You can either Chat, Upload an image for inspiration, provide a website URL or try the Magic! What would you like to create today?',
-      isUser: false,
-      timestamp: new Date()
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+
+  const resetSession = useCallback(() => {
+    setCurrentSessionId(null);
+    setDiplomaHtml('');
+    setDiplomaCss('');
+    setDiplomaFormat('portrait');
+    setDiplomaFields({ recipientName: '', degree: '', field: '', institution: '', date: '' });
+    setMessages([{ ...INITIAL_MESSAGE, id: crypto.randomUUID(), timestamp: new Date() }]);
+  }, []);
+
+  const loadSession = useCallback(async (id: string) => {
+    const { data, error } = await supabase
+      .from('diploma_sessions')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error || !data) return;
+
+    setCurrentSessionId(data.id);
+    setDiplomaHtml(data.diploma_html);
+    setDiplomaCss(data.diploma_css);
+    setDiplomaFormat((data.diploma_format as 'portrait' | 'landscape') || 'portrait');
+
+    // Restore messages from JSON
+    const savedMessages = data.messages as unknown;
+    if (Array.isArray(savedMessages) && savedMessages.length > 0) {
+      setMessages(savedMessages.map((m: any) => ({
+        ...m,
+        timestamp: new Date(m.timestamp),
+      })));
+    } else {
+      setMessages([{ ...INITIAL_MESSAGE, id: crypto.randomUUID(), timestamp: new Date() }]);
     }
-  ]);
+  }, []);
+
+  const saveSession = useCallback(async (title?: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const messagesJson = JSON.parse(JSON.stringify(messages));
+
+    if (currentSessionId) {
+      await supabase
+        .from('diploma_sessions')
+        .update({
+          diploma_html: diplomaHtml,
+          diploma_css: diplomaCss,
+          diploma_format: diplomaFormat,
+          messages: messagesJson,
+          title: title || 'Untitled Diploma',
+        })
+        .eq('id', currentSessionId);
+    } else {
+      const { data } = await supabase
+        .from('diploma_sessions')
+        .insert({
+          diploma_html: diplomaHtml,
+          diploma_css: diplomaCss,
+          diploma_format: diplomaFormat,
+          messages: messagesJson,
+          title: title || 'Untitled Diploma',
+          user_id: user.id,
+        })
+        .select('id')
+        .single();
+      if (data) setCurrentSessionId(data.id);
+    }
+  }, [currentSessionId, diplomaHtml, diplomaCss, diplomaFormat, messages]);
 
   return (
     <DiplomaContext.Provider value={{
@@ -79,7 +152,11 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
       signingInstitutionName,
       setSigningInstitutionName,
       diplomaFormat,
-      setDiplomaFormat
+      setDiplomaFormat,
+      currentSessionId,
+      loadSession,
+      saveSession,
+      resetSession,
     }}>
       {children}
     </DiplomaContext.Provider>
