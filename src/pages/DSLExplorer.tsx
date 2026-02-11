@@ -45,8 +45,8 @@ const DSLExplorer = () => {
   const backgroundPreviews = useMemo(() =>
     DSL_BLOCK_OPTIONS.backgroundStyles.map(style => ({
       label: style,
-      html: `<div style="width:100%;height:100%;${backgroundStyles[style]}"></div>`,
-      css: '',
+      html: `<div class="bg-preview"></div>`,
+      css: `.bg-preview { width:100%; height:100%; ${backgroundStyles[style]} }`,
     })), []);
 
   const borderPreviews = useMemo(() =>
