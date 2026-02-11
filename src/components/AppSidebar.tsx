@@ -163,6 +163,12 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
               {!collapsed && <span>New Diploma</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => navigate('/signed')} tooltip="Signed Diplomas">
+              <Award className="h-4 w-4" />
+              {!collapsed && <span>Signed Diplomas</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
