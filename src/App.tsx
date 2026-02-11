@@ -41,7 +41,7 @@ const queryClient = new QueryClient();
 
 const LoadingFallback = () => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "system-ui" }}>
-    Laddar...
+    Loading...
   </div>
 );
 

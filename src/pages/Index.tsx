@@ -94,7 +94,7 @@ const Index = () => {
                     href="/auth"
                     className="text-sm font-medium text-primary hover:underline"
                   >
-                    Skapa konto →
+                    Create account →
                   </a>
                 )}
               </div>

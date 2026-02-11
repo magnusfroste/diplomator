@@ -65,7 +65,7 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
     if (isGuest && guestAccess && !guestAccess.canGenerate) {
       const limitMessage: Message = {
         id: Date.now().toString(),
-        content: 'Du har använt alla dina gratis-genereringar. Skapa ett konto för obegränsad åtkomst!',
+        content: 'You have used all your free generations. Create an account for unlimited access!',
         isUser: false,
         timestamp: new Date()
       };

@@ -24,61 +24,61 @@ const integrations: IntegrationConfig[] = [
     id: 'anthropic',
     name: 'Anthropic (Claude)',
     icon: <Brain className="h-5 w-5" />,
-    description: 'Claude-modeller för diplomgenerering. Standard-integration.',
+    description: 'Claude models for diploma generation. Default integration.',
     secretName: 'ANTHROPIC_API_KEY',
     getKeyUrl: 'https://console.anthropic.com/settings/keys',
-    getKeyInstructions: 'Skapa konto på console.anthropic.com → Settings → API Keys → Create Key',
+    getKeyInstructions: 'Create account at console.anthropic.com → Settings → API Keys → Create Key',
     supabaseSecretCommand: 'supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx',
     models: [
-      { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Senaste)' },
+      { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Latest)' },
       { value: 'claude-3-7-sonnet-20250219', label: 'Claude 3.7 Sonnet' },
       { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
       { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
-      { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku (Snabb/Billig)' },
-      { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus (Mest kapabel)' },
+      { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku (Fast/Cheap)' },
+      { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus (Most capable)' },
     ],
   },
   {
     id: 'openai',
     name: 'OpenAI (GPT)',
     icon: <Sparkles className="h-5 w-5" />,
-    description: 'GPT-modeller som alternativ AI-provider.',
+    description: 'GPT models as alternative AI provider.',
     secretName: 'OPENAI_API_KEY',
     getKeyUrl: 'https://platform.openai.com/api-keys',
-    getKeyInstructions: 'Logga in på platform.openai.com → API Keys → Create new secret key',
+    getKeyInstructions: 'Sign in at platform.openai.com → API Keys → Create new secret key',
     supabaseSecretCommand: 'supabase secrets set OPENAI_API_KEY=sk-xxxxx',
     models: [
-      { value: 'gpt-4o', label: 'GPT-4o (Senaste)' },
-      { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Snabb/Billig)' },
+      { value: 'gpt-4o', label: 'GPT-4o (Latest)' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Fast/Cheap)' },
       { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-      { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Billigast)' },
+      { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Cheapest)' },
     ],
   },
   {
     id: 'gemini',
     name: 'Google Gemini',
     icon: <Zap className="h-5 w-5" />,
-    description: 'Googles Gemini-modeller med multimodal kapacitet.',
+    description: 'Google Gemini models with multimodal capabilities.',
     secretName: 'GEMINI_API_KEY',
     getKeyUrl: 'https://aistudio.google.com/apikey',
-    getKeyInstructions: 'Gå till aistudio.google.com → Get API Key → Create API Key',
+    getKeyInstructions: 'Go to aistudio.google.com → Get API Key → Create API Key',
     supabaseSecretCommand: 'supabase secrets set GEMINI_API_KEY=AIzaxxxxx',
     models: [
-      { value: 'gemini-2.5-pro-preview-06-05', label: 'Gemini 2.5 Pro (Senaste)' },
+      { value: 'gemini-2.5-pro-preview-06-05', label: 'Gemini 2.5 Pro (Latest)' },
       { value: 'gemini-2.5-flash-preview-05-20', label: 'Gemini 2.5 Flash' },
       { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
       { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-      { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (Billigast)' },
+      { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (Cheapest)' },
     ],
   },
   {
     id: 'firecrawl',
     name: 'Firecrawl (Web Scraper)',
     icon: <Globe className="h-5 w-5" />,
-    description: 'Webb-scraping för att hämta brandingdata från webbplatser.',
+    description: 'Web scraping to fetch branding data from websites.',
     secretName: 'FIRECRAWL_API_KEY',
     getKeyUrl: 'https://www.firecrawl.dev/app/api-keys',
-    getKeyInstructions: 'Skapa konto på firecrawl.dev → Dashboard → API Keys → Create API Key',
+    getKeyInstructions: 'Create account at firecrawl.dev → Dashboard → API Keys → Create API Key',
     supabaseSecretCommand: 'supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx',
     models: [{ value: 'scrape', label: 'Scrape (Standard)' }],
   },
@@ -130,9 +130,9 @@ const AdminIntegrations = () => {
       .eq('key', 'ai_provider');
 
     if (error) {
-      toast.error('Kunde inte spara inställningen');
+      toast.error('Failed to save setting');
     } else {
-      toast.success(`Aktiv provider: ${activeProvider} / ${activeModel}`);
+      toast.success(`Active provider: ${activeProvider} / ${activeModel}`);
     }
     setSaving(false);
   };
@@ -146,7 +146,7 @@ const AdminIntegrations = () => {
       });
       if (error) {
         setResults(prev => ({ ...prev, [integration.id]: { success: false, message: error.message, model, latencyMs: 0 } }));
-        toast.error(`${integration.name}: Test misslyckades`);
+        toast.error(`${integration.name}: Test failed`);
       } else {
         setResults(prev => ({ ...prev, [integration.id]: data }));
         data.success ? toast.success(`${integration.name}: OK (${data.latencyMs}ms)`) : toast.error(`${integration.name}: ${data.message}`);
@@ -167,9 +167,9 @@ const AdminIntegrations = () => {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Zap className="h-4 w-4 text-primary" />
-            Aktiv AI-provider för diplomgenerering
+            Active AI Provider for Diploma Generation
           </CardTitle>
-          <CardDescription>Denna provider används för alla diplomgenereringar.</CardDescription>
+          <CardDescription>This provider is used for all diploma generations.</CardDescription>
         </CardHeader>
         <CardContent>
           {loadingSettings ? (
@@ -206,7 +206,7 @@ const AdminIntegrations = () => {
 
               <Button onClick={saveActiveProvider} disabled={saving} className="gap-1">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Spara
+                Save
               </Button>
             </div>
           )}
@@ -219,7 +219,7 @@ const AdminIntegrations = () => {
           <CardTitle className="text-base">🔧 Self-hosting / VPS Setup</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>Diplomator är open source. Konfigurera API-nycklar som Supabase secrets:</p>
+          <p>Diplomator is open source. Configure API keys as Supabase secrets:</p>
           <pre className="bg-muted p-3 rounded-md text-xs overflow-x-auto">
 {`# Supabase CLI
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx
@@ -246,7 +246,7 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
                       {integration.name}
-                      {isActive && <Badge variant="default" className="text-xs">Aktiv</Badge>}
+                      {isActive && <Badge variant="default" className="text-xs">Active</Badge>}
                     </CardTitle>
                     <CardDescription className="text-xs">{integration.description}</CardDescription>
                   </div>
@@ -254,7 +254,7 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
                 {result && (
                   <Badge variant={result.success ? 'default' : 'destructive'} className="gap-1">
                     {result.success ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                    {result.success ? `OK ${result.latencyMs}ms` : 'Fel'}
+                    {result.success ? `OK ${result.latencyMs}ms` : 'Error'}
                   </Badge>
                 )}
               </div>
@@ -278,7 +278,7 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
                 )}
                 <Button onClick={() => testIntegration(integration)} disabled={isTesting} size="sm">
                   {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                  {isTesting ? 'Testar...' : 'Testa'}
+                  {isTesting ? 'Testing...' : 'Test'}
                 </Button>
               </div>
 
@@ -292,7 +292,7 @@ supabase secrets set FIRECRAWL_API_KEY=fc-xxxxx`}
                 <span>Secret: <code className="bg-muted px-1 rounded">{integration.secretName}</code></span>
                 <span>·</span>
                 <a href={integration.getKeyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
-                  Hämta API-nyckel <ExternalLink className="h-3 w-3" />
+                  Get API Key <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
               <p className="text-xs text-muted-foreground">{integration.getKeyInstructions}</p>

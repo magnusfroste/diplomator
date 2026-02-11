@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const HealthCheck = () => {
-  const [dbStatus, setDbStatus] = useState<string>("Testar...");
-  const [authStatus, setAuthStatus] = useState<string>("Testar...");
+  const [dbStatus, setDbStatus] = useState<string>("Testing...");
+  const [authStatus, setAuthStatus] = useState<string>("Testing...");
   const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,10 +17,10 @@ const HealthCheck = () => {
       if (error) {
         setAuthStatus(`❌ ${error.message}`);
       } else if (data.session) {
-        setAuthStatus("✅ Inloggad");
+        setAuthStatus("✅ Logged in");
         setUser(data.session.user.email || data.session.user.id);
       } else {
-        setAuthStatus("⚠️ Ej inloggad");
+        setAuthStatus("⚠️ Not logged in");
       }
     });
   }, []);
@@ -31,10 +31,10 @@ const HealthCheck = () => {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <tbody>
           {[
-            ["Databas", dbStatus],
+            ["Database", dbStatus],
             ["Auth", authStatus],
-            ["Användare", user || "—"],
-            ["Tid", new Date().toLocaleString("sv-SE")],
+            ["User", user || "—"],
+            ["Time", new Date().toLocaleString("en-US")],
           ].map(([label, value]) => (
             <tr key={label} style={{ borderBottom: "1px solid #eee" }}>
               <td style={{ padding: "0.5rem", fontWeight: 600 }}>{label}</td>

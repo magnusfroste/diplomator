@@ -166,7 +166,7 @@ const DSLExplorer = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <t.icon className="h-5 w-5" />
-                    {t.label} ({t.items.length} st)
+                    {t.label} ({t.items.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

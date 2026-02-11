@@ -73,17 +73,17 @@ const AdminDashboard = () => {
     if (hasAdmin) {
       const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).eq('role', 'admin');
       if (error) {
-        toast.error('Kunde inte ta bort admin-roll');
+        toast.error('Failed to remove admin role');
         return;
       }
-      toast.success('Admin-roll borttagen');
+      toast.success('Admin role removed');
     } else {
       const { error } = await supabase.from('user_roles').insert({ user_id: userId, role: 'admin' });
       if (error) {
-        toast.error('Kunde inte lägga till admin-roll');
+        toast.error('Failed to add admin role');
         return;
       }
-      toast.success('Admin-roll tillagd');
+      toast.success('Admin role added');
     }
     fetchAll();
   };
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
             </Button>
             <Button variant="outline" onClick={() => navigate('/app')}>
               <Home className="h-4 w-4 mr-2" />
-              Tillbaka
+              Back
             </Button>
           </div>
         </div>
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Totalt diplom</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">Total Diplomas</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-foreground">{diplomas.length}</p>
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Registrerade användare</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">Registered Users</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-foreground">{users.length}</p>
@@ -151,34 +151,34 @@ const AdminDashboard = () => {
         <Tabs defaultValue="diplomas">
           <TabsList>
             <TabsTrigger value="diplomas" className="gap-2">
-              <FileText className="h-4 w-4" /> Diplom
+              <FileText className="h-4 w-4" /> Diplomas
             </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
-              <Users className="h-4 w-4" /> Användare & Roller
+              <Users className="h-4 w-4" /> Users & Roles
             </TabsTrigger>
             <TabsTrigger value="integrations" className="gap-2">
-              <Settings className="h-4 w-4" /> Integrationer
+              <Settings className="h-4 w-4" /> Integrations
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="diplomas">
             <Card>
               <CardHeader>
-                <CardTitle>Alla signerade diplom</CardTitle>
+                <CardTitle>All Signed Diplomas</CardTitle>
               </CardHeader>
               <CardContent>
                 {diplomas.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">Inga diplom ännu.</p>
+                  <p className="text-muted-foreground text-center py-8">No diplomas yet.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>ID</TableHead>
-                          <TableHead>Mottagare</TableHead>
+                          <TableHead>Recipient</TableHead>
                           <TableHead>Institution</TableHead>
-                          <TableHead>Datum</TableHead>
-                          <TableHead>Åtgärd</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Action</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -187,10 +187,10 @@ const AdminDashboard = () => {
                             <TableCell className="font-mono text-xs max-w-[120px] truncate">{d.blockchain_id}</TableCell>
                             <TableCell>{d.recipient_name}</TableCell>
                             <TableCell>{d.institution_name}</TableCell>
-                            <TableCell>{new Date(d.created_at).toLocaleDateString('sv-SE')}</TableCell>
+                            <TableCell>{new Date(d.created_at).toLocaleDateString('en-US')}</TableCell>
                             <TableCell>
                               <Button size="sm" variant="outline" onClick={() => navigate(`/diploma/${d.blockchain_id}`)}>
-                                Visa
+                                View
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -206,20 +206,20 @@ const AdminDashboard = () => {
           <TabsContent value="users">
             <Card>
               <CardHeader>
-                <CardTitle>Användare & Roller</CardTitle>
+                <CardTitle>Users & Roles</CardTitle>
               </CardHeader>
               <CardContent>
                 {users.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">Inga användare ännu.</p>
+                  <p className="text-muted-foreground text-center py-8">No users yet.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Namn</TableHead>
-                          <TableHead>E-post</TableHead>
-                          <TableHead>Roller</TableHead>
-                          <TableHead>Registrerad</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Roles</TableHead>
+                          <TableHead>Registered</TableHead>
                           <TableHead>Admin</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -238,14 +238,14 @@ const AdminDashboard = () => {
                                   ))}
                                 </div>
                               </TableCell>
-                              <TableCell>{new Date(u.created_at).toLocaleDateString('sv-SE')}</TableCell>
+                              <TableCell>{new Date(u.created_at).toLocaleDateString('en-US')}</TableCell>
                               <TableCell>
                                 <Button
                                   size="sm"
                                   variant={hasAdmin ? 'destructive' : 'outline'}
                                   onClick={() => toggleAdminRole(u.id)}
                                 >
-                                  {hasAdmin ? 'Ta bort admin' : 'Gör admin'}
+                                  {hasAdmin ? 'Remove admin' : 'Make admin'}
                                 </Button>
                               </TableCell>
                             </TableRow>
