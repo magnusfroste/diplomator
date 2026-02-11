@@ -163,12 +163,6 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
               {!collapsed && <span>New Diploma</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => navigate('/signed')} tooltip="Signed Diplomas">
-              <Award className="h-4 w-4" />
-              {!collapsed && <span>Signed Diplomas</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
@@ -203,6 +197,12 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
       {userEmail && (
         <SidebarFooter>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/signed')} tooltip="Signed Diplomas">
+                <Award className="h-4 w-4" />
+                {!collapsed && <span>Signed Diplomas</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -239,10 +239,6 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
                       <SettingsContent />
                     </DialogContent>
                   </Dialog>
-                  <DropdownMenuItem onClick={() => navigate('/signed')}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Signed
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
