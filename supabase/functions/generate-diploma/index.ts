@@ -48,17 +48,31 @@ const extractBrandName = (html: string, url: string) => {
 
 const BASE_SYSTEM_PROMPT = `You are an expert diploma designer. Create beautiful, professional diplomas.
 
-FORBIDDEN: QR codes, <img> tags, external image files.
-Use only CSS for all visual elements (seals, borders, emblems).
+CRITICAL RULES:
+- FORBIDDEN: QR codes, <img> tags, external image files, markdown code fences.
+- Use ONLY CSS for all visual elements (seals, borders, emblems, decorations).
+- SIGNATURE: Always include "Mr Diploma" signature with Dancing Script font, handwriting styling.
+- NEVER wrap your output in \`\`\`html or \`\`\`css or any markdown formatting.
 
-SIGNATURE: Always include "Mr Diploma" signature with Dancing Script font, handwriting styling.
+LAYOUT RULES:
+- The diploma MUST fit within a single page (max-width: 800px, max-height: 1100px).
+- Use box-sizing: border-box on all elements.
+- All borders, padding, and decorative elements must stay INSIDE the container.
+- Use percentage-based or em/rem sizing for responsive fit.
+- Avoid absolute positioning that causes overflow.
+- The outer container should have overflow: hidden.
+- Test mentally that nothing bleeds outside the diploma boundary.
 
-Format response as:
-MESSAGE: [explanation]
-HTML: [complete HTML]
-CSS: [complete CSS]
+QUALITY:
+- Professional, print-ready design with classic fonts (serif for headings, clean sans-serif for body).
+- Rich CSS decorative elements: borders, gradients, box-shadows, pseudo-elements for ornaments.
+- Elegant spacing with proper hierarchy.
 
-Requirements: Professional, print-ready, classic fonts, CSS decorative elements.`;
+Format your response EXACTLY as:
+MESSAGE: [brief explanation of the design]
+HTML: [complete HTML without any markdown formatting]
+CSS: [complete CSS without any markdown formatting]`;
+
 
 // ── Provider adapters ──
 
@@ -250,11 +264,12 @@ serve(async (req) => {
         break;
     }
 
-    // Parse response
+    // Parse response — strip markdown fences if present
     const responseText = result.text;
+    const stripFences = (s: string) => s.replace(/```(?:html|css|)\s*/gi, '').replace(/```\s*/g, '').trim();
     const messagePart = responseText.match(/MESSAGE:\s*(.*?)(?=HTML:|$)/s)?.[1]?.trim() || "I've created a diploma for you!";
-    const htmlPart = responseText.match(/HTML:\s*(.*?)(?=CSS:|$)/s)?.[1]?.trim() || '';
-    const cssPart = responseText.match(/CSS:\s*(.*?)$/s)?.[1]?.trim() || '';
+    const htmlPart = stripFences(responseText.match(/HTML:\s*(.*?)(?=CSS:|$)/s)?.[1]?.trim() || '');
+    const cssPart = stripFences(responseText.match(/CSS:\s*(.*?)$/s)?.[1]?.trim() || '');
 
     return new Response(JSON.stringify({ message: messagePart, html: htmlPart, css: cssPart, provider, model }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
