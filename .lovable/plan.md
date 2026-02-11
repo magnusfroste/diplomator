@@ -1,62 +1,72 @@
 
 
-# Left Sidebar with Diploma History
+# Chat Landing Page (Grok/Claude Style)
 
 ## Overview
-Add a collapsible left sidebar (like ChatGPT/Grok) to the `/app` page showing diploma history. Profile and settings move to the sidebar footer. The header becomes minimal with just logo + sidebar trigger.
+Transform the new diploma experience: instead of immediately showing the split chat+preview layout, start with a clean centered landing page with a single input field and action buttons. Once the user sends their first prompt (or uploads/pastes a URL), transition to the full chat+canvas view.
 
-## What Changes
-
-### 1. New Database Table: `diploma_sessions`
-Stores each diploma "conversation" so users can return to previous designs:
-- `id`, `user_id`, `title` (auto-generated from recipient/theme), `diploma_html`, `diploma_css`, `diploma_format`, `created_at`, `updated_at`
-- RLS: users see only their own sessions
-
-### 2. New Component: `AppSidebar.tsx`
-- Uses the existing Shadcn `Sidebar` components
-- **Top**: "New Diploma" button (+ icon)
-- **Middle**: Scrollable list of saved diploma sessions, grouped by date (Today, Yesterday, Previous 7 days)
-- **Bottom footer**: User avatar, name, settings gear, logout -- minimal row
-- Collapsible to icon-only mode (just icons visible)
-
-### 3. Updated Layout: `Index.tsx`
-- Wrap everything in `SidebarProvider`
-- Structure: `Sidebar | Header + Content`
-- Header simplified: just logo + `SidebarTrigger` on left, no profile menu on right
-- The resizable Chat + Preview panels remain unchanged inside the main content area
-
-### 4. Updated Context: `DiplomaContext.tsx`
-- Add `currentSessionId` and `loadSession(id)` / `saveSession()` helpers
-- Auto-save current diploma state when generating or switching sessions
-
-### 5. Remove from Header
-- Profile dropdown moves entirely to sidebar footer
-- BlockchainMenu stays in header (or moves to preview panel toolbar)
-
-## Layout Sketch
+## How It Works
 
 ```text
+NEW SESSION (no messages yet):
 +--------+------------------------------------------+
-| [=]    |  Logo  Diplomator         [Blockchain]   |
-| New +  |------------------------------------------|
-|        |  Chat Panel  |  |   Preview Panel        |
-| Today  |              |  |                        |
-|  Diploma A |          |  |                        |
-|  Diploma B |          |  |                        |
-| Yesterday  |          |  |                        |
-|  Diploma C |          |  |                        |
-|        |              |  |                        |
-|--------|              |  |                        |
-| [AV] Name  [gear]    |  |                        |
+| Sidebar|                                          |
+|        |         [Logo] Diplomator                |
+|        |                                          |
+|        |     "What diploma would you like         |
+|        |      to create today?"                   |
+|        |                                          |
+|        |   +--------------------------------+     |
+|        |   | Describe your diploma...       |     |
+|        |   |                          [->]  |     |
+|        |   +--------------------------------+     |
+|        |   [Upload] [URL] [Magic]                 |
+|        |                                          |
 +--------+------------------------------------------+
+
+AFTER FIRST PROMPT (has messages):
++--------+---------------+-------------------------+
+| Sidebar| Chat messages  |   Preview/Canvas       |
+|        | ...            |                        |
+|        | [input field]  |                        |
+|        | [Upload][URL]  |                        |
++--------+---------------+-------------------------+
 ```
+
+## Changes
+
+### 1. New Component: `ChatLanding.tsx`
+A centered landing view shown when no messages exist yet (only the initial welcome message):
+- App logo + title at top
+- Tagline: "What diploma would you like to create today?"
+- Large centered textarea with send button
+- Action row below: Upload, URL, Magic buttons as icon+label chips
+- Upload opens a file picker dialog (not a separate tab)
+- URL opens a popover with URL input
+- Magic fills the textarea with a random prompt
+
+### 2. Update `Index.tsx` Layout Logic
+- Track whether the session is in "landing" or "active" state
+- Landing state = no user messages yet -> show `ChatLanding` full-width (no resizable panels, no preview)
+- Active state = has user messages -> show current resizable split layout
+- Transition happens automatically when first message is sent
+
+### 3. Update `ChatPanel.tsx`
+- Remove the tab bar (Upload, URL, Magic tabs)
+- The chat view becomes purely: message list + input area
+- Move Upload/URL/Magic action buttons into the input area as small icon buttons (like Claude's attachment button)
+- Input area: textarea with action icons on the left, send button on the right
+
+### 4. Context: Add `hasStarted` derived state
+- Simple check: `messages.filter(m => m.isUser).length > 0`
+- Used by `Index.tsx` to decide which layout to show
 
 ## Technical Details
 
-- **Migration SQL**: Create `diploma_sessions` table with RLS policy `user_id = auth.uid()`
-- **Auto-save**: Debounced save after each AI generation completes (updates `diploma_html`, `diploma_css`, `title`)
-- **Title generation**: First generation in a session auto-sets title from recipient name or theme (e.g., "Royal - John Smith")
-- **Session switching**: Loading a session restores `diplomaHtml`, `diplomaCss`, `diplomaFormat`, and `messages` into context
-- **Sidebar width**: 240px expanded, 48px collapsed (icon-only shows just the + button and avatar)
-- **New Diploma**: Resets context to blank state, creates a new session row
+- **ChatLanding.tsx**: New component. Contains the centered input, action buttons, and handles the first message send. After sending, the context gets a user message, which triggers the layout switch automatically.
+- **ChatPanel.tsx**: Simplified to just MessageList + input bar with inline action icons. No more tab system.
+- **Index.tsx**: Conditionally renders either `ChatLanding` (full width) or the resizable split panels based on whether user messages exist.
+- **FileUpload / URLInput**: Reused inside dialogs/popovers triggered from action buttons, rather than as full tab panels.
+- No database changes needed.
+- No new routes needed -- the transition is purely visual within `/app`.
 
