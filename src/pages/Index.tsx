@@ -44,10 +44,10 @@ const IndexContent = ({ user, isGuest, guestAccess }: {
               <div className="flex items-center gap-2">
                 {isGuest && (
                   <>
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
-                      <Award className="w-5 h-5 text-white" />
+                    <div className="bg-primary/15 border border-primary/20 p-1.5 rounded-lg">
+                      <Award className="w-5 h-5 text-primary" />
                     </div>
-                    <h1 className="text-lg font-bold text-foreground">Diplomator</h1>
+                    <h1 className="text-lg font-semibold tracking-tight text-foreground">Diplomator</h1>
                   </>
                 )}
               </div>

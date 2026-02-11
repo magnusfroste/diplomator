@@ -208,36 +208,36 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-8">
-      <div className="w-full max-w-2xl space-y-8 text-center">
+      <div className="w-full max-w-2xl space-y-10 text-center">
         {/* Logo & tagline */}
-        <div className="space-y-3">
-          <div className="w-14 h-14 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
-            <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="space-y-4">
+          <div className="w-16 h-16 mx-auto bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center">
+            <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">What diploma would you like to create today?</h1>
-          <p className="text-muted-foreground text-sm">Describe your vision, upload an image, paste a URL, or let the magic decide.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">What diploma would you like to create?</h1>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">Describe your vision, upload an image, paste a URL, or let the magic decide.</p>
         </div>
 
         {/* Input area */}
-        <div className="relative bg-background border border-border rounded-2xl shadow-sm">
+        <div className="relative bg-card border border-border rounded-2xl shadow-lg shadow-black/20">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Describe the diploma you want to create..."
-            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[100px] rounded-2xl pb-14"
+            className="border-0 shadow-none focus-visible:ring-0 resize-none min-h-[120px] rounded-2xl pb-14 bg-transparent text-foreground placeholder:text-muted-foreground"
             rows={4}
             disabled={isGenerating}
           />
           {/* Bottom bar with actions */}
-          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-            <div className="flex items-center gap-1">
+          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+            <div className="flex items-center gap-0.5">
               {/* Upload */}
               <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
                     <Upload className="w-4 h-4" />
                   </Button>
                 </DialogTrigger>
@@ -248,7 +248,7 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
                   <div
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                      isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                      isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
                     }`}
                   >
                     <input {...getInputProps()} />
@@ -262,7 +262,7 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
               {/* URL */}
               <Popover open={urlOpen} onOpenChange={setUrlOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground hover:text-foreground" disabled={isGenerating}>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
                     <Link className="w-4 h-4" />
                   </Button>
                 </PopoverTrigger>
@@ -289,7 +289,7 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                 onClick={generateRandomPrompt}
                 disabled={isGenerating}
               >
@@ -301,7 +301,7 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
               onClick={handleSendMessage}
               disabled={!message.trim() || isGenerating}
               size="sm"
-              className="h-8 w-8 p-0 rounded-full"
+              className="h-8 w-8 p-0 rounded-full bg-primary hover:bg-primary/90"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -309,7 +309,12 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
         </div>
 
         {isGenerating && (
-          <p className="text-sm text-muted-foreground animate-pulse">Generating your diploma...</p>
+          <div className="flex items-center justify-center gap-1.5">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse-dot" />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse-dot" style={{ animationDelay: '0.2s' }} />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse-dot" style={{ animationDelay: '0.4s' }} />
+            <span className="text-sm text-muted-foreground ml-2">Generating your diploma...</span>
+          </div>
         )}
       </div>
     </div>
