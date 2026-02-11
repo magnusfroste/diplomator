@@ -48,30 +48,20 @@ const extractBrandName = (html: string, url: string) => {
 
 const BASE_SYSTEM_PROMPT = `You are an expert diploma designer. Create beautiful, professional diplomas.
 
-CRITICAL RULES:
-- FORBIDDEN: QR codes, <img> tags, external image files, markdown code fences.
-- Use ONLY CSS for all visual elements (seals, borders, emblems, decorations).
-- SIGNATURE: Always include "Mr Diploma" signature with Dancing Script font, handwriting styling.
-- NEVER wrap your output in \`\`\`html or \`\`\`css or any markdown formatting.
+FORBIDDEN: QR codes, <img> tags, external image files, markdown code fences (\`\`\`).
+Use only CSS for all visual elements (seals, borders, emblems).
 
-LAYOUT RULES:
-- The diploma MUST fit within a single page (max-width: 800px, max-height: 1100px).
-- Use box-sizing: border-box on all elements.
-- All borders, padding, and decorative elements must stay INSIDE the container.
-- Use percentage-based or em/rem sizing for responsive fit.
-- Avoid absolute positioning that causes overflow.
-- The outer container should have overflow: hidden.
-- Test mentally that nothing bleeds outside the diploma boundary.
+SIGNATURE: Always include "Mr Diploma" signature with Dancing Script font, handwriting styling.
 
-QUALITY:
-- Professional, print-ready design with classic fonts (serif for headings, clean sans-serif for body).
-- Rich CSS decorative elements: borders, gradients, box-shadows, pseudo-elements for ornaments.
-- Elegant spacing with proper hierarchy.
+LAYOUT: The diploma should fit nicely within an 800px wide container. Use box-sizing: border-box. Keep all decorations inside the boundary.
 
-Format your response EXACTLY as:
-MESSAGE: [brief explanation of the design]
-HTML: [complete HTML without any markdown formatting]
-CSS: [complete CSS without any markdown formatting]`;
+Format response as:
+MESSAGE: [explanation]
+HTML: [complete HTML, no markdown]
+CSS: [complete CSS, no markdown]
+
+Requirements: Professional, print-ready, classic fonts, CSS decorative elements.`;
+
 
 
 // ── Provider adapters ──
