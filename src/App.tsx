@@ -35,6 +35,7 @@ const DiplomaEmbed = lazy(() => lazyRetry(() => import("./pages/DiplomaEmbed")))
 const TestDiploma = lazy(() => lazyRetry(() => import("./pages/TestDiploma")));
 const Verify = lazy(() => lazyRetry(() => import("./pages/Verify")));
 const AdminDashboard = lazy(() => lazyRetry(() => import("./pages/AdminDashboard")));
+const DSLExplorer = lazy(() => lazyRetry(() => import("./pages/DSLExplorer")));
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => {
                 <Route path="/testdiploma/:diplomaId" element={<TestDiploma />} />
                 <Route path="/verify/:diplomaId?" element={<Verify />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/dsl" element={<DSLExplorer />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
