@@ -1,211 +1,119 @@
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Award, ArrowRight, Shield, Users, Zap, BookOpen, TrendingUp, Globe, CheckCircle, Share2 } from "lucide-react";
+import { Award, ArrowRight, Shield, Zap, BookOpen, TrendingUp, Globe, CheckCircle, Share2, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
   const navigate = useNavigate();
 
+  const features = [
+    { icon: Shield, title: "Blockchain Verification", desc: "Tamper-proof credentials with unique verification links and QR codes." },
+    { icon: Zap, title: "AI-Powered Design", desc: "Professional diploma designs in seconds — from bootcamps to nano-degrees." },
+    { icon: BookOpen, title: "Micro-Learning Ready", desc: "Perfect for 2-hour workshops to 6-week bootcamps. Stack credentials as you grow." },
+    { icon: Share2, title: "Instant Sharing", desc: "One-click sharing to LinkedIn, portfolios, or secure links to employers." },
+    { icon: TrendingUp, title: "Impact Analytics", desc: "Track verification rates and understand which credentials open doors." },
+    { icon: Users, title: "Learning Community", desc: "Join thousands showcasing verified micro-credentials." },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="max-w-4xl mx-auto py-12">
-        {/* Hero Section */}
-        <section className="text-center mb-12">
-          <div className="inline-flex rounded-full bg-secondary p-1 text-secondary-foreground mb-4">
-            <Award className="w-6 h-6" />
+    <div className="min-h-screen bg-background">
+      {/* Nav */}
+      <nav className="border-b border-border">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/15 border border-primary/20 p-1.5 rounded-lg">
+              <Award className="w-5 h-5 text-primary" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight text-foreground">Diplomator</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Create and Verify Micro-Learning Diplomas on the Blockchain
-          </h1>
-          <p className="text-lg text-gray-700 mb-6">
-            In today's fast-paced world, micro-learning and skill-based certifications are the future. 
-            Generate secure, instantly verifiable digital diplomas that employers trust and learners can proudly share.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <Badge variant="secondary" className="px-3 py-1">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              Micro-Learning Ready
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1">
-              <CheckCircle className="w-4 h-4 mr-1" />
-              Instantly Verifiable
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1">
-              <Share2 className="w-4 h-4 mr-1" />
-              Easy Sharing
-            </Badge>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button size="lg" onClick={() => navigate('/auth')}>
-              Get Started <ArrowRight className="ml-2 w-5 h-5" />
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/demo')}>
+              Try Free
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}>
-              Try Free – No Sign Up
+            <Button size="sm" onClick={() => navigate('/auth')}>
+              Get Started
             </Button>
           </div>
-        </section>
+        </div>
+      </nav>
 
-        {/* Value Proposition Banner */}
-        <section className="mb-12">
-          <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold mb-3">Why Verified Diplomas Matter More Than Ever</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                  <div>
-                    <BookOpen className="w-6 h-6 mx-auto mb-2" />
-                    <h3 className="font-semibold mb-1">Micro-Learning Revolution</h3>
-                    <p>68% of professionals prefer bite-sized learning. Showcase your continuous skill development with stackable credentials.</p>
-                  </div>
-                  <div>
-                    <Shield className="w-6 h-6 mx-auto mb-2" />
-                    <h3 className="font-semibold mb-1">Combat Credential Fraud</h3>
-                    <p>With 40% of resumes containing false information, blockchain verification ensures your achievements are trusted.</p>
-                  </div>
-                  <div>
-                    <Globe className="w-6 h-6 mx-auto mb-2" />
-                    <h3 className="font-semibold mb-1">Global Recognition</h3>
-                    <p>Share your verified credentials instantly across LinkedIn, portfolios, and job applications worldwide.</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+      {/* Hero */}
+      <section className="max-w-3xl mx-auto text-center px-6 pt-24 pb-16">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-card text-xs text-muted-foreground mb-6">
+          <CheckCircle className="w-3 h-3 text-primary" />
+          Blockchain-verified credentials
+        </div>
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground leading-tight mb-5">
+          Create and verify diplomas on the blockchain
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-8 leading-relaxed">
+          Generate secure, instantly verifiable digital diplomas that employers trust and learners can proudly share.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button size="lg" onClick={() => navigate('/auth')}>
+            Get Started <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => navigate('/demo')}>
+            Try Free — No Sign Up
+          </Button>
+        </div>
+      </section>
 
-        {/* Features Section */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {/* Blockchain Verification */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-green-500" />
-                Blockchain Verification
-              </CardTitle>
-              <CardDescription>
-                Tamper-proof credentials that employers can instantly verify.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Eliminate credential fraud with immutable blockchain technology. Each diploma comes with a unique verification link and QR code.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Stats bar */}
+      <section className="border-y border-border bg-card/50">
+        <div className="max-w-4xl mx-auto grid grid-cols-3 divide-x divide-border py-8 px-6">
+          <div className="text-center">
+            <p className="text-2xl font-semibold text-foreground">68%</p>
+            <p className="text-xs text-muted-foreground mt-1">Prefer micro-learning</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-semibold text-foreground">40%</p>
+            <p className="text-xs text-muted-foreground mt-1">Resumes contain fraud</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-semibold text-primary">100%</p>
+            <p className="text-xs text-muted-foreground mt-1">Verifiable on-chain</p>
+          </div>
+        </div>
+      </section>
 
-          {/* AI-Powered Design */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-blue-500" />
-                AI-Powered Design
-              </CardTitle>
-              <CardDescription>
-                Professional diploma designs in seconds, not hours.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                From bootcamp certificates to nano-degrees, our AI creates stunning designs that match your achievement level and industry standards.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Features */}
+      <section className="max-w-4xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground text-center mb-12">
+          Everything you need for verified credentials
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((f) => (
+            <div key={f.title} className="group p-5 rounded-xl border border-border bg-card hover:border-primary/30 transition-colors">
+              <f.icon className="w-5 h-5 text-primary mb-3" />
+              <h3 className="text-sm font-medium text-foreground mb-1.5">{f.title}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-          {/* Micro-Learning Support */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-purple-500" />
-                Micro-Learning Ready
-              </CardTitle>
-              <CardDescription>
-                Perfect for modern bite-sized learning achievements.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Designed for today's learning landscape - from 2-hour workshops to 6-week bootcamps. Stack your credentials as you grow.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Easy Sharing */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="w-5 h-5 text-orange-500" />
-                Instant Sharing
-              </CardTitle>
-              <CardDescription>
-                Share verified credentials across all platforms instantly.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                One-click sharing to LinkedIn, embed in portfolios, or send secure links to employers. Your achievements, everywhere.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Analytics and Tracking */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-teal-500" />
-                Impact Analytics
-              </CardTitle>
-              <CardDescription>
-                See how your credentials are performing in the market.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Track verification rates, view engagement metrics, and understand which credentials are opening doors for you.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Community and Support */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-indigo-500" />
-                Learning Community
-              </CardTitle>
-              <CardDescription>
-                Connect with fellow learners and credential holders.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Join thousands of professionals showcasing verified micro-credentials and advancing their careers through continuous learning.
-              </p>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Call to Action */}
-        <section className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to Showcase Your Learning Journey?
+      {/* CTA */}
+      <section className="border-t border-border bg-card/30">
+        <div className="max-w-3xl mx-auto text-center px-6 py-20">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-4">
+            Ready to showcase your learning journey?
           </h2>
-          <p className="text-lg text-gray-700 mb-8">
-            Join the verified credential revolution. Create your first blockchain-verified diploma today!
+          <p className="text-muted-foreground mb-8">
+            Create your first blockchain-verified diploma today.
           </p>
           <Button size="lg" onClick={() => navigate('/auth')}>
-            Create Your First Diploma <ArrowRight className="ml-2 w-5 h-5" />
+            Create Your First Diploma <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="text-center mt-12">
-          <p className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Diplomator. Empowering the future of verified learning.
-          </p>
-        </footer>
-      </div>
+      {/* Footer */}
+      <footer className="border-t border-border py-6 text-center">
+        <p className="text-xs text-muted-foreground">
+          &copy; {new Date().getFullYear()} Diplomator. Empowering the future of verified learning.
+        </p>
+      </footer>
     </div>
   );
 };
