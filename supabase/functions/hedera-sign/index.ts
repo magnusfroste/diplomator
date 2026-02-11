@@ -47,7 +47,23 @@ serve(async (req) => {
       await import("npm:@hashgraph/sdk@2.51.0");
 
     const client = Client.forTestnet();
-    const privateKey = PrivateKey.fromStringDer(HEDERA_PRIVATE_KEY);
+    
+    // Try parsing the private key in multiple formats
+    let privateKey;
+    try {
+      privateKey = PrivateKey.fromStringDer(HEDERA_PRIVATE_KEY);
+    } catch {
+      try {
+        privateKey = PrivateKey.fromStringED25519(HEDERA_PRIVATE_KEY);
+      } catch {
+        try {
+          privateKey = PrivateKey.fromStringECDSA(HEDERA_PRIVATE_KEY);
+        } catch {
+          throw new Error('Could not parse private key. Ensure it is a valid HEX or DER-encoded Hedera private key.');
+        }
+      }
+    }
+    
     client.setOperator(HEDERA_ACCOUNT_ID, privateKey);
 
     // Use a shared topic - stored as env var or create one
