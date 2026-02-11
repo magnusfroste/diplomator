@@ -36,11 +36,12 @@ export interface LayoutConfig {
 // ── Header Block ──
 
 export type HeaderStyle = 
-  | 'serif-centered'      // Classic centered serif
-  | 'modern-left'         // Modern left-aligned
-  | 'elegant-script'      // Cursive/script heading
-  | 'bold-caps'           // Bold uppercase
-  | 'minimal';            // Simple, clean
+  | 'serif-centered'
+  | 'modern-left'
+  | 'elegant-script'
+  | 'bold-caps'
+  | 'minimal'
+  | 'monumental';
 
 export interface HeaderBlock {
   style: HeaderStyle;
@@ -51,13 +52,17 @@ export interface HeaderBlock {
 // ── Border Block ──
 
 export type BorderStyle = 
-  | 'ornamental'          // Classic ornamental with corner decorations
-  | 'double-line'         // Double line border
-  | 'modern'              // Clean modern border
-  | 'minimal'             // Thin single line
-  | 'classical'           // Traditional thick border with inner frame
-  | 'art-deco'            // Art deco geometric pattern
-  | 'none';               // No border
+  | 'ornamental'
+  | 'double-line'
+  | 'modern'
+  | 'minimal'
+  | 'classical'
+  | 'art-deco'
+  | 'celtic-knot'
+  | 'botanical-vine'
+  | 'wave'
+  | 'geometric-deco'
+  | 'none';
 
 export interface BorderBlock {
   style: BorderStyle;
@@ -79,13 +84,15 @@ export interface BodyBlock {
 // ── Seal Block ──
 
 export type SealStyle = 
-  | 'classical-round'     // Traditional round seal
-  | 'star'                // Star-shaped seal
-  | 'shield'              // Shield/crest shape
-  | 'ribbon'              // Ribbon decoration
-  | 'modern-circle'       // Modern minimalist circle
-  | 'rosette'             // Rosette/flower pattern
-  | 'none';               // No seal
+  | 'classical-round'
+  | 'star'
+  | 'shield'
+  | 'ribbon'
+  | 'modern-circle'
+  | 'rosette'
+  | 'compass'
+  | 'laurel-wreath'
+  | 'none';
 
 export type SealPosition = 'bottom-right' | 'bottom-left' | 'bottom-center' | 'top-right';
 
@@ -111,13 +118,19 @@ export interface SignatureBlock {
 // ── Background Block ──
 
 export type BackgroundStyle = 
-  | 'parchment'           // Warm parchment texture
-  | 'clean-white'         // Plain white
-  | 'ivory'               // Soft ivory/cream
-  | 'gradient-warm'       // Warm gradient
-  | 'gradient-cool'       // Cool gradient
-  | 'linen'               // Linen texture feel
-  | 'marble';             // Marble-like pattern
+  | 'parchment'
+  | 'clean-white'
+  | 'ivory'
+  | 'gradient-warm'
+  | 'gradient-cool'
+  | 'linen'
+  | 'marble'
+  | 'ocean-deep'
+  | 'cosmic-dark'
+  | 'botanical-green'
+  | 'vintage-sepia'
+  | 'watercolor-soft'
+  | 'royal-burgundy';
 
 export interface BackgroundBlock {
   style: BackgroundStyle;
@@ -134,12 +147,12 @@ export interface FooterBlock {
 // ── Available block options (for AI prompt) ──
 
 export const DSL_BLOCK_OPTIONS = {
-  headerStyles: ['serif-centered', 'modern-left', 'elegant-script', 'bold-caps', 'minimal'] as const,
-  borderStyles: ['ornamental', 'double-line', 'modern', 'minimal', 'classical', 'art-deco', 'none'] as const,
-  sealStyles: ['classical-round', 'star', 'shield', 'ribbon', 'modern-circle', 'rosette', 'none'] as const,
+  headerStyles: ['serif-centered', 'modern-left', 'elegant-script', 'bold-caps', 'minimal', 'monumental'] as const,
+  borderStyles: ['ornamental', 'double-line', 'modern', 'minimal', 'classical', 'art-deco', 'celtic-knot', 'botanical-vine', 'wave', 'geometric-deco', 'none'] as const,
+  sealStyles: ['classical-round', 'star', 'shield', 'ribbon', 'modern-circle', 'rosette', 'compass', 'laurel-wreath', 'none'] as const,
   sealPositions: ['bottom-right', 'bottom-left', 'bottom-center', 'top-right'] as const,
   signatureStyles: ['handwriting', 'formal', 'elegant'] as const,
-  backgroundStyles: ['parchment', 'clean-white', 'ivory', 'gradient-warm', 'gradient-cool', 'linen', 'marble'] as const,
+  backgroundStyles: ['parchment', 'clean-white', 'ivory', 'gradient-warm', 'gradient-cool', 'linen', 'marble', 'ocean-deep', 'cosmic-dark', 'botanical-green', 'vintage-sepia', 'watercolor-soft', 'royal-burgundy'] as const,
   layoutOrientations: ['landscape', 'portrait'] as const,
   layoutPaddings: ['compact', 'normal', 'spacious'] as const,
 };
