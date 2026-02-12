@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Award } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DiplomaManager } from '@/components/DiplomaManager';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -31,10 +31,6 @@ const SignedContent = ({ user }: { user: User }) => {
                 <p className="text-sm text-muted-foreground">Manage your blockchain-verified credentials</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/app')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to App
-            </Button>
           </div>
           <div className="bg-card rounded-lg shadow-sm border p-6">
             <DiplomaManager />
