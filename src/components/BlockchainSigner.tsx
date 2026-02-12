@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield, CheckCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Shield, CheckCircle, ExternalLink, Loader2, Users } from 'lucide-react';
 import { useDiploma } from '@/contexts/DiplomaContext';
 import { signDiplomaToBlockchain, createDiplomaUrl, DiplomaRecord } from '@/services/blockchainService';
 import { toast } from 'sonner';
+import { BulkSignDialog } from '@/components/BulkSignDialog';
 
 export const BlockchainSigner = () => {
   const { 
@@ -21,6 +22,7 @@ export const BlockchainSigner = () => {
   const [isSigningTx, setIsSigningTx] = useState(false);
   const [signedRecord, setSignedRecord] = useState<DiplomaRecord | null>(null);
   const [diplomaUrl, setDiplomaUrl] = useState('');
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const handleSignToBlockchain = async () => {
     if (!signingRecipientName.trim() || !signingInstitutionName.trim()) {
@@ -89,6 +91,21 @@ export const BlockchainSigner = () => {
                 <><Shield className="w-4 h-4 mr-2" />Sign on Hedera Blockchain</>
               )}
             </Button>
+
+            <Button variant="outline" onClick={() => setBulkOpen(true)}
+              disabled={!hasContent || isSigningTx || !signingInstitutionName.trim()}
+              className="w-full">
+              <Users className="w-4 h-4 mr-2" />
+              Bulk Sign for Multiple Recipients
+            </Button>
+
+            <BulkSignDialog
+              open={bulkOpen}
+              onOpenChange={setBulkOpen}
+              diplomaHtml={diplomaHtml}
+              diplomaCss={diplomaCss}
+              institutionName={signingInstitutionName.trim()}
+            />
 
             {!hasContent && (
               <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
