@@ -1,39 +1,73 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DiplomaManager } from '@/components/DiplomaManager';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
+import { DiplomaProvider } from '@/contexts/DiplomaContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@supabase/supabase-js';
 
-const Signed = () => {
+const SignedContent = ({ user }: { user: User }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/15 border border-primary/20 p-2 rounded-lg">
-              <Award className="w-6 h-6 text-primary" />
+    <div className="flex min-h-screen w-full">
+      <AppSidebar
+        userEmail={user.email || ''}
+        userName={user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
+      />
+      <main className="flex-1 bg-background p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/15 border border-primary/20 p-2 rounded-lg">
+                <Award className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-foreground">Signed Diplomas</h1>
+                <p className="text-sm text-muted-foreground">Manage your blockchain-verified credentials</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Signed Diplomas</h1>
-              <p className="text-sm text-muted-foreground">Manage your blockchain-verified credentials</p>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/app')}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to App
+            </Button>
           </div>
-
-          <Button variant="outline" size="sm" onClick={() => navigate('/app')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to App
-          </Button>
+          <div className="bg-card rounded-lg shadow-sm border p-6">
+            <DiplomaManager />
+          </div>
         </div>
-
-        {/* Diploma Manager */}
-        <div className="bg-card rounded-lg shadow-sm border p-6">
-          <DiplomaManager />
-        </div>
-      </div>
+      </main>
     </div>
+  );
+};
+
+const Signed = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (!session) navigate('/auth');
+    });
+  }, [navigate]);
+
+  if (loading || !user) return null;
+
+  return (
+    <ThemeProvider>
+      <DiplomaProvider>
+        <SidebarProvider>
+          <SignedContent user={user} />
+        </SidebarProvider>
+      </DiplomaProvider>
+    </ThemeProvider>
   );
 };
 
