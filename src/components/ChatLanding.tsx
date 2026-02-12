@@ -1,15 +1,12 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Link, Wand2, Send, Globe, X, Image } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { Upload, Link, Wand2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { useDiploma } from '@/contexts/DiplomaContext';
-import { generateDiploma, generateDiplomaFromImage, generateDiplomaFromUrl } from '@/services/anthropicService';
+import { useGeneration } from '@/hooks/useGeneration';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useDropzone } from 'react-dropzone';
-import type { Message } from '@/contexts/DiplomaContext';
-import type { ChatMessage } from '@/services/anthropicService';
 
 const stunningDiplomaPrompts = [
   "Create an elegant royal diploma with gold embossed borders, deep burgundy background, ornate baroque decorations, and calligraphy-style fonts for a Master of Fine Arts degree",
@@ -34,31 +31,16 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
   const [urlValue, setUrlValue] = useState('');
   const [urlOpen, setUrlOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const {
-    messages,
-    setMessages,
-    isGenerating,
-    setIsGenerating,
-    diplomaHtml,
-    diplomaCss,
-    setDiplomaHtml,
-    setDiplomaCss,
-    diplomaFormat
-  } = useDiploma();
+  const { isGenerating, generateFromText, generateFromImage, generateFromUrl } = useGeneration(isGuest, guestAccess);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file && file.type.startsWith('image/')) {
-      setUploadedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
       setUploadOpen(false);
-      // Auto-generate from image
-      handleGenerateFromImage(file);
+      generateFromImage(file);
     }
-  }, []);
+  }, [generateFromImage]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -66,132 +48,16 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
     multiple: false,
   });
 
-  const handleGenerateFromImage = async (file: File) => {
-    if (isGenerating) return;
-    setIsGenerating(true);
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: `Generate a diploma inspired by uploaded image: ${file.name}`,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMsg]);
-
-    try {
-      const response = await generateDiplomaFromImage(file);
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setMessages((prev: Message[]) => [...prev, aiMsg]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error analyzing the image. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const handleUrlSubmit = async () => {
-    if (!urlValue.trim() || isGenerating) return;
-    try { new URL(urlValue); } catch { return; }
-
     setUrlOpen(false);
-    setIsGenerating(true);
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: `Generate a diploma inspired by this website: ${urlValue}`,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMsg]);
-
-    try {
-      const response = await generateDiplomaFromUrl(urlValue);
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setMessages((prev: Message[]) => [...prev, aiMsg]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error analyzing the website. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-      setUrlValue('');
-    }
+    await generateFromUrl(urlValue);
+    setUrlValue('');
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim() || isGenerating) return;
-    if (isGuest && guestAccess && !guestAccess.canGenerate) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: message,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMessage]);
+    const text = message;
     setMessage('');
-    setIsGenerating(true);
-
-    try {
-      const chatMessages: ChatMessage[] = messages
-        .filter(m => m.id !== '1')
-        .map(msg => ({
-          role: msg.isUser ? 'user' as const : 'assistant' as const,
-          content: msg.content,
-        }));
-      chatMessages.push({ role: 'user' as const, content: userMessage.content });
-
-      const response = await generateDiploma({
-        messages: chatMessages,
-        requestType: 'text',
-        currentHtml: diplomaHtml || undefined,
-        currentCss: diplomaCss || undefined,
-        diplomaFormat,
-      });
-
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-    }
+    await generateFromText(text);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -202,14 +68,12 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
   };
 
   const generateRandomPrompt = () => {
-    const randomPrompt = stunningDiplomaPrompts[Math.floor(Math.random() * stunningDiplomaPrompts.length)];
-    setMessage(randomPrompt);
+    setMessage(stunningDiplomaPrompts[Math.floor(Math.random() * stunningDiplomaPrompts.length)]);
   };
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-2xl space-y-10 text-center">
-        {/* Logo & tagline */}
         <div className="space-y-4">
           <div className="w-16 h-16 mx-auto bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center">
             <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -220,7 +84,6 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
           <p className="text-muted-foreground text-sm max-w-md mx-auto">Describe your vision, upload an image, paste a URL, or let the magic decide.</p>
         </div>
 
-        {/* Input area */}
         <div className="relative bg-card border border-border rounded-2xl shadow-lg shadow-black/20">
           <Textarea
             value={message}
@@ -231,10 +94,8 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
             rows={4}
             disabled={isGenerating}
           />
-          {/* Bottom bar with actions */}
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
             <div className="flex items-center gap-0.5">
-              {/* Upload */}
               <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
@@ -259,7 +120,6 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
                 </DialogContent>
               </Dialog>
 
-              {/* URL */}
               <Popover open={urlOpen} onOpenChange={setUrlOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
@@ -277,15 +137,12 @@ export const ChatLanding = ({ isGuest, guestAccess }: ChatLandingProps) => {
                         className="text-sm"
                         onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
                       />
-                      <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>
-                        Go
-                      </Button>
+                      <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>Go</Button>
                     </div>
                   </div>
                 </PopoverContent>
               </Popover>
 
-              {/* Magic */}
               <Button
                 variant="ghost"
                 size="sm"
