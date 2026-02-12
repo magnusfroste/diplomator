@@ -91,9 +91,13 @@ THEME GUIDELINES:
 - For elegant/artistic diplomas use: elegant-script header, art-deco/double-line border, rosette/laurel-wreath seal, linen/marble/watercolor-soft bg.
 - For nature/botanical diplomas use: serif-centered/elegant-script header, botanical-vine border, laurel-wreath seal, botanical-green bg.
 - For ocean/nautical diplomas use: elegant-script header, wave border, compass seal, ocean-deep bg.
-- For space/cosmic diplomas use: bold-caps/monumental header, geometric-deco border, star seal, cosmic-dark bg. Use light text colors in customCss.
+- For space/cosmic diplomas use: bold-caps/monumental header, geometric-deco border, star seal, cosmic-dark bg. Use light primaryColor AND add customCss color overrides (see below).
 - For vintage/classic diplomas use: serif-centered header, celtic-knot/ornamental border, classical-round seal, vintage-sepia bg.
 - For royal/formal diplomas use: monumental/bold-caps header, classical/double-line border, shield seal, royal-burgundy bg. Use deep dark primaryColor like #3b0d0d or #1a1a2e.
+
+DARK BACKGROUND customCss (REQUIRED for ocean-deep, cosmic-dark):
+When using dark backgrounds, ALWAYS add customCss with explicit light color overrides as a safety net:
+  "customCss": ".diploma-pretext,.diploma-description,.diploma-date,.diploma-footer,.diploma-footer a,.diploma-fields,.diploma-fields .field-label,.diploma-header .subtitle,.diploma-signature .sig-title{color:#ccc !important}"
 
 Return ONLY the JSON object. No extra text.`;
 
@@ -207,18 +211,29 @@ function getSignatureHtmlCss(style: string, name: string, title?: string, color 
   return styles[style] || styles['handwriting'];
 }
 
+function isLightColor(hex: string): boolean {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.5;
+}
+
 function renderDSL(dsl: any): {html:string;css:string} {
   const pc = dsl.brand?.primaryColor || '#1a365d';
   const ac = dsl.brand?.accentColor || '#c6a961';
   const pad = ({compact:'24px',normal:'40px',spacious:'60px'} as any)[dsl.layout?.padding] || '40px';
   const bgCss = BG_STYLES[dsl.background?.style] || BG_STYLES['clean-white'];
+  const light = isLightColor(pc);
+  const t = { body: light?'#ddd':'#333', sec: light?'#ccc':'#555', ter: light?'#aaa':'#666', mut: light?'#999':'#888', fnt: light?'#888':'#aaa' };
 
   const cssParts = [
     `@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&display=swap');`,
-    `.diploma-container{max-width:800px;margin:0 auto;padding:${pad};box-sizing:border-box;overflow:hidden;font-family:'Georgia','Times New Roman',serif;color:#333;${bgCss}}`,
+    `.diploma-container{max-width:800px;width:100%;margin:0 auto;padding:${pad};box-sizing:border-box;overflow:hidden;font-family:'Georgia','Times New Roman',serif;color:${t.body};${bgCss}}`,
     getBorderCss(dsl.border?.style || 'classical', dsl.border?.color || pc),
+    `.diploma-border{overflow:visible;position:relative}`,
     getHeaderCss(dsl.header?.style || 'serif-centered', pc),
-    `.diploma-body{text-align:center;margin:1.5em 0}.diploma-body .diploma-title{font-family:'Georgia',serif;font-size:32px;font-weight:bold;color:${pc};margin-bottom:0.8em;letter-spacing:2px;text-transform:uppercase}.diploma-body .diploma-pretext{font-size:14px;color:#666;margin-bottom:0.5em;font-style:italic}.diploma-body .diploma-recipient{font-family:'Dancing Script',cursive;font-size:36px;color:${pc};margin:0.3em 0;border-bottom:2px solid ${ac}40;display:inline-block;padding:0 20px 4px}.diploma-body .diploma-description{font-size:15px;color:#555;max-width:500px;margin:1em auto;line-height:1.6}.diploma-body .diploma-course{font-size:18px;font-weight:bold;color:${pc};margin:0.5em 0}.diploma-body .diploma-date{font-size:13px;color:#888;margin-top:1em}.diploma-body .diploma-fields{margin-top:1em;font-size:13px;color:#666}.diploma-body .diploma-fields .field-label{font-weight:bold;color:#555}`,
+    `.diploma-body{text-align:center;margin:1.2em 0}.diploma-body .diploma-title{font-family:'Georgia',serif;font-size:32px;font-weight:bold;color:${pc};margin-bottom:0.8em;letter-spacing:2px;text-transform:uppercase}.diploma-body .diploma-pretext{font-size:14px;color:${t.ter};margin-bottom:0.5em;font-style:italic}.diploma-body .diploma-recipient{font-family:'Dancing Script',cursive;font-size:36px;color:${pc};margin:0.3em 0;border-bottom:2px solid ${ac}40;display:inline-block;padding:0 20px 4px}.diploma-body .diploma-description{font-size:15px;color:${t.sec};max-width:600px;margin:1em auto;line-height:1.6}.diploma-body .diploma-course{font-size:18px;font-weight:bold;color:${pc};margin:0.5em 0}.diploma-body .diploma-date{font-size:13px;color:${t.mut};margin-top:1em}.diploma-body .diploma-fields{margin-top:1em;font-size:13px;color:${t.ter}}.diploma-body .diploma-fields .field-label{font-weight:bold;color:${t.sec}}`,
   ];
 
   const seal = getSealHtmlCss(dsl.seal?.style || 'none', ac, dsl.seal?.text);
@@ -234,7 +249,7 @@ function renderDSL(dsl: any): {html:string;css:string} {
 
   const sig = getSignatureHtmlCss(dsl.signature?.style||'handwriting', dsl.signature?.name||'Mr Diploma', dsl.signature?.title, pc);
   cssParts.push(sig.css);
-  cssParts.push(`.diploma-footer{text-align:center;margin-top:1.5em;font-size:10px;color:#aaa}.diploma-footer a{color:#aaa;text-decoration:none}.diploma-bottom-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:1.5em}.diploma-bottom-row.no-seal{justify-content:center}`);
+  cssParts.push(`.diploma-footer{text-align:center;margin-top:1.5em;font-size:10px;color:${t.fnt}}.diploma-footer a{color:${t.fnt};text-decoration:none}.diploma-bottom-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:1.5em}.diploma-bottom-row.no-seal{justify-content:center}`);
   if (dsl.customCss) cssParts.push(dsl.customCss);
 
   // Build HTML

@@ -11,10 +11,34 @@ import {
   paddingValues,
 } from './blocks';
 
+// ── Color helpers ──
+
+function isLightColor(hex: string): boolean {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+  // Relative luminance (sRGB)
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum > 0.5;
+}
+
+function deriveTextPalette(primaryColor: string) {
+  const light = isLightColor(primaryColor);
+  return {
+    body:      light ? '#ddd' : '#333',
+    secondary: light ? '#ccc' : '#555',
+    tertiary:  light ? '#aaa' : '#666',
+    muted:     light ? '#999' : '#888',
+    faint:     light ? '#888' : '#aaa',
+  };
+}
+
 export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string } {
   const primaryColor = dsl.brand?.primaryColor || '#1a365d';
   const accentColor = dsl.brand?.accentColor || '#c6a961';
   const padding = paddingValues[dsl.layout.padding] || '40px';
+  const txt = deriveTextPalette(primaryColor);
 
   // ── Collect CSS ──
   const cssParts: string[] = [];
@@ -24,22 +48,23 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
   cssParts.push(`
     .diploma-container {
       max-width: 800px;
+      width: 100%;
       margin: 0 auto;
       padding: ${padding};
       box-sizing: border-box;
       overflow: hidden;
       font-family: 'Georgia', 'Times New Roman', serif;
-      color: #333;
+      color: ${txt.body};
       ${bgCss}
     }
   `);
 
-  // Border — always clip content inside the frame
+  // Border — allow decorations to extend, container clips the outer edge
   const borderFn = borderStyles[dsl.border.style] || borderStyles['classical'];
   cssParts.push(borderFn(dsl.border.color || primaryColor));
   cssParts.push(`
     .diploma-border {
-      overflow: hidden;
+      overflow: visible;
       position: relative;
     }
   `);
@@ -52,7 +77,7 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
   cssParts.push(`
     .diploma-body {
       text-align: center;
-      margin: 1.5em 0;
+      margin: 1.2em 0;
     }
     .diploma-body .diploma-title {
       font-family: 'Georgia', serif;
@@ -65,7 +90,7 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
     }
     .diploma-body .diploma-pretext {
       font-size: 14px;
-      color: #666;
+      color: ${txt.tertiary};
       margin-bottom: 0.5em;
       font-style: italic;
     }
@@ -80,8 +105,8 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
     }
     .diploma-body .diploma-description {
       font-size: 15px;
-      color: #555;
-      max-width: 500px;
+      color: ${txt.secondary};
+      max-width: 600px;
       margin: 1em auto;
       line-height: 1.6;
     }
@@ -93,17 +118,17 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
     }
     .diploma-body .diploma-date {
       font-size: 13px;
-      color: #888;
+      color: ${txt.muted};
       margin-top: 1em;
     }
     .diploma-body .diploma-fields {
       margin-top: 1em;
       font-size: 13px;
-      color: #666;
+      color: ${txt.tertiary};
     }
     .diploma-body .diploma-fields .field-label {
       font-weight: bold;
-      color: #555;
+      color: ${txt.secondary};
     }
   `);
 
@@ -141,10 +166,10 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
       text-align: center;
       margin-top: 1.5em;
       font-size: 10px;
-      color: #aaa;
+      color: ${txt.faint};
     }
     .diploma-footer a {
-      color: #aaa;
+      color: ${txt.faint};
       text-decoration: none;
     }
     .diploma-bottom-row {
