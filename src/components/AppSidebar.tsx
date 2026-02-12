@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Plus, Settings, LogOut, FileText, User, Award, PanelLeftClose, PanelLeft, ShieldCheck } from 'lucide-react';
+import { Plus, Settings, LogOut, FileText, User, Award, PanelLeftClose, PanelLeft, ShieldCheck, Trash2 } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,6 +23,16 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from '@/components/ui/sidebar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
@@ -82,6 +93,7 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
   const { currentSessionId, loadSession, resetSession } = useDiploma();
   const [sessions, setSessions] = useState<DiplomaSession[]>([]);
   const [profileName, setProfileName] = useState(userName || '');
+  const [deleteTarget, setDeleteTarget] = useState<DiplomaSession | null>(null);
   const { isAdmin } = useAdminRole();
 
   // Refresh sessions when currentSessionId changes (new session created or switched)
@@ -128,6 +140,22 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
       toast.success('Signed out successfully');
       navigate('/');
     }
+  };
+
+  const handleDeleteSession = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase
+      .from('diploma_sessions')
+      .delete()
+      .eq('id', deleteTarget.id);
+    if (error) {
+      toast.error('Failed to delete session');
+    } else {
+      toast.success('Session deleted');
+      if (currentSessionId === deleteTarget.id) resetSession();
+      setSessions(prev => prev.filter(s => s.id !== deleteTarget.id));
+    }
+    setDeleteTarget(null);
   };
 
   const getInitials = (name: string) =>
@@ -177,15 +205,22 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {group.items.map(session => (
-                      <SidebarMenuItem key={session.id}>
+                      <SidebarMenuItem key={session.id} className="group/session">
                         <SidebarMenuButton
                           onClick={() => handleSelectSession(session.id)}
                           isActive={session.id === currentSessionId}
                           tooltip={session.title}
                         >
                           <FileText className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{session.title}</span>
+                          <span className="truncate flex-1">{session.title}</span>
                         </SidebarMenuButton>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(session); }}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/session:opacity-100 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-opacity"
+                          aria-label={`Delete ${session.title}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
@@ -260,6 +295,22 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
           </SidebarMenu>
         </SidebarFooter>
       )}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete "{deleteTarget?.title}". Signed diplomas are not affected.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteSession} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sidebar>
   );
 }
