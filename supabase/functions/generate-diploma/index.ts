@@ -74,6 +74,18 @@ RULES:
 - "body.preText" is optional text before the recipient name like "This is to certify that".
 - "customCss" is for any extra CSS tweaks the predefined blocks don't cover. Keep it minimal.
 - Pick background, border, seal, and header styles that complement each other.
+
+COLOR CONTRAST RULES (CRITICAL):
+- The primaryColor is used for headings, titles, recipient name, and course text.
+- The accentColor is used for decorative elements, seal accents, and underlines.
+- ALWAYS ensure primaryColor has strong contrast against the chosen background:
+  - Light backgrounds (parchment, clean-white, ivory, gradient-warm, gradient-cool, linen, marble, watercolor-soft): use DARK primaryColor (#1a365d, #2d3748, #1a202c, #4a1942, #5b2c20, etc.)
+  - Medium/warm backgrounds (vintage-sepia, botanical-green, royal-burgundy): use DEEP DARK primaryColor (#1a1a2e, #2d1b00, #3b0d0d, #1a3a1a, etc.) — NOT gold/yellow/light colors!
+  - Dark backgrounds (ocean-deep, cosmic-dark): use LIGHT primaryColor (#e2e8f0, #ffffff, #f0e6d3, etc.)
+- NEVER use gold (#c6a961, #d4a855) or yellow as primaryColor on light/medium backgrounds — it is unreadable!
+- Gold/amber colors work well as accentColor for decorative touches, but NOT for body text.
+
+THEME GUIDELINES:
 - For formal/academic diplomas use: serif-centered/monumental header, ornamental/classical border, classical-round seal, parchment/ivory bg.
 - For modern/tech diplomas use: modern-left/minimal header, modern/wave border, modern-circle seal, clean-white/gradient-cool bg.
 - For elegant/artistic diplomas use: elegant-script header, art-deco/double-line border, rosette/laurel-wreath seal, linen/marble/watercolor-soft bg.
@@ -81,7 +93,7 @@ RULES:
 - For ocean/nautical diplomas use: elegant-script header, wave border, compass seal, ocean-deep bg.
 - For space/cosmic diplomas use: bold-caps/monumental header, geometric-deco border, star seal, cosmic-dark bg. Use light text colors in customCss.
 - For vintage/classic diplomas use: serif-centered header, celtic-knot/ornamental border, classical-round seal, vintage-sepia bg.
-- For royal/formal diplomas use: monumental/bold-caps header, classical/double-line border, shield seal, royal-burgundy bg.
+- For royal/formal diplomas use: monumental/bold-caps header, classical/double-line border, shield seal, royal-burgundy bg. Use deep dark primaryColor like #3b0d0d or #1a1a2e.
 
 Return ONLY the JSON object. No extra text.`;
 
