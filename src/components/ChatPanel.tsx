@@ -1,16 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, Link, Wand2, Send, Globe } from 'lucide-react';
+import { Upload, Link, Wand2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { useDiploma } from '@/contexts/DiplomaContext';
-import { generateDiploma, generateDiplomaFromImage, generateDiplomaFromUrl } from '@/services/anthropicService';
+import { useGeneration } from '@/hooks/useGeneration';
 import { MessageList } from '@/components/MessageList';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useDropzone } from 'react-dropzone';
-import type { Message } from '@/contexts/DiplomaContext';
-import type { ChatMessage } from '@/services/anthropicService';
 
 const stunningDiplomaPrompts = [
   "Create an elegant royal diploma with gold embossed borders, deep burgundy background, ornate baroque decorations, and calligraphy-style fonts for a Master of Fine Arts degree",
@@ -36,25 +34,16 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
   const [urlOpen, setUrlOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
 
-  const {
-    messages,
-    setMessages,
-    isGenerating,
-    setIsGenerating,
-    diplomaHtml,
-    diplomaCss,
-    setDiplomaHtml,
-    setDiplomaCss,
-    diplomaFormat
-  } = useDiploma();
+  const { diplomaHtml } = useDiploma();
+  const { isGenerating, generateFromText, generateFromImage, generateFromUrl } = useGeneration(isGuest, guestAccess);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file && file.type.startsWith('image/')) {
       setUploadOpen(false);
-      handleGenerateFromImage(file);
+      generateFromImage(file);
     }
-  }, [isGenerating]);
+  }, [generateFromImage]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -62,136 +51,16 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
     multiple: false,
   });
 
-  const handleGenerateFromImage = async (file: File) => {
-    if (isGenerating) return;
-    setIsGenerating(true);
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: `Generate a diploma inspired by uploaded image: ${file.name}`,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMsg]);
-
-    try {
-      const response = await generateDiplomaFromImage(file);
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error analyzing the image. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const handleUrlSubmit = async () => {
-    if (!urlValue.trim() || isGenerating) return;
-    try { new URL(urlValue); } catch { return; }
-
     setUrlOpen(false);
-    setIsGenerating(true);
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: `Generate a diploma inspired by this website: ${urlValue}`,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMsg]);
-
-    try {
-      const response = await generateDiplomaFromUrl(urlValue);
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error analyzing the website. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-      setUrlValue('');
-    }
+    await generateFromUrl(urlValue);
+    setUrlValue('');
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim() || isGenerating) return;
-    if (isGuest && guestAccess && !guestAccess.canGenerate) {
-      setMessages((prev: Message[]) => [...prev, {
-        id: Date.now().toString(),
-        content: 'You have used all your free generations. Create an account for unlimited access!',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      return;
-    }
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: message,
-      isUser: true,
-      timestamp: new Date(),
-    };
-    setMessages((prev: Message[]) => [...prev, userMessage]);
+    const text = message;
     setMessage('');
-    setIsGenerating(true);
-
-    try {
-      const chatMessages: ChatMessage[] = messages.map(msg => ({
-        role: msg.isUser ? 'user' as const : 'assistant' as const,
-        content: msg.content,
-      }));
-      chatMessages.push({ role: 'user' as const, content: userMessage.content });
-
-      const response = await generateDiploma({
-        messages: chatMessages,
-        requestType: 'text',
-        currentHtml: diplomaHtml || undefined,
-        currentCss: diplomaCss || undefined,
-        diplomaFormat,
-      });
-
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-      if (response.html) setDiplomaHtml(response.html);
-      if (response.css) setDiplomaCss(response.css);
-      if (isGuest && guestAccess) guestAccess.incrementUsage();
-    } catch {
-      setMessages((prev: Message[]) => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsGenerating(false);
-    }
+    await generateFromText(text);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -202,16 +71,13 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
   };
 
   const generateRandomPrompt = () => {
-    const randomPrompt = stunningDiplomaPrompts[Math.floor(Math.random() * stunningDiplomaPrompts.length)];
-    setMessage(randomPrompt);
+    setMessage(stunningDiplomaPrompts[Math.floor(Math.random() * stunningDiplomaPrompts.length)]);
   };
 
   return (
     <div className="h-full flex flex-col">
-      {/* Messages */}
       <MessageList />
 
-      {/* Input area with inline actions */}
       <div className="p-3 border-t border-border bg-background/80 backdrop-blur-sm">
         <div className="relative bg-card border border-border rounded-xl transition-colors focus-within:border-primary/30">
           <Textarea
@@ -227,7 +93,6 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
             <div className="flex items-center gap-0.5">
               {!diplomaHtml && (
                 <>
-                  {/* Upload */}
                   <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
                     <DialogTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
@@ -251,7 +116,6 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
                     </DialogContent>
                   </Dialog>
 
-                  {/* URL */}
                   <Popover open={urlOpen} onOpenChange={setUrlOpen}>
                     <PopoverTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
@@ -275,7 +139,6 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
                     </PopoverContent>
                   </Popover>
 
-                  {/* Magic */}
                   <Button
                     variant="ghost"
                     size="sm"
