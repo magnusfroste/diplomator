@@ -1,43 +1,40 @@
 
 
-# Improving the Signed Diplomas Page
+# Inline Text Editing in Diploma Preview
 
-The current `/signed` page is functional but visually flat -- a plain card wrapping a list of diploma entries with raw URLs and code blocks. Here is a plan to make it more polished and appealing.
+Add a lightweight "Edit Mode" toggle to the preview panel that lets users click on any text element in the diploma and edit it directly -- no code, no credits, no complexity.
 
 ---
 
-## 1. Summary Stats Bar
+## How It Works
 
-Add a row of small stat cards above the diploma list showing at-a-glance numbers:
-- **Total Diplomas** issued
-- **Institutions** (unique count)
-- **Latest Signed** (relative date, e.g. "2 days ago")
+1. User generates a diploma via AI chat
+2. User clicks "Edit Mode" toggle button in the preview toolbar
+3. Text elements in the preview become clickable -- a subtle highlight appears on hover
+4. Clicking a text element opens an inline edit (contenteditable or a small input overlay)
+5. User types the correction, clicks away or presses Enter
+6. The underlying HTML in DiplomaContext is updated automatically
+7. User toggles Edit Mode off and proceeds to Sign/Share
 
-This gives the page immediate visual weight even before scrolling to the list.
+---
 
-## 2. Better Empty State
+## What Gets Built
 
-Replace the plain text empty state with a more inviting illustration-style layout:
-- A large Award icon with a subtle background circle
-- A clear heading and a CTA button ("Create Your First Diploma") that navigates to `/app`
+### Preview Panel Toolbar Addition
+- A new "Edit" toggle button (Pencil icon) next to the existing Fullscreen/Download buttons
+- When active, the button shows as highlighted/pressed
+- A small banner: "Click any text to edit it" appears below the toolbar
 
-## 3. Improved Diploma Cards
+### Iframe Communication
+- When Edit Mode is on, inject a small script into the iframe via `srcDoc` that:
+  - Adds `contenteditable="true"` to all text-containing elements (p, h1-h6, span, td, li, etc.)
+  - Adds hover highlight styling (subtle outline or background)
+  - Sends a `postMessage` back to the parent with the updated HTML when the user finishes editing (on `blur`)
+- The parent listens for these messages and calls `setDiplomaHtml()` with the updated content
 
-Redesign each diploma card to feel more like a credential:
-- Add a subtle left border accent (e.g. green or primary color) to each card
-- Show a small "shield check" verified icon inline instead of a badge in the corner
-- Collapse the three URL fields (Diploma ID, Diploma URL, Verification URL) into a collapsible "Details" section using an Accordion or Collapsible, keeping the card compact by default
-- Show only recipient name, institution, date, and quick-action buttons (View, Verify, Copy Link) in the default collapsed view
-
-## 4. Better Loading State
-
-Replace "Loading signed diplomas..." text with skeleton cards (2-3 placeholder cards with shimmer animation using the existing Skeleton component).
-
-## 5. Sort and View Options
-
-Add a small toolbar next to the search bar:
-- Sort toggle: newest first / oldest first
-- Optional: grid vs list view toggle for future flexibility
+### No New Dependencies
+- Uses standard browser APIs: `contenteditable`, `postMessage`, `MutationObserver`
+- No drag-and-drop library, no WYSIWYG framework
 
 ---
 
@@ -45,21 +42,20 @@ Add a small toolbar next to the search bar:
 
 ### Files Modified
 
-**`src/components/DiplomaManager.tsx`** -- main changes:
-- Import `Skeleton`, `Collapsible`/`CollapsibleTrigger`/`CollapsibleContent`, `ShieldCheck`, `ChevronDown` from existing UI/lucide
-- Add a `stats` computed section (total count, unique institutions, latest date) rendered as small stat cards
-- Replace loading state with 3 `Skeleton` cards
-- Replace empty state with illustrated CTA
-- Refactor each diploma card:
-  - Add `border-l-4 border-primary` accent
-  - Default view: recipient, institution, date, action buttons (View Diploma, Verify, Copy Link)
-  - Collapsible detail section with blockchain ID and raw URLs
-- Add sort state (`ascending` toggle) passed to the query or applied client-side
-- Add sort button next to search input
+**`src/components/PreviewPanel.tsx`**
+- Add `isEditMode` state (boolean toggle)
+- Add Pencil icon button in header toolbar
+- Modify `getPreviewContent()` to inject edit-mode script when `isEditMode` is true
+- Add `useEffect` with `window.addEventListener('message', ...)` to listen for HTML updates from the iframe
+- When an update message arrives, call `setDiplomaHtml(newHtml)` to persist the change
 
-**`src/pages/Signed.tsx`** -- minor:
-- Remove "Back to App" button (sidebar already provides navigation)
-- Keep header clean
+**Injected iframe script (inline in srcDoc)**
+- On load (when edit mode): query all text elements, set `contenteditable="true"`, add hover CSS
+- On `blur` of any editable element: gather the full `.diploma-wrapper` innerHTML and `postMessage` it to parent
+- On exit edit mode: remove `contenteditable`, remove hover styles
 
-No database changes or new dependencies required. All components used (Skeleton, Collapsible, Badge) are already installed.
+### Scope Boundaries
+- Only text content is editable -- no moving, resizing, or style changes
+- Structural changes (adding/removing elements) still go through the AI chat or code editor
+- This keeps the feature simple and unlikely to break diploma layouts
 
