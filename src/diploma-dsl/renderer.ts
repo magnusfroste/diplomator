@@ -34,9 +34,15 @@ export function renderDiplomaDSL(dsl: DiplomaDSL): { html: string; css: string }
     }
   `);
 
-  // Border
+  // Border — always clip content inside the frame
   const borderFn = borderStyles[dsl.border.style] || borderStyles['classical'];
   cssParts.push(borderFn(dsl.border.color || primaryColor));
+  cssParts.push(`
+    .diploma-border {
+      overflow: hidden;
+      position: relative;
+    }
+  `);
 
   // Header
   const headerFn = headerStyles[dsl.header.style] || headerStyles['serif-centered'];
