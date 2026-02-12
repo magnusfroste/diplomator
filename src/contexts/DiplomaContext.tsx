@@ -43,6 +43,8 @@ interface Message {
 
 const DiplomaContext = createContext<DiplomaContextType | undefined>(undefined);
 
+const EMPTY_FIELDS: DiplomaFields = { recipientName: '', degree: '', field: '', institution: '', date: '' };
+
 export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [diplomaHtml, setDiplomaHtml] = useState('');
   const [diplomaCss, setDiplomaCss] = useState('');
@@ -51,41 +53,95 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
   const [signingInstitutionName, setSigningInstitutionName] = useState('');
   const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>({
-    recipientName: '',
-    degree: '',
-    field: '',
-    institution: '',
-    date: ''
-  });
+  const [diplomaFields, setDiplomaFields] = useState<DiplomaFields>(EMPTY_FIELDS);
   const [messages, setMessages] = useState<Message[]>([]);
+
+  // ── Refs: always-fresh values for async operations ──
+  const htmlRef = useRef(diplomaHtml);
+  const cssRef = useRef(diplomaCss);
+  const formatRef = useRef(diplomaFormat);
+  const messagesRef = useRef(messages);
+  const sessionIdRef = useRef(currentSessionId);
+  const isResettingRef = useRef(false);
   const wasGenerating = useRef(false);
 
-  // Auto-save after generation completes
+  // Keep refs in sync with state
+  useEffect(() => { htmlRef.current = diplomaHtml; }, [diplomaHtml]);
+  useEffect(() => { cssRef.current = diplomaCss; }, [diplomaCss]);
+  useEffect(() => { formatRef.current = diplomaFormat; }, [diplomaFormat]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => { sessionIdRef.current = currentSessionId; }, [currentSessionId]);
+
+  // ── Save session (reads from refs, no stale closures) ──
+  const saveSession = useCallback(async (title?: string) => {
+    if (isResettingRef.current) return; // Guard: don't save during reset
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const html = htmlRef.current;
+    const css = cssRef.current;
+    const format = formatRef.current;
+    const msgs = JSON.parse(JSON.stringify(messagesRef.current));
+    const sessionId = sessionIdRef.current;
+
+    if (sessionId) {
+      await supabase
+        .from('diploma_sessions')
+        .update({
+          diploma_html: html,
+          diploma_css: css,
+          diploma_format: format,
+          messages: msgs,
+          title: title || 'Untitled Diploma',
+        })
+        .eq('id', sessionId);
+    } else {
+      const { data } = await supabase
+        .from('diploma_sessions')
+        .insert({
+          diploma_html: html,
+          diploma_css: css,
+          diploma_format: format,
+          messages: msgs,
+          title: title || 'Untitled Diploma',
+          user_id: user.id,
+        })
+        .select('id')
+        .single();
+      if (data) setCurrentSessionId(data.id);
+    }
+  }, []); // No deps needed — reads from refs
+
+  // ── Auto-save after generation completes ──
   useEffect(() => {
     if (isGenerating) {
       wasGenerating.current = true;
       return;
     }
-    if (wasGenerating.current && diplomaHtml) {
+    if (wasGenerating.current && htmlRef.current) {
       wasGenerating.current = false;
-      // Generate title from first user message or diploma content
-      const userMessages = messages.filter(m => m.isUser);
+      const userMessages = messagesRef.current.filter(m => m.isUser);
       const lastUserMsg = userMessages[userMessages.length - 1]?.content || '';
       const autoTitle = lastUserMsg.slice(0, 50) || 'Untitled Diploma';
       saveSession(autoTitle);
     }
-  }, [isGenerating]);
+  }, [isGenerating, saveSession]);
 
+  // ── Reset session (guarded) ──
   const resetSession = useCallback(() => {
+    isResettingRef.current = true;
     setCurrentSessionId(null);
     setDiplomaHtml('');
     setDiplomaCss('');
     setDiplomaFormat('portrait');
-    setDiplomaFields({ recipientName: '', degree: '', field: '', institution: '', date: '' });
+    setDiplomaFields(EMPTY_FIELDS);
     setMessages([]);
+    // Allow saves again after React flushes the reset
+    requestAnimationFrame(() => { isResettingRef.current = false; });
   }, []);
 
+  // ── Load session ──
   const loadSession = useCallback(async (id: string) => {
     const { data, error } = await supabase
       .from('diploma_sessions')
@@ -99,7 +155,6 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
     setDiplomaCss(data.diploma_css);
     setDiplomaFormat((data.diploma_format as 'portrait' | 'landscape') || 'portrait');
 
-    // Restore messages from JSON
     const savedMessages = data.messages as unknown;
     if (Array.isArray(savedMessages) && savedMessages.length > 0) {
       setMessages(savedMessages.map((m: any) => ({
@@ -110,40 +165,6 @@ export const DiplomaProvider = ({ children }: { children: ReactNode }) => {
       setMessages([]);
     }
   }, []);
-
-  const saveSession = useCallback(async (title?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const messagesJson = JSON.parse(JSON.stringify(messages));
-
-    if (currentSessionId) {
-      await supabase
-        .from('diploma_sessions')
-        .update({
-          diploma_html: diplomaHtml,
-          diploma_css: diplomaCss,
-          diploma_format: diplomaFormat,
-          messages: messagesJson,
-          title: title || 'Untitled Diploma',
-        })
-        .eq('id', currentSessionId);
-    } else {
-      const { data } = await supabase
-        .from('diploma_sessions')
-        .insert({
-          diploma_html: diplomaHtml,
-          diploma_css: diplomaCss,
-          diploma_format: diplomaFormat,
-          messages: messagesJson,
-          title: title || 'Untitled Diploma',
-          user_id: user.id,
-        })
-        .select('id')
-        .single();
-      if (data) setCurrentSessionId(data.id);
-    }
-  }, [currentSessionId, diplomaHtml, diplomaCss, diplomaFormat, messages]);
 
   return (
     <DiplomaContext.Provider value={{
