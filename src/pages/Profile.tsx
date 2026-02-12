@@ -4,174 +4,148 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Award, User, Mail, Calendar } from 'lucide-react';
+import { User, Mail, Calendar, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
+import { DiplomaProvider } from '@/contexts/DiplomaContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-const Profile = () => {
-  const navigate = useNavigate();
+const ProfileContent = ({ user }: { user: SupabaseUser }) => {
   const { toast } = useToast();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState({ name: '' });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getProfile();
-  }, []);
-
-  const getProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-      
-      setUser(user);
-      
-      const { data: profileData } = await supabase
+    const loadProfile = async () => {
+      const { data } = await supabase
         .from('profiles')
         .select('name')
         .eq('id', user.id)
         .single();
-      
-      if (profileData) {
-        setProfile({ name: profileData.name || '' });
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  };
+      if (data) setProfile({ name: data.name || '' });
+    };
+    loadProfile();
+  }, [user.id]);
 
   const updateProfile = async () => {
-    if (!user) return;
-    
     setLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .upsert({ id: user.id, name: profile.name });
-      
       if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive",
-      });
+      toast({ title: "Success", description: "Profile updated successfully" });
+    } catch {
+      toast({ title: "Error", description: "Failed to update profile", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header with Brand */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-              <Award className="w-6 h-6 text-white" />
+    <div className="flex min-h-screen w-full">
+      <AppSidebar
+        userEmail={user.email || ''}
+        userName={user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
+      />
+      <main className="flex-1 bg-background p-4 md:p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-primary/15 border border-primary/20 p-2 rounded-lg">
+              <User className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Diplomator</h1>
-              <p className="text-sm text-gray-600">Profile</p>
+              <h1 className="text-2xl font-semibold text-foreground">Profile</h1>
+              <p className="text-sm text-muted-foreground">Manage your account settings</p>
             </div>
           </div>
-          
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/app')}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to App
-          </Button>
-        </div>
 
-        {/* Profile Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Profile Information
-            </CardTitle>
-            <CardDescription>
-              Manage your account settings and personal information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Email (Read-only) */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </Label>
-              <Input
-                id="email"
-                value={user?.email || ''}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-
-            {/* Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            {/* Account Created */}
-            {user?.created_at && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Profile Information
+              </CardTitle>
+              <CardDescription>
+                Your personal information and account details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Member Since
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email
                 </Label>
-                <p className="text-sm text-gray-600">
-                  {new Date(user.created_at).toLocaleDateString()}
-                </p>
+                <Input
+                  id="email"
+                  value={user.email || ''}
+                  disabled
+                  className="bg-muted"
+                />
               </div>
-            )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-              <Button 
-                onClick={updateProfile} 
-                disabled={loading}
-                className="flex-1"
-              >
-                {loading ? 'Updating...' : 'Save Changes'}
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={signOut}
-                className="flex-1"
-              >
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  value={profile.name}
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              {user.created_at && (
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Member Since
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(user.created_at).toLocaleDateString('en-US')}
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-4">
+                <Button onClick={updateProfile} disabled={loading}>
+                  {loading ? 'Updating...' : 'Save Changes'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
+  );
+};
+
+const Profile = () => {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (!session) navigate('/auth');
+    });
+  }, [navigate]);
+
+  if (loading || !user) return null;
+
+  return (
+    <ThemeProvider>
+      <DiplomaProvider>
+        <SidebarProvider>
+          <ProfileContent user={user} />
+        </SidebarProvider>
+      </DiplomaProvider>
+    </ThemeProvider>
   );
 };
 
