@@ -225,64 +225,68 @@ export const ChatPanel = ({ isGuest, guestAccess }: ChatPanelProps) => {
           />
           <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between">
             <div className="flex items-center gap-0.5">
-              {/* Upload */}
-              <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
-                    <Upload className="w-3.5 h-3.5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Upload Image</DialogTitle>
-                  </DialogHeader>
-                  <div
-                    {...getRootProps()}
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                      isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
-                    }`}
+              {!diplomaHtml && (
+                <>
+                  {/* Upload */}
+                  <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
+                        <Upload className="w-3.5 h-3.5" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Upload Image</DialogTitle>
+                      </DialogHeader>
+                      <div
+                        {...getRootProps()}
+                        className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+                          isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
+                        }`}
+                      >
+                        <input {...getInputProps()} />
+                        <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                        <p className="text-sm text-muted-foreground">Drop an image here, or click to select</p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* URL */}
+                  <Popover open={urlOpen} onOpenChange={setUrlOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
+                        <Link className="w-3.5 h-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-72" align="start">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Website URL</p>
+                        <div className="flex gap-2">
+                          <Input
+                            value={urlValue}
+                            onChange={(e) => setUrlValue(e.target.value)}
+                            placeholder="https://example.com"
+                            className="text-sm"
+                            onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
+                          />
+                          <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>Go</Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
+                  {/* Magic */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                    onClick={generateRandomPrompt}
+                    disabled={isGenerating}
                   >
-                    <input {...getInputProps()} />
-                    <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">Drop an image here, or click to select</p>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* URL */}
-              <Popover open={urlOpen} onOpenChange={setUrlOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" disabled={isGenerating}>
-                    <Link className="w-3.5 h-3.5" />
+                    <Wand2 className="w-3.5 h-3.5" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-72" align="start">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Website URL</p>
-                    <div className="flex gap-2">
-                      <Input
-                        value={urlValue}
-                        onChange={(e) => setUrlValue(e.target.value)}
-                        placeholder="https://example.com"
-                        className="text-sm"
-                        onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
-                      />
-                      <Button size="sm" onClick={handleUrlSubmit} disabled={!urlValue.trim()}>Go</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Magic */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                onClick={generateRandomPrompt}
-                disabled={isGenerating}
-              >
-                <Wand2 className="w-3.5 h-3.5" />
-              </Button>
+                </>
+              )}
             </div>
 
             <Button
