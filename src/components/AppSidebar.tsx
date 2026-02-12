@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { Plus, Settings, LogOut, FileText, User, Award, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Plus, Settings, LogOut, FileText, User, Award, PanelLeftClose, PanelLeft, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDiploma } from '@/contexts/DiplomaContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -81,6 +82,7 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
   const { currentSessionId, loadSession, resetSession } = useDiploma();
   const [sessions, setSessions] = useState<DiplomaSession[]>([]);
   const [profileName, setProfileName] = useState(userName || '');
+  const { isAdmin } = useAdminRole();
 
   // Refresh sessions when currentSessionId changes (new session created or switched)
   useEffect(() => {
@@ -197,6 +199,14 @@ export function AppSidebar({ userEmail, userName }: AppSidebarProps) {
       {userEmail && (
         <SidebarFooter>
           <SidebarMenu>
+            {isAdmin && (
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => navigate('/admin')} tooltip="Admin Dashboard">
+                  <ShieldCheck className="h-4 w-4" />
+                  {!collapsed && <span>Admin</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => navigate('/signed')} tooltip="Signed Diplomas">
                 <Award className="h-4 w-4" />
