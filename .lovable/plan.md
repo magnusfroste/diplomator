@@ -1,61 +1,62 @@
 
 
-# Inline Text Editing in Diploma Preview
+# Design System Review: Colors, Containment & Space Optimization
 
-Add a lightweight "Edit Mode" toggle to the preview panel that lets users click on any text element in the diploma and edit it directly -- no code, no credits, no complexity.
-
----
-
-## How It Works
-
-1. User generates a diploma via AI chat
-2. User clicks "Edit Mode" toggle button in the preview toolbar
-3. Text elements in the preview become clickable -- a subtle highlight appears on hover
-4. Clicking a text element opens an inline edit (contenteditable or a small input overlay)
-5. User types the correction, clicks away or presses Enter
-6. The underlying HTML in DiplomaContext is updated automatically
-7. User toggles Edit Mode off and proceeds to Sign/Share
+After reviewing the renderer, CSS blocks, and AI prompt, I found three categories of issues to fix.
 
 ---
 
-## What Gets Built
+## 1. Dark Background Text Contrast (Critical)
 
-### Preview Panel Toolbar Addition
-- A new "Edit" toggle button (Pencil icon) next to the existing Fullscreen/Download buttons
-- When active, the button shows as highlighted/pressed
-- A small banner: "Click any text to edit it" appears below the toolbar
+**Problem**: The renderer hardcodes body text colors (`#333`, `#555`, `#666`, `#888`, `#999`, `#aaa`) that are invisible on dark backgrounds like `cosmic-dark` or `ocean-deep`. The AI prompt tells the model to use light `primaryColor`, but the renderer ignores this for secondary text elements (pretext, description, date, fields, footer, subtitle).
 
-### Iframe Communication
-- When Edit Mode is on, inject a small script into the iframe via `srcDoc` that:
-  - Adds `contenteditable="true"` to all text-containing elements (p, h1-h6, span, td, li, etc.)
-  - Adds hover highlight styling (subtle outline or background)
-  - Sends a `postMessage` back to the parent with the updated HTML when the user finishes editing (on `blur`)
-- The parent listens for these messages and calls `setDiplomaHtml()` with the updated content
+**Fix**: In `renderer.ts`, derive secondary text colors from `primaryColor` instead of hardcoding. If primaryColor is light (luminance check), use light grays for secondary text. If dark, use the current dark grays.
 
-### No New Dependencies
-- Uses standard browser APIs: `contenteditable`, `postMessage`, `MutationObserver`
-- No drag-and-drop library, no WYSIWYG framework
+---
+
+## 2. Border Overflow Clipping (Medium)
+
+**Problem**: The `overflow: hidden` rule on `.diploma-border` clips decorative pseudo-elements that intentionally extend outside the border (ornamental `::after` at `top: -8px`, celtic-knot at `top: -10px`, botanical-vine at `-10px`, geometric-deco at `-16px`). These decorations are part of the design but get cut off.
+
+**Fix**: Change `.diploma-border` from `overflow: hidden` to `overflow: visible`, and instead apply `overflow: hidden` only on `.diploma-container` (the outer wrapper) to prevent page-level overflow while allowing decorations to render within the container padding area.
+
+---
+
+## 3. Space Utilization (Medium)
+
+**Problem**: The diploma body description is capped at `max-width: 500px` inside an `800px` container, leaving a lot of unused horizontal space. Combined with generous margins, the diploma can feel small and empty.
+
+**Fix**:
+- Increase `.diploma-body .diploma-description` max-width from `500px` to `600px`
+- Reduce some vertical margins slightly for a tighter, more professional feel
+- Ensure `.diploma-container` takes the full available width with `width: 100%` alongside `max-width`
 
 ---
 
 ## Technical Details
 
-### Files Modified
+### File: `src/diploma-dsl/renderer.ts`
 
-**`src/components/PreviewPanel.tsx`**
-- Add `isEditMode` state (boolean toggle)
-- Add Pencil icon button in header toolbar
-- Modify `getPreviewContent()` to inject edit-mode script when `isEditMode` is true
-- Add `useEffect` with `window.addEventListener('message', ...)` to listen for HTML updates from the iframe
-- When an update message arrives, call `setDiplomaHtml(newHtml)` to persist the change
+**A) Add color luminance helper** (top of file):
+- A small function `isLightColor(hex)` that returns true if the color is light (luminance > 0.5)
+- Used to derive appropriate secondary text colors
 
-**Injected iframe script (inline in srcDoc)**
-- On load (when edit mode): query all text elements, set `contenteditable="true"`, add hover CSS
-- On `blur` of any editable element: gather the full `.diploma-wrapper` innerHTML and `postMessage` it to parent
-- On exit edit mode: remove `contenteditable`, remove hover styles
+**B) Derive adaptive text palette**:
+- If `primaryColor` is light: secondary text = `#ccc`, `#aaa`, `#999` (light grays for dark backgrounds)
+- If `primaryColor` is dark: secondary text = `#555`, `#666`, `#888` (dark grays, current behavior)
+- Apply these to: `.diploma-pretext`, `.diploma-description`, `.diploma-date`, `.diploma-fields`, `.diploma-footer`, header `.subtitle`, signature `.sig-title`
 
-### Scope Boundaries
-- Only text content is editable -- no moving, resizing, or style changes
-- Structural changes (adding/removing elements) still go through the AI chat or code editor
-- This keeps the feature simple and unlikely to break diploma layouts
+**C) Fix overflow**:
+- `.diploma-container`: add `overflow: hidden`
+- `.diploma-border`: change to `overflow: visible` (let border decorations render within container padding)
+
+**D) Improve space usage**:
+- `.diploma-description` max-width: `500px` -> `600px`
+- `.diploma-container` add `width: 100%`
+- Reduce `.diploma-body` margin from `1.5em 0` to `1.2em 0`
+
+### File: `supabase/functions/generate-diploma/index.ts`
+
+**E) Add prompt rule about customCss for dark backgrounds**:
+- Instruct AI to add `color` overrides for `.diploma-description`, `.diploma-pretext`, `.diploma-date`, `.diploma-footer` via `customCss` when using dark backgrounds, as a safety net alongside the renderer fix.
 
