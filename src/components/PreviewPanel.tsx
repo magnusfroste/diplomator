@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Code, Eye, Maximize, Save, X, Share, Shield } from 'lucide-react';
+import { Download, Code, Eye, Maximize, Save, X, Share, Shield, Pencil } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
 import { AnimationTemplates } from '@/components/AnimationTemplates';
 import { Button } from '@/components/ui/button';
 import { useDiploma } from '@/contexts/DiplomaContext';
@@ -15,6 +16,18 @@ export const PreviewPanel = () => {
   const [editableHtml, setEditableHtml] = useState(diplomaHtml || '');
   const [editableCss, setEditableCss] = useState(diplomaCss || '');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Listen for postMessage from iframe for edit mode updates
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === 'DIPLOMA_HTML_UPDATE' && typeof event.data.html === 'string') {
+        setDiplomaHtml(event.data.html);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [setDiplomaHtml]);
 
   useEffect(() => {
     setEditableHtml(diplomaHtml || '');
@@ -126,12 +139,46 @@ export const PreviewPanel = () => {
           .diploma-wrapper [style*="position:absolute"] {
             max-width: 95% !important;
           }
+          ${isEditMode ? `
+          [contenteditable="true"] {
+            outline: none;
+            cursor: text;
+          }
+          [contenteditable="true"]:hover {
+            outline: 2px dashed rgba(99, 102, 241, 0.5);
+            outline-offset: 2px;
+            border-radius: 2px;
+          }
+          [contenteditable="true"]:focus {
+            outline: 2px solid rgba(99, 102, 241, 0.8);
+            outline-offset: 2px;
+            border-radius: 2px;
+            background: rgba(99, 102, 241, 0.05);
+          }
+          ` : ''}
         </style>
       </head>
       <body>
         <div class="diploma-wrapper">
           ${diplomaHtml}
         </div>
+        ${isEditMode ? `
+        <script>
+          (function() {
+            var tags = ['h1','h2','h3','h4','h5','h6','p','span','td','th','li','a','label','strong','em','b','i','u','small','blockquote'];
+            var wrapper = document.querySelector('.diploma-wrapper');
+            if (!wrapper) return;
+            var els = wrapper.querySelectorAll(tags.join(','));
+            els.forEach(function(el) {
+              el.setAttribute('contenteditable', 'true');
+              el.addEventListener('blur', function() {
+                var html = wrapper.innerHTML;
+                window.parent.postMessage({ type: 'DIPLOMA_HTML_UPDATE', html: html }, '*');
+              });
+            });
+          })();
+        </script>
+        ` : ''}
       </body>
       </html>
     `;
@@ -168,6 +215,16 @@ export const PreviewPanel = () => {
             </div>
             <div className="flex gap-1">
               <AnimationTemplates />
+              <Toggle
+                size="sm"
+                pressed={isEditMode}
+                onPressedChange={setIsEditMode}
+                className="h-7 w-7 p-0 text-muted-foreground data-[state=on]:text-primary data-[state=on]:bg-primary/10"
+                aria-label="Toggle edit mode"
+                disabled={!diplomaHtml}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </Toggle>
               <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={handleFullscreen}>
                 <Maximize className="w-3.5 h-3.5" />
               </Button>
@@ -204,6 +261,11 @@ export const PreviewPanel = () => {
         {/* Content */}
         <div className="flex-1 bg-background flex flex-col">
           <TabsContent value="preview" className="flex-1 p-3 m-0">
+            {isEditMode && (
+              <div className="mb-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-lg text-xs text-foreground">
+                ✏️ Click any text to edit it. Changes save automatically.
+              </div>
+            )}
             <div className="h-full rounded-xl border border-border overflow-hidden shadow-lg shadow-black/20">
               <iframe
                 ref={iframeRef}
