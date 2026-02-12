@@ -27,7 +27,7 @@ export const EmbedGenerator = ({ diplomaId }: EmbedGeneratorProps) => {
     const width = typeof size.width === 'number' ? `${size.width}px` : size.width;
     const height = `${size.height}px`;
 
-    return `<!-- Diplomator Embed -->
+    return `<!-- certera.ink Embed -->
 <iframe 
   src="${embedUrl}" 
   width="${width}" 
@@ -37,7 +37,7 @@ export const EmbedGenerator = ({ diplomaId }: EmbedGeneratorProps) => {
   style="border: 1px solid #e2e8f0; border-radius: 8px; max-width: 100%;"
   title="Verified Diploma">
 </iframe>
-<!-- End Diplomator Embed -->`;
+<!-- End certera.ink Embed -->`;
   };
 
   const copyEmbedCode = async () => {

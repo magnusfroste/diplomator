@@ -219,7 +219,7 @@ const AdminIntegrations = () => {
           <CardTitle className="text-base">🔧 Self-hosting / VPS Setup</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>Diplomator is open source. Configure API keys as Supabase secrets:</p>
+          <p>certera.ink is open source. Configure API keys as Supabase secrets:</p>
           <pre className="bg-muted p-3 rounded-md text-xs overflow-x-auto">
 {`# Supabase CLI
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx

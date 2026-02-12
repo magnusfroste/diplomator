@@ -97,7 +97,7 @@ const Verify = () => {
             Verify diploma authenticity on Hedera blockchain
           </p>
           <Button variant="outline" onClick={() => navigate('/')} className="mt-4">
-            <Home className="w-4 h-4 mr-2" />Back to Diplomator
+            <Home className="w-4 h-4 mr-2" />Back to certera.ink
           </Button>
         </div>
 

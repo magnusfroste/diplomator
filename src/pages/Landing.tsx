@@ -41,7 +41,7 @@ const Landing = () => {
             <div className="bg-primary/15 border border-primary/20 p-1.5 rounded-lg">
               <Award className="w-5 h-5 text-primary" />
             </div>
-            <span className="text-lg font-semibold tracking-tight text-foreground">Diplomator</span>
+            <span className="text-lg font-semibold tracking-tight text-foreground">certera.ink</span>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate('/demo')}>
@@ -111,7 +111,7 @@ const Landing = () => {
       <section className="border-y border-border bg-card/30">
         <div className="max-w-4xl mx-auto px-6 py-20">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground text-center mb-12">
-            Why organizations choose Diplomator
+            Why organizations choose certera.ink
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
@@ -146,7 +146,7 @@ const Landing = () => {
               <tr className="border-b border-border bg-primary/5">
                 <td className="p-4 font-medium text-foreground flex items-center gap-2">
                   <Award className="w-4 h-4 text-primary" />
-                  Diplomator
+                  certera.ink
                 </td>
                 <td className="p-4">
                   <span className="inline-flex items-center gap-1 text-primary text-xs font-medium">
@@ -185,7 +185,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="border-t border-border py-6 text-center">
         <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Diplomator. Blockchain-verified credentials for the modern world.
+          &copy; {new Date().getFullYear()} certera.ink. Blockchain-verified credentials for the modern world.
         </p>
       </footer>
     </div>

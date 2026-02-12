@@ -51,7 +51,7 @@ export const BlockchainMenu = () => {
           <DropdownMenuSeparator />
           
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-            Powered by Diplomator
+            Powered by certera.ink
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -64,7 +64,7 @@ export const BlockchainMenu = () => {
               Blockchain Diploma Verification
             </DialogTitle>
             <DialogDescription>
-              Understanding how Diplomator ensures your diplomas are tamper-proof and verifiable
+              Understanding how certera.ink ensures your diplomas are tamper-proof and verifiable
             </DialogDescription>
           </DialogHeader>
 
@@ -77,7 +77,7 @@ export const BlockchainMenu = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Blockchain verification makes your diplomas impossible to fake or tamper with. When you sign a diploma 
-                  to the blockchain, Diplomator creates a unique cryptographic fingerprint and stores it permanently 
+                  to the blockchain, certera.ink creates a unique cryptographic fingerprint and stores it permanently 
                   on a decentralized network.
                 </p>
               </CardContent>
@@ -104,9 +104,9 @@ export const BlockchainMenu = () => {
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
                     <Shield className="w-5 h-5 text-green-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-sm">2. Diplomator Signature</h4>
+                      <h4 className="font-medium text-sm">2. certera.ink Signature</h4>
                       <p className="text-xs text-muted-foreground">
-                        Diplomator signs the hash with its private key, creating an unforgeable digital signature 
+                        certera.ink signs the hash with its private key, creating an unforgeable digital signature
                         that proves authenticity.
                       </p>
                     </div>
@@ -129,7 +129,7 @@ export const BlockchainMenu = () => {
                       <h4 className="font-medium text-sm">4. Verification</h4>
                       <p className="text-xs text-muted-foreground">
                         Anyone can verify your diploma by checking the content hash against the blockchain record 
-                        and validating Diplomator's signature.
+                        and validating certera.ink's signature.
                       </p>
                     </div>
                   </div>
@@ -199,7 +199,7 @@ export const BlockchainMenu = () => {
               <CardContent className="space-y-3">
                 <div className="text-sm space-y-2">
                   <p><strong>Privacy-First:</strong> Only hashed versions of personal information are stored on the blockchain.</p>
-                  <p><strong>Diplomator Authority:</strong> Only Diplomator can create valid signatures using our secure private key.</p>
+                  <p><strong>certera.ink Authority:</strong> Only certera.ink can create valid signatures using our secure private key.</p>
                   <p><strong>Open Verification:</strong> The verification process is transparent and can be audited by anyone.</p>
                 </div>
               </CardContent>
@@ -214,7 +214,7 @@ export const BlockchainMenu = () => {
                 <div className="text-xs space-y-2 font-mono bg-muted p-3 rounded">
                   <p><strong>Hashing:</strong> SHA-256 cryptographic hash function</p>
                   <p><strong>Storage:</strong> Simulated blockchain (production ready for real chains)</p>
-                  <p><strong>Signature:</strong> Diplomator private key + content hash + recipient</p>
+                  <p><strong>Signature:</strong> certera.ink private key + content hash + recipient</p>
                   <p><strong>Verification:</strong> Content hash matching + signature validation</p>
                 </div>
               </CardContent>
