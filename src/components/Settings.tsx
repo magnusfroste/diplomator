@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Settings as SettingsIcon, Key, Layout } from 'lucide-react';
+import { Layout } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -15,42 +14,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 // Settings content component for embedding in other dialogs
 export const SettingsContent = () => {
   const { toast } = useToast();
-  const [apiKey, setApiKey] = useState('');
   const [diplomaFormat, setDiplomaFormat] = useState<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
-    // Load saved API key from localStorage
-    const savedApiKey = localStorage.getItem('anthropic_api_key');
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
-
-    // Load saved diploma format from localStorage
     const savedFormat = localStorage.getItem('diplomaFormat') as 'portrait' | 'landscape';
     if (savedFormat) {
       setDiplomaFormat(savedFormat);
     }
   }, []);
-
-  const handleApiKeySave = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('anthropic_api_key', apiKey);
-      toast({
-        title: "API Key Saved",
-        description: "Your Anthropic API key has been saved locally.",
-      });
-    } else {
-      localStorage.removeItem('anthropic_api_key');
-      toast({
-        title: "API Key Removed",
-        description: "Your Anthropic API key has been removed.",
-      });
-    }
-  };
 
   const handleFormatChange = (format: 'portrait' | 'landscape') => {
     setDiplomaFormat(format);
@@ -63,37 +39,6 @@ export const SettingsContent = () => {
 
   return (
     <div className="space-y-6">
-      {/* API Key Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="w-5 h-5" />
-            API Configuration
-          </CardTitle>
-          <CardDescription>
-            Configure your Anthropic API key for AI-powered diploma generation
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="api-key">Anthropic API Key</Label>
-            <Input
-              id="api-key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Anthropic API key"
-            />
-            <p className="text-xs text-muted-foreground">
-              Your API key is stored locally and never sent to our servers
-            </p>
-          </div>
-          <Button onClick={handleApiKeySave}>
-            Save API Key
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Diploma Settings */}
       <Card>
         <CardHeader>
@@ -124,7 +69,7 @@ export const SettingsContent = () => {
                 Portrait
               </Toggle>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Current format: <span className="font-medium capitalize">{diplomaFormat}</span>
             </p>
           </div>
@@ -147,7 +92,7 @@ export const Settings = () => {
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Configure your application preferences and API settings
+            Configure your application preferences
           </DialogDescription>
         </DialogHeader>
         <SettingsContent />
