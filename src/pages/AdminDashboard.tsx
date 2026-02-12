@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Home, Loader2, Settings, Layers } from 'lucide-react';
+import { Shield, Users, FileText, Home, Loader2, Settings, Layers, Palette } from 'lucide-react';
 import AdminIntegrations from '@/components/AdminIntegrations';
+import AdminBranding from '@/components/AdminBranding';
 import { toast } from 'sonner';
 
 interface DiplomaRow {
@@ -156,6 +157,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" /> Users & Roles
             </TabsTrigger>
+            <TabsTrigger value="branding" className="gap-2">
+              <Palette className="h-4 w-4" /> Branding & OG
+            </TabsTrigger>
             <TabsTrigger value="integrations" className="gap-2">
               <Settings className="h-4 w-4" /> Integrations
             </TabsTrigger>
@@ -257,6 +261,10 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="branding">
+            <AdminBranding />
           </TabsContent>
 
           <TabsContent value="integrations">
