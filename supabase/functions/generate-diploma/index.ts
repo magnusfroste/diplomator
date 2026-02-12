@@ -69,6 +69,7 @@ ${DSL_SCHEMA}
 RULES:
 - Choose blocks that match the style the user wants (classic, modern, elegant, bold, minimal).
 - The "signature.name" should default to "Mr Diploma" unless user specifies otherwise.
+- IMPORTANT: The "body.recipientName" MUST always be set to exactly "{{recipient_name}}" (the literal placeholder text). This allows bulk signing to personalize each diploma. Never use a real name here.
 - Use appropriate brand colors that match the institution or requested style.
 - "body.preText" is optional text before the recipient name like "This is to certify that".
 - "customCss" is for any extra CSS tweaks the predefined blocks don't cover. Keep it minimal.
@@ -109,6 +110,7 @@ const IMAGE_SYSTEM_PROMPT = `You are an expert diploma designer. Analyze the upl
 RESPOND WITH ONLY A JSON OBJECT matching this schema (no markdown, no explanation outside JSON):
 ${DSL_SCHEMA}
 
+IMPORTANT: The "body.recipientName" MUST always be set to exactly "{{recipient_name}}" (the literal placeholder text). This allows bulk signing to personalize each diploma.
 Choose blocks that reflect the visual style of the uploaded image. Return ONLY the JSON object.`;
 
 const URL_SYSTEM_PROMPT = `You are an expert diploma designer. Design a diploma matching a brand's visual identity by choosing from predefined visual blocks.
@@ -116,6 +118,7 @@ const URL_SYSTEM_PROMPT = `You are an expert diploma designer. Design a diploma 
 RESPOND WITH ONLY A JSON OBJECT matching this schema (no markdown, no explanation outside JSON):
 ${DSL_SCHEMA}
 
+IMPORTANT: The "body.recipientName" MUST always be set to exactly "{{recipient_name}}" (the literal placeholder text). This allows bulk signing to personalize each diploma.
 Use the provided website data to pick appropriate brand colors, fonts, and style. Return ONLY the JSON object.`;
 
 // ── Inline DSL Renderer (edge functions can't import from src/) ──
