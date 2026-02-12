@@ -1,43 +1,65 @@
 
 
-# Simplify the Diploma Viewer
+# Improving the Signed Diplomas Page
 
-The current `/diploma/:diplomaId` page is overloaded with 4 tabs and repeated information. The goal is to create a clean, single-page view that shows what matters most.
+The current `/signed` page is functional but visually flat -- a plain card wrapping a list of diploma entries with raw URLs and code blocks. Here is a plan to make it more polished and appealing.
 
-## Current Problems
-- 4 tabs (Diploma, Verification, Embed, Share) -- too many for a viewer
-- Redundant URLs shown in multiple places
-- Embed/Share tabs are admin features, not relevant for someone viewing a diploma
-- "Diplomator Seal" raw JSON shown to end users
+---
 
-## Simplified Design
+## 1. Summary Stats Bar
 
-The new viewer will be a single clean page with:
+Add a row of small stat cards above the diploma list showing at-a-glance numbers:
+- **Total Diplomas** issued
+- **Institutions** (unique count)
+- **Latest Signed** (relative date, e.g. "2 days ago")
 
-1. **Header bar** -- Diplomator branding + "Blockchain Verified" badge
-2. **Diploma rendering** -- the actual diploma HTML/CSS, front and center
-3. **Compact footer bar** -- recipient, institution, date, and action buttons (Verify, QR, Copy Link)
+This gives the page immediate visual weight even before scrolling to the list.
 
-No tabs. The diploma itself is the hero. Verification details are accessible via the existing `/verify/:id` route (linked from the Verify button).
+## 2. Better Empty State
+
+Replace the plain text empty state with a more inviting illustration-style layout:
+- A large Award icon with a subtle background circle
+- A clear heading and a CTA button ("Create Your First Diploma") that navigates to `/app`
+
+## 3. Improved Diploma Cards
+
+Redesign each diploma card to feel more like a credential:
+- Add a subtle left border accent (e.g. green or primary color) to each card
+- Show a small "shield check" verified icon inline instead of a badge in the corner
+- Collapse the three URL fields (Diploma ID, Diploma URL, Verification URL) into a collapsible "Details" section using an Accordion or Collapsible, keeping the card compact by default
+- Show only recipient name, institution, date, and quick-action buttons (View, Verify, Copy Link) in the default collapsed view
+
+## 4. Better Loading State
+
+Replace "Loading signed diplomas..." text with skeleton cards (2-3 placeholder cards with shimmer animation using the existing Skeleton component).
+
+## 5. Sort and View Options
+
+Add a small toolbar next to the search bar:
+- Sort toggle: newest first / oldest first
+- Optional: grid vs list view toggle for future flexibility
+
+---
 
 ## Technical Details
 
-### File: `src/pages/Diploma.tsx` (rewrite)
+### Files Modified
 
-- Remove `Tabs`, `EmbedGenerator`, `QRCodeGenerator` imports and all tab content
-- Keep: data fetching, loading/error states
-- New layout:
-  - Sticky header with brand + verified badge
-  - Full-width diploma display (the HTML/CSS rendered)
-  - Bottom action bar with: Copy Link, Verify on Blockchain, and a small QR toggle (inline popover)
-- Parse `diplomator_seal` JSON to show Hedera topic/tx info in a small collapsible section below the diploma (optional click to expand)
+**`src/components/DiplomaManager.tsx`** -- main changes:
+- Import `Skeleton`, `Collapsible`/`CollapsibleTrigger`/`CollapsibleContent`, `ShieldCheck`, `ChevronDown` from existing UI/lucide
+- Add a `stats` computed section (total count, unique institutions, latest date) rendered as small stat cards
+- Replace loading state with 3 `Skeleton` cards
+- Replace empty state with illustrated CTA
+- Refactor each diploma card:
+  - Add `border-l-4 border-primary` accent
+  - Default view: recipient, institution, date, action buttons (View Diploma, Verify, Copy Link)
+  - Collapsible detail section with blockchain ID and raw URLs
+- Add sort state (`ascending` toggle) passed to the query or applied client-side
+- Add sort button next to search input
 
-### File: `src/pages/Verify.tsx` (no changes)
+**`src/pages/Signed.tsx`** -- minor:
+- Remove "Back to App" button (sidebar already provides navigation)
+- Keep header clean
 
-Already works well as a standalone verification page.
+No database changes or new dependencies required. All components used (Skeleton, Collapsible, Badge) are already installed.
 
-### File: `src/pages/DiplomaEmbed.tsx` (no changes)
-
-Embed remains separate for iframe use cases.
-
-This keeps the Diploma page focused on displaying the diploma beautifully, with minimal UI chrome. Advanced features (embed code, share URLs) can be accessed from the `/signed` management page instead.
