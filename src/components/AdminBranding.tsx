@@ -26,15 +26,15 @@ interface OgSettings {
 }
 
 const defaultBranding: BrandingSettings = {
-  appName: 'Diplomator',
-  appDescription: 'Diploma Design Generator',
+  appName: 'certera.ink',
+  appDescription: 'Diploma Agent Generator',
   logoUrl: '/lovable-uploads/0fe040f4-6866-4c1f-8dff-ec186506d1b0.png',
   faviconUrl: '/lovable-uploads/0fe040f4-6866-4c1f-8dff-ec186506d1b0.png',
 };
 
 const defaultOg: OgSettings = {
-  ogTitle: 'Diplomator',
-  ogDescription: 'Diploma Design Generator',
+  ogTitle: 'certera.ink',
+  ogDescription: 'Diploma Agent Generator',
   ogImage: '',
   twitterCard: 'summary_large_image',
   twitterSite: '',

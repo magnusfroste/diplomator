@@ -100,7 +100,7 @@ const Diploma = () => {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-primary" />
-            <span className="font-semibold text-foreground">Diplomator</span>
+            <span className="font-semibold text-foreground">certera.ink</span>
           </div>
           <Badge variant="secondary">
             <Shield className="w-3 h-3 mr-1" />

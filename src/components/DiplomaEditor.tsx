@@ -93,8 +93,8 @@ export const DiplomaEditor = () => {
     // Ensure the signature section shows "Mr Diploma" in handwriting style
     console.log('DiplomaEditor: Updating signature with Mr Diploma');
     // Replace various signature name patterns with "Mr Diploma"
-    updatedHtml = updatedHtml.replace(/Diplomator Demo/gi, 'Mr Diploma');
-    updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Diplomator Demo'}/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/Certera Demo/gi, 'Mr Diploma');
+    updatedHtml = updatedHtml.replace(/\${userFullName \|\| 'Certera Demo'}/gi, 'Mr Diploma');
     updatedHtml = updatedHtml.replace(/Authorized Signature/gi, 'Mr Diploma');
     updatedHtml = updatedHtml.replace(/<div class="signature-name">[^<]*<\/div>/gi, `<div class="signature-name">Mr Diploma</div>`);
     updatedHtml = updatedHtml.replace(/class="signature-name">[^<]*</gi, `class="signature-name">Mr Diploma<`);

@@ -95,7 +95,7 @@ const Auth = () => {
               <Award className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">Diplomator</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">certera.ink</h1>
           <p className="text-sm text-muted-foreground">Create and verify digital diplomas</p>
           
           <div className="flex justify-center gap-2 mt-4">
